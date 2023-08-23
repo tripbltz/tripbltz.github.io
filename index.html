@@ -33,33 +33,30 @@ body { background:#F1C40F url(img/Background_Small.png); }
 <body onload="reset();">
 
   <div class="full-head" style="width:100%;background:url(img/IMG_0010.PNG) repeat-x center top;border-bottom:2px solid #2ba6cb;height:200px;">
-	<div class="row">
-		<div class="large-12 columns" style="padding-top:50px;background:url(IMG_0010.PNG) repeat-x center top;z-index:20;">
-		<ul class="button-group even-4">
-      <li><a href="index.html" class="alert button" id="reset">Reset</a></li>
-			<li><button class="button" id="list" onclick="namelist();">Names</button></li>
-			<li><button class="button" id="save" onclick="save();">Update</button></li>
-			<li><button class="success button" id="go" onclick="go();">GO!</button></li>
-    </ul>
-		</div>
-	</div>
+	  <div class="row">
+      <div class="large-12 columns" style="padding-top:50px;background:url(IMG_0010.PNG) repeat-x center top;z-index:20;">
+        <ul class="button-group even-4">
+          <li><a href="index.html" class="alert button" id="reset">Reset</a></li>
+          <li><button class="button" id="list" onclick="namelist();">Names</button></li>
+          <li><button class="button" id="save" onclick="save();">Update</button></li>
+          <li><button class="success button" id="go" onclick="go();">GO!</button></li>
+        </ul>
+      </div>
+	  </div>
 	</div>
 
 	<div class="row">
 		<div class="large-12 columns">
-			<h3 style="text-align:center;margin-top:30px;font-family: 'Indie Flower', cursive;" id="headline">Val team selector</h3>
 			<div id="varnote">
         <img src="img/IMG_0007.PNG" style="height:250px;float: left;">
         <img src="img/IMG_0008.PNG" style="height:250px;float: right;">
       </div>
-			
       <div id="popdown">
-      <div id="names" class="inbox"><textarea name="namesbox" id="namesbox"></textarea></div>
+        <div id="names" class="inbox"><textarea name="namesbox" id="namesbox"></textarea>
+        </div>
       </div>
-      
-      <div id="values"></div>
-
-
+      <div id="values">
+      </div>
 		</div>
 	</div>
 
