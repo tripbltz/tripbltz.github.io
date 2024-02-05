@@ -87,7 +87,63 @@
 							}
 						})(document, "script", "weatherwidget-io-js");
 					</script>
+					<!---
 					<img src="img/peebes1.png" style="width: 100%" />
+					--->
+					<!--IMAGE SLIDESHOW-->
+					<style>
+						/* Container for the images */
+						.slideshow-container {
+							position: relative;
+							max-width: 100%;
+							height: auto;
+							padding-top: 50px;
+						}
+
+						/* Individual images */
+						.mySlides {
+							display: none;
+							width: 100%;
+							height: auto;
+
+							max-height: 1000px;
+						}
+
+						/* Keyframes for fade effect */
+						@keyframes fade {
+							0%,
+							100% {
+								opacity: 0;
+							}
+							50% {
+								opacity: 1;
+							}
+						}
+					</style>
+
+					<div class="slideshow-container">
+						<img class="mySlides" src="img/peebes1.png" alt="Image 1" />
+						<img class="mySlides" src="img/peebes2.png" alt="Image 2" />
+						<img class="mySlides" src="img/peebes3.png" alt="Image 3" />
+						<img class="mySlides" src="img/peebes4.png" alt="Image 4" />
+						<!-- Add more images here -->
+					</div>
+
+					<script>
+						// JavaScript to switch images
+						let slideIndex = 0;
+						showSlides();
+
+						function showSlides() {
+							const slides = document.getElementsByClassName("mySlides");
+							for (let i = 0; i < slides.length; i++) {
+								slides[i].style.display = "none";
+							}
+							slideIndex = (slideIndex + 1) % slides.length;
+							slides[slideIndex].style.display = "block";
+							setTimeout(showSlides, 45000); // Change image every 45 seconds
+						}
+					</script>
 
 					<!-- start sw-rss-feed code -->
 
