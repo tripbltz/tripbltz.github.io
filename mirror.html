@@ -173,9 +173,46 @@
 							style="margin-left: 8px"
 						></iframe>
 					</div>
+					<!-- TradingView Widget BEGIN -->
+					<div style="width: 840px; padding-left: 26px; padding-right: 8px">
+						<div class="tradingview-widget-container">
+							<div class="tradingview-widget-container__widget"></div>
+							<script
+								type="text/javascript"
+								src="https://s3.tradingview.com/external-embedding/embed-widget-ticker-tape.js"
+								async
+							>
+								{
+								"symbols": [
+								  {
+									"description": "",
+									"proName": "TURQUOISE:AVL"
+								  },
+								  {
+									"description": "",
+									"proName": "NYSE:NIO"
+								  },
+								  {
+									"description": "",
+									"proName": "NYSE:XPEV"
+								  },
+								  {
+									"description": "",
+									"proName": "TURQUOISE:GAWL"
+								  }
+								],
+								"showSymbolLogo": true,
+								"isTransparent": true,
+								"displayMode": "adaptive",
+								"colorTheme": "dark",
+								"locale": "en"
+								 }
+							</script>
+						</div>
+					</div>
+					<!-- TradingView Widget END -->
 				</div>
 			</div>
-
 			<!-- end sw-rss-feed code -->
 		</div>
 
