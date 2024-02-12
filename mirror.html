@@ -76,8 +76,7 @@
 						href="https://forecast7.com/en/52d661d32/sprowston/"
 						data-label_1="SPROWSTON"
 						data-label_2="Ward-Smith house"
-						data-font="Tinos"
-						data-icons="Climacons Animated"
+						data-font="Helvetica"
 						data-days="5"
 						data-theme="dark"
 						>SPROWSTON Ward-Smith house</a
@@ -173,7 +172,9 @@
 							style="margin-left: 8px"
 						></iframe>
 					</div>
-					<!-- TradingView Widget BEGIN -->
+					<!-- end sw-rss-feed code -->
+
+					<!-- TradingView Widget BEGIN 
 					<div style="width: 840px; padding-left: 26px; padding-right: 8px">
 						<div class="tradingview-widget-container">
 							<div class="tradingview-widget-container__widget"></div>
@@ -210,10 +211,9 @@
 							</script>
 						</div>
 					</div>
-					<!-- TradingView Widget END -->
+					TradingView Widget END -->
 				</div>
 			</div>
-			<!-- end sw-rss-feed code -->
 		</div>
 
 		<!---JS FOR TIME AND DATE-->
@@ -277,6 +277,34 @@
 			}
 
 			updateDate();
+		</script>
+		<!--Browser refresh-->
+		<script>
+			function refreshAt(hours, minutes, seconds) {
+				var now = new Date();
+				var then = new Date();
+
+				if (
+					now.getHours() > hours ||
+					(now.getHours() == hours && now.getMinutes() > minutes) ||
+					(now.getHours() == hours &&
+						now.getMinutes() == minutes &&
+						now.getSeconds() >= seconds)
+				) {
+					then.setDate(now.getDate() + 1);
+				}
+				then.setHours(hours);
+				then.setMinutes(minutes);
+				then.setSeconds(seconds);
+
+				var timeout = then.getTime() - now.getTime();
+				setTimeout(function () {
+					window.location.reload(true);
+				}, timeout);
+			}
+
+			//refresh the page at 01:00:00
+			refreshAt(01, 00, 0);
 		</script>
 	</body>
 </html>
