@@ -280,31 +280,14 @@
 		</script>
 		<!--Browser refresh-->
 		<script>
-			function refreshAt(hours, minutes, seconds) {
-				var now = new Date();
-				var then = new Date();
-
-				if (
-					now.getHours() > hours ||
-					(now.getHours() == hours && now.getMinutes() > minutes) ||
-					(now.getHours() == hours &&
-						now.getMinutes() == minutes &&
-						now.getSeconds() >= seconds)
-				) {
-					then.setDate(now.getDate() + 1);
-				}
-				then.setHours(hours);
-				then.setMinutes(minutes);
-				then.setSeconds(seconds);
-
-				var timeout = then.getTime() - now.getTime();
-				setTimeout(function () {
-					window.location.reload(true);
-				}, timeout);
+			function refreshPageEvery(seconds) {
+				setTimeout(() => {
+					window.location.reload();
+				}, seconds * 1000);
 			}
 
-			//refresh the page at 01:00:00
-			refreshAt(01, 00, 0);
+			// Call the function with the desired interval (45 minutes in seconds)
+			refreshPageEvery(45 * 60);
 		</script>
 	</body>
 </html>
