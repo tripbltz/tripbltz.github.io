@@ -97,19 +97,20 @@
 					<style>
 						/* Container for the images */
 						.slideshow-container {
+							display: flex;
+							justify-content: center;
+							align-items: center;
+							height: 1000px; /* Adjust as necessary */
 							position: relative;
-							max-width: 100%;
-							height: auto;
-							padding-top: 25px;
-							padding-bottom: 25px;
 						}
 
 						/* Individual images */
 						.mySlides {
 							display: none;
-							width: 100%;
-							height: auto;
-							max-height: 1000px;
+							max-width: 100%;
+							max-height: 100%;
+							padding-top: 25px;
+							padding-bottom: 25px;
 						}
 
 						/* Keyframes for fade effect */
@@ -132,7 +133,7 @@
 						<img class="mySlides" src="img/peebes11.png" alt="Image 5" />
 						<img class="mySlides" src="img/peebes12.png" alt="Image 6" />
 						<img class="mySlides" src="img/peebes13.png" alt="Image 7" />
-						<!-- Add more images here -->
+						<img class="mySlides" src="img/peebes14.png" alt="Image 8" />
 					</div>
 
 					<script>
@@ -147,7 +148,7 @@
 							}
 							slideIndex = (slideIndex + 1) % slides.length;
 							slides[slideIndex].style.display = "block";
-							setTimeout(showSlides, 45000); // Change image every 45 seconds
+							setTimeout(showSlides, 30000); // Change image every 30 seconds
 						}
 					</script>
 
