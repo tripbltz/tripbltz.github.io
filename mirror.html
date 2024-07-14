@@ -52,136 +52,134 @@
 		}
 	</style>
 	<body>
-		<div class="container bg-black p-4 mt-5 shadow" style="height: 1900px">
+		<div class="container bg-black p-4 mt-5 shadow">
 			<h1 style="color: white; text-align: center; font-size: 50px">
 				Welcome to the Ward-Smith household
 			</h1>
 
-			<div class="container mt-5">
-				<div class="row">
-					<!--DISPLAY TIME AND DATE-->
-					<div class="container">
-						<div class="display-date">
-							<span id="day">day</span>,
-							<span id="daynum">00</span>
-							<span id="month">month</span>
-							<span id="year">0000</span>
-						</div>
-						<div class="display-time"></div>
-					</div>
+			<!--DISPLAY TIME AND DATE-->
+			<div class="container">
+				<div class="display-date">
+					<span id="day">day</span>,
+					<span id="daynum">00</span>
+					<span id="month">month</span>
+					<span id="year">0000</span>
+				</div>
+				<div class="display-time"></div>
+			</div>
 
-					<!--WEATHER WIDGET - IF NEEDED SWITCH THEME TO PURE-->
-					<a
-						class="weatherwidget-io"
-						href="https://forecast7.com/en/52d661d32/sprowston/"
-						data-label_1="SPROWSTON"
-						data-label_2="Ward-Smith house"
-						data-font="Helvetica"
-						data-days="5"
-						data-theme="dark"
-						>SPROWSTON Ward-Smith house</a
-					>
-					<script>
-						!(function (d, s, id) {
-							var js,
-								fjs = d.getElementsByTagName(s)[0];
-							if (!d.getElementById(id)) {
-								js = d.createElement(s);
-								js.id = id;
-								js.src = "https://weatherwidget.io/js/widget.min.js";
-								fjs.parentNode.insertBefore(js, fjs);
-							}
-						})(document, "script", "weatherwidget-io-js");
-					</script>
-					<!--IMAGE SLIDESHOW-->
-					<style>
-						/* Container for the images */
-						.slideshow-container {
-							display: flex;
-							justify-content: center;
-							align-items: center;
-							height: 1000px;
-							position: relative;
-						}
+			<!--WEATHER WIDGET - IF NEEDED SWITCH THEME TO PURE-->
+			<a
+				class="weatherwidget-io"
+				href="https://forecast7.com/en/52d661d32/sprowston/"
+				data-label_1="SPROWSTON"
+				data-label_2="Ward-Smith house"
+				data-font="Helvetica"
+				data-days="5"
+				data-theme="dark"
+				>SPROWSTON Ward-Smith house</a
+			>
+			<script>
+				!(function (d, s, id) {
+					var js,
+						fjs = d.getElementsByTagName(s)[0];
+					if (!d.getElementById(id)) {
+						js = d.createElement(s);
+						js.id = id;
+						js.src = "https://weatherwidget.io/js/widget.min.js";
+						fjs.parentNode.insertBefore(js, fjs);
+					}
+				})(document, "script", "weatherwidget-io-js");
+			</script>
+			<!--IMAGE SLIDESHOW-->
+			<style>
+				/* Container for the images */
+				.slideshow-container {
+					display: flex;
+					justify-content: center;
+					align-items: center;
+					height: 1000px;
+					position: relative;
+				}
 
-						/* Individual images */
-						.mySlides {
-							display: none;
-							max-width: 100%;
-							max-height: 100%;
-							padding-top: 25px;
-							padding-bottom: 25px;
-						}
+				/* Individual images */
+				.mySlides {
+					display: none;
+					max-width: 100%;
+					max-height: 100%;
+					padding-top: 25px;
+					padding-bottom: 25px;
+				}
 
-						/* Keyframes for fade effect */
-						@keyframes fade {
-							0%,
-							100% {
-								opacity: 0;
-							}
-							50% {
-								opacity: 1;
-							}
-						}
-					</style>
+				/* Keyframes for fade effect */
+				@keyframes fade {
+					0%,
+					100% {
+						opacity: 0;
+					}
+					50% {
+						opacity: 1;
+					}
+				}
+			</style>
 
-					<div class="slideshow-container">
-						<img class="mySlides" src="img/peebes7.png" alt="Image 1" />
-						<img class="mySlides" src="img/peebes8.png" alt="Image 2" />
-						<img class="mySlides" src="img/peebes9.png" alt="Image 3" />
-						<img class="mySlides" src="img/peebes10.png" alt="Image 4" />
-						<img class="mySlides" src="img/peebes11.png" alt="Image 5" />
-						<img class="mySlides" src="img/peebes12.png" alt="Image 6" />
-						<img class="mySlides" src="img/peebes13.png" alt="Image 7" />
-						<img class="mySlides" src="img/peebes14.png" alt="Image 8" />
-						<img class="mySlides" src="img/peebes17.png" alt="Image 9" />
-						<img class="mySlides" src="img/peebes18.png" alt="Image 10" />
-						<img class="mySlides" src="img/peebes19.png" alt="Image 11" />
-						<img class="mySlides" src="img/peebes20.png" alt="Image 12" />
-						<img class="mySlides" src="img/peebes21.png" alt="Image 13" />
-						<img class="mySlides" src="img/peebes22.png" alt="Image 14" />
-					</div>
+			<div class="slideshow-container">
+				<img class="mySlides" src="img/peebes7.png" alt="Image 1" />
+				<img class="mySlides" src="img/peebes8.png" alt="Image 2" />
+				<img class="mySlides" src="img/peebes9.png" alt="Image 3" />
+				<img class="mySlides" src="img/peebes10.png" alt="Image 4" />
+				<img class="mySlides" src="img/peebes11.png" alt="Image 5" />
+				<img class="mySlides" src="img/peebes12.png" alt="Image 6" />
+				<img class="mySlides" src="img/peebes13.png" alt="Image 7" />
+				<img class="mySlides" src="img/peebes14.png" alt="Image 8" />
+				<img class="mySlides" src="img/peebes17.png" alt="Image 9" />
+				<img class="mySlides" src="img/peebes18.png" alt="Image 10" />
+				<img class="mySlides" src="img/peebes19.png" alt="Image 11" />
+				<img class="mySlides" src="img/peebes20.png" alt="Image 12" />
+				<img class="mySlides" src="img/peebes21.png" alt="Image 13" />
+				<img class="mySlides" src="img/peebes22.png" alt="Image 14" />
+			</div>
 
-					<script>
-						// JavaScript to switch images
-						let slideIndex = 0;
-						showSlides();
+			<script>
+				// JavaScript to switch images
+				let slideIndex = 0;
+				showSlides();
 
-						function showSlides() {
-							const slides = document.getElementsByClassName("mySlides");
-							for (let i = 0; i < slides.length; i++) {
-								slides[i].style.display = "none";
-							}
-							slideIndex = (slideIndex + 1) % slides.length;
-							slides[slideIndex].style.display = "block";
-							setTimeout(showSlides, 30000); // Change image every 30 seconds
-						}
-					</script>
+				function showSlides() {
+					const slides = document.getElementsByClassName("mySlides");
+					for (let i = 0; i < slides.length; i++) {
+						slides[i].style.display = "none";
+					}
+					slideIndex = (slideIndex + 1) % slides.length;
+					slides[slideIndex].style.display = "block";
+					setTimeout(showSlides, 30000); // Change image every 30 seconds
+				}
+			</script>
 
-					<!-- start sw-rss-feed code -->
+			<!-- start sw-rss-feed code -->
 
-					<script
-						type="text/javascript"
-						src="//feed.surfing-waves.com/js/rss-feed.js"
-					></script>
-					<div class="feed-example">
-						<iframe
-							id="rssfeed_frame"
-							width="900"
-							height="300"
-							frameborder="0"
-							src="https://feed.surfing-waves.com/php/rssfeed.php?rssfeed[url][0]=https%3A%2F%2Ffeeds.bbci.co.uk%2Fnews%2Frss.xml&amp;&amp;rssfeed[frame_width]=500&amp;rssfeed[frame_height]=300&amp;rssfeed[scroll]=on&amp;rssfeed[scroll_step]=15&amp;rssfeed[scroll_bar]=off&amp;rssfeed[target]=_blank&amp;rssfeed[font_size]=22&amp;rssfeed[font_face]=Arial&amp;rssfeed[border]=off&amp;rssfeed[css_url]=&amp;rssfeed[title]=on&amp;rssfeed[title_name]=BBC%20News&amp;rssfeed[title_bgcolor]=%23000&amp;rssfeed[title_color]=%23fff&amp;rssfeed[title_bgimage]=&amp;rssfeed[footer]=off&amp;rssfeed[footer_name]=rss%20feed&amp;rssfeed[footer_bgcolor]=%23fff&amp;rssfeed[footer_color]=%23333&amp;rssfeed[footer_bgimage]=&amp;rssfeed[item_bgcolor]=%23000&amp;rssfeed[item_bgimage]=&amp;rssfeed[item_title_length]=70&amp;rssfeed[item_title_color]=%23fff&amp;rssfeed[item_border_bottom]=off&amp;rssfeed[item_source_icon]=off&amp;rssfeed[item_date]=off&amp;rssfeed[item_description]=on&amp;rssfeed[item_description_length]=130&amp;rssfeed[item_description_color]=%23fff&amp;rssfeed[item_description_link_color]=%23333&amp;rssfeed[item_description_tag]=off&amp;rssfeed[no_items]=3&amp;rssfeed[cache]= 1765146d3d1eec4058e41f37614caed3"
-							marginwidth="0"
-							marginheight="0"
-							vspace="0"
-							hspace="0"
-							scrolling="no"
-							style="margin-left: 8px"
-						></iframe>
-					</div>
-					<!-- end sw-rss-feed code -->
+			<script
+				type="text/javascript"
+				src="//feed.surfing-waves.com/js/rss-feed.js"
+			></script>
+			<div class="feed-example">
+				<iframe
+					id="rssfeed_frame"
+					width="900"
+					height="300"
+					frameborder="0"
+					src="https://feed.surfing-waves.com/php/rssfeed.php?rssfeed[url][0]=https%3A%2F%2Ffeeds.bbci.co.uk%2Fnews%2Frss.xml&amp;&amp;rssfeed[frame_width]=500&amp;rssfeed[frame_height]=300&amp;rssfeed[scroll]=on&amp;rssfeed[scroll_step]=15&amp;rssfeed[scroll_bar]=off&amp;rssfeed[target]=_blank&amp;rssfeed[font_size]=22&amp;rssfeed[font_face]=Arial&amp;rssfeed[border]=off&amp;rssfeed[css_url]=&amp;rssfeed[title]=on&amp;rssfeed[title_name]=BBC%20News&amp;rssfeed[title_bgcolor]=%23000&amp;rssfeed[title_color]=%23fff&amp;rssfeed[title_bgimage]=&amp;rssfeed[footer]=off&amp;rssfeed[footer_name]=rss%20feed&amp;rssfeed[footer_bgcolor]=%23fff&amp;rssfeed[footer_color]=%23333&amp;rssfeed[footer_bgimage]=&amp;rssfeed[item_bgcolor]=%23000&amp;rssfeed[item_bgimage]=&amp;rssfeed[item_title_length]=70&amp;rssfeed[item_title_color]=%23fff&amp;rssfeed[item_border_bottom]=off&amp;rssfeed[item_source_icon]=off&amp;rssfeed[item_date]=off&amp;rssfeed[item_description]=on&amp;rssfeed[item_description_length]=130&amp;rssfeed[item_description_color]=%23fff&amp;rssfeed[item_description_link_color]=%23333&amp;rssfeed[item_description_tag]=off&amp;rssfeed[no_items]=3&amp;rssfeed[cache]= 1765146d3d1eec4058e41f37614caed3"
+					marginwidth="0"
+					marginheight="0"
+					vspace="0"
+					hspace="0"
+					scrolling="no"
+					style="margin-left: 8px"
+				></iframe>
+			</div>
+			<!-- end sw-rss-feed code -->
 
-					<!-- TradingView Widget BEGIN 
+			<!-- TradingView Widget BEGIN 
 					<div style="width: 840px; padding-left: 26px; padding-right: 8px">
 						<div class="tradingview-widget-container">
 							<div class="tradingview-widget-container__widget"></div>
@@ -219,8 +217,6 @@
 						</div>
 					</div>
 					TradingView Widget END -->
-				</div>
-			</div>
 		</div>
 
 		<!---JS FOR TIME AND DATE-->
