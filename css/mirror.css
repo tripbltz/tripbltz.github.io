@@ -6,13 +6,14 @@ img {
 .feed-container {
 	font-size: 22px;
 	border: 1px solid #cccccc;
+	font-family: Arial, Helvetica, sans-serif;
 }
 
 .feed-container .header {
 	margin: 0px;
 	padding: 5px 5px 5px 5px;
 	color: #fff;
-	background-color: #3366ff;
+	background-color: #000;
 	background-image: url();
 }
 
@@ -53,7 +54,7 @@ img {
 .feed-container .content {
 	margin: 0px;
 	padding: 0 3px;
-	background-color: #fff;
+	background-color: #000;
 	background-image: url();
 }
 
@@ -71,7 +72,7 @@ img {
 }
 
 .feed-container .content .item .title a:link {
-	color: #000;
+	color: #fff;
 	text-decoration: none;
 }
 
