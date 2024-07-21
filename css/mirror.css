@@ -109,6 +109,5 @@ img {
 	font-size: 10px;
 }
 .description {
-	min-height: 100px;
-	border-bottom: #767171 1px solid;
+	min-height: 95px;
 }
