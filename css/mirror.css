@@ -110,5 +110,5 @@ img {
 }
 .description {
 	min-height: 100px;
-	height: auto;
+	max-height: 105px;
 }
