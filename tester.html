@@ -37,20 +37,23 @@
 				background-color: #8db600;
 				color: #fff;
 				font-size: 14px;
-				opacity: 0;
-				transition: opacity 0.5s ease, width 0.5s ease, height 0.5s ease;
 				display: flex;
-				flex-direction: column;
-				align-items: flex-start;
-				overflow: hidden;
+				flex-wrap: wrap;
+				gap: 5px;
+				justify-content: center;
+				align-items: center;
+				text-align: center;
+				line-height: 1.5;
 				padding: 10px 15px;
+				transition: opacity 0.5s ease, width 0.5s ease, height 0.5s ease;
+				overflow: hidden;
 			}
 
 			/* Stages 1-20 for progressively growing "puddle" shapes */
 			.vomit-bubble.stage1 {
 				width: 100px;
 				height: 60px;
-				border-radius: 50% 50% 50% 50%;
+				border-radius: 50%;
 			}
 			.vomit-bubble.stage2 {
 				width: 120px;
@@ -155,12 +158,32 @@
 				transition: opacity 0.5s ease;
 			}
 
-			input[type="text"] {
+			.checkbox-container {
+				position: absolute;
+				top: 20px;
+				right: 20px;
+				text-align: left;
+				display: flex;
+				flex-direction: column;
+			}
+
+			.checkbox-container label {
+				margin-bottom: 5px;
+			}
+
+			#resetButton {
 				margin-top: 20px;
-				padding: 10px;
-				width: 200px;
-				border: 1px solid #ccc;
+				padding: 5px 10px;
+				font-size: 14px;
+				background-color: #ff4d4d;
+				color: #fff;
+				border: none;
 				border-radius: 5px;
+				cursor: pointer;
+			}
+
+			#resetButton:hover {
+				background-color: #d42d2d;
 			}
 
 			button {
@@ -178,44 +201,100 @@
 				background-color: #0056b3;
 			}
 
-			/* Reset button styling */
-			.name-list-container {
-				position: absolute;
-				top: 10px;
-				right: 10px;
-				text-align: left;
-			}
-
-			#resetButton {
-				margin-top: 10px;
-				padding: 5px 10px;
-				font-size: 14px;
-				background-color: #ff4d4d;
-				color: #fff;
-				border: none;
-				border-radius: 5px;
-				cursor: pointer;
-			}
-
-			#resetButton:hover {
-				background-color: #d42d2d;
+			.vomit-image {
+				max-width: 40px;
 			}
 		</style>
 	</head>
 	<body>
 		<div class="container">
-			<!-- Reset button at the top right -->
-			<div class="name-list-container">
-				<button id="resetButton">Reset</button>
-			</div>
-
 			<div class="image-container">
 				<img src="img/enter.png" alt="Sample Image" id="mainImage" />
 				<div class="vomit-bubble stage1" id="vomitBubble"></div>
 			</div>
 
-			<input type="text" id="textInput" placeholder="Type your message here" />
 			<button id="showBubbleBtn">Go!</button>
+		</div>
+
+		<div class="checkbox-container">
+			<label
+				><input
+					type="checkbox"
+					value="Chris"
+					data-image="img/Chris_Final.png"
+				/>
+				Chris</label
+			>
+			<label
+				><input type="checkbox" value="Ali" data-image="img/Ali_Final.png" />
+				Ali</label
+			>
+			<label
+				><input type="checkbox" value="Sam" data-image="img/Sam_Final.png" />
+				Sam</label
+			>
+			<label
+				><input
+					type="checkbox"
+					value="Snowy"
+					data-image="img/Snowy_Final.png"
+				/>
+				Snowy</label
+			>
+			<label
+				><input
+					type="checkbox"
+					value="Taylor"
+					data-image="img/Taylor_Final.png"
+				/>
+				Taylor</label
+			>
+			<label
+				><input type="checkbox" value="Josh" data-image="img/Josh_Final.png" />
+				Josh</label
+			>
+			<label
+				><input type="checkbox" value="Rosa" data-image="img/Rosa_Final.png" />
+				Rosa</label
+			>
+			<label
+				><input
+					type="checkbox"
+					value="Neets"
+					data-image="img/Neets_Final.png"
+				/>
+				Neets</label
+			>
+			<label
+				><input
+					type="checkbox"
+					value="Lukas"
+					data-image="https://via.placeholder.com/20"
+				/>
+				Lukas</label
+			>
+			<label
+				><input type="checkbox" value="Ash" data-image="img/Ash_Final.png" />
+				Ash</label
+			>
+			<label
+				><input
+					type="checkbox"
+					value="Other 1"
+					data-image="img/Unknown_Final.png"
+				/>
+				Other 1</label
+			>
+			<label
+				><input
+					type="checkbox"
+					value="Other 2"
+					data-image="img/Unknown_2_Final.png"
+				/>
+				Other 2</label
+			>
+
+			<button id="resetButton">Reset</button>
 		</div>
 
 		<script>
@@ -227,39 +306,59 @@
 				.addEventListener("click", function () {
 					const vomitBubble = document.getElementById("vomitBubble");
 					const mainImage = document.getElementById("mainImage");
-					const textInput = document.getElementById("textInput").value;
 
-					// Add new text to the vomit bubble
-					const nameItem = document.createElement("div");
-					nameItem.textContent = textInput;
-					vomitBubble.appendChild(nameItem);
+					const checkedBoxes = Array.from(
+						document.querySelectorAll(
+							".checkbox-container input[type='checkbox']:checked"
+						)
+					);
+					if (checkedBoxes.length > 0) {
+						const randomBox =
+							checkedBoxes[Math.floor(Math.random() * checkedBoxes.length)];
+						const imageUrl = randomBox.getAttribute("data-image");
 
-					// Remove previous stage class and add the next stage class
-					vomitBubble.classList.remove(`stage${stage}`);
-					stage = Math.min(stage + 1, maxStage); // Increment stage but don't exceed maxStage
-					vomitBubble.classList.add(`stage${stage}`);
+						// Create an img element and append to bubble
+						const imageItem = document.createElement("img");
+						imageItem.src = imageUrl;
+						imageItem.classList.add("vomit-image");
+						vomitBubble.appendChild(imageItem);
 
-					// Change the image source
-					mainImage.src = "img/IMG_0008.PNG"; // Replace with your new image URL
+						// Update stage class to grow bubble
+						vomitBubble.classList.remove(`stage${stage}`);
+						stage = Math.min(stage + 1, maxStage);
+						vomitBubble.classList.add(`stage${stage}`);
 
-					// Play sound
-					const sound = new Audio("assets/vomit.mp3");
-					sound.play();
+						// Update image
+						mainImage.src = "img/IMG_0008.PNG";
 
-					// Make the vomit bubble visible
-					vomitBubble.style.opacity = 1;
+						// Play sound
+						const sound = new Audio("assets/vomit.mp3");
+						sound.play();
+
+						// Make bubble visible
+						vomitBubble.style.opacity = 1;
+
+						// Uncheck the selected checkbox
+						randomBox.checked = false;
+					}
 				});
 
-			// Reset button functionality
+			// Reset functionality
 			document
 				.getElementById("resetButton")
 				.addEventListener("click", function () {
 					const vomitBubble = document.getElementById("vomitBubble");
-					vomitBubble.innerHTML = ""; // Clear the bubble content
-					vomitBubble.style.opacity = 0; // Hide the bubble
+					vomitBubble.innerHTML = "";
+					vomitBubble.style.opacity = 0;
 					vomitBubble.classList.remove(`stage${stage}`);
-					stage = 1; // Reset to the initial stage
+					stage = 1;
 					vomitBubble.classList.add(`stage${stage}`);
+
+					// Reset all checkboxes
+					const checkboxes = document.querySelectorAll(
+						".checkbox-container input[type='checkbox']"
+					);
+					checkboxes.forEach((cb) => (cb.checked = false));
 				});
 		</script>
 	</body>
