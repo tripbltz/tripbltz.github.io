@@ -5,24 +5,6 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<title>tester</title>
 		<style>
-			/* Your existing styles */
-			/* Additional styles for two-column layout */
-			.output-container {
-				display: flex;
-				justify-content: space-between;
-				gap: 20px;
-				margin-top: 20px;
-			}
-			.output-column {
-				text-align: center;
-				position: relative;
-				width: 48%;
-			}
-			.output-image {
-				width: 250px;
-				height: auto;
-				border-radius: 10px;
-			}
 			* {
 				box-sizing: border-box;
 				margin: 0;
@@ -35,7 +17,7 @@
 				justify-content: center;
 				align-items: center;
 				height: 100vh;
-				background-color: #ee59da;
+				background-color: #f0f0f0;
 			}
 
 			.container {
@@ -190,6 +172,21 @@
 				margin-bottom: 5px;
 			}
 
+			#resetButton {
+				margin-bottom: 20px;
+				padding: 5px 10px;
+				font-size: 14px;
+				background-color: #ff4d4d;
+				color: #fff;
+				border: none;
+				border-radius: 5px;
+				cursor: pointer;
+			}
+
+			#resetButton:hover {
+				background-color: #d42d2d;
+			}
+
 			#showBubbleBtn {
 				margin-top: 10px;
 				padding: 10px 20px;
@@ -206,28 +203,20 @@
 			}
 
 			.vomit-image {
-				max-width: 45px;
+				max-width: 40px;
 			}
 		</style>
 	</head>
 	<body>
 		<div class="container">
-			<div class="output-container">
-				<div class="output-column">
-					<h2>Team Captain 1</h2>
-					<img id="firstOutput" class="output-image" />
-					<div class="vomit-bubble stage1" id="vomitBubble1"></div>
-				</div>
-				<hr />
-				<div class="output-column">
-					<h2>Team Captain 2</h2>
-					<img id="secondOutput" class="output-image" />
-					<div class="vomit-bubble stage1" id="vomitBubble2"></div>
-				</div>
+			<div class="image-container">
+				<img src="img/enter.png" alt="Sample Image" id="mainImage" />
+				<div class="vomit-bubble stage1" id="vomitBubble"></div>
 			</div>
 		</div>
 
 		<div class="checkbox-container">
+			<button id="resetButton">Reset</button>
 			<label
 				><input
 					type="checkbox"
@@ -310,82 +299,60 @@
 			>
 			<button id="showBubbleBtn">Go!</button>
 		</div>
-
 		<script>
 			let stage = 1;
 			const maxStage = 20;
-			let outputCount = 0;
 
 			document
 				.getElementById("showBubbleBtn")
 				.addEventListener("click", function () {
+					const vomitBubble = document.getElementById("vomitBubble");
+					const mainImage = document.getElementById("mainImage");
+
 					const checkedBoxes = Array.from(
 						document.querySelectorAll(
 							".checkbox-container input[type='checkbox']:checked"
 						)
 					);
-
 					if (checkedBoxes.length > 0) {
 						const randomBox =
 							checkedBoxes[Math.floor(Math.random() * checkedBoxes.length)];
 						const imageUrl = randomBox.getAttribute("data-image");
 
-						if (outputCount === 0) {
-							document.getElementById("firstOutput").src = imageUrl;
-						} else if (outputCount === 1) {
-							document.getElementById("secondOutput").src = imageUrl;
-						} else {
-							const bubble =
-								outputCount % 2 === 0 ? "vomitBubble1" : "vomitBubble2";
-							const vomitBubble = document.getElementById(bubble);
-							const imageItem = document.createElement("img");
-							imageItem.src = imageUrl;
-							imageItem.classList.add("vomit-image");
-							vomitBubble.appendChild(imageItem);
+						const imageItem = document.createElement("img");
+						imageItem.src = imageUrl;
+						imageItem.classList.add("vomit-image");
+						vomitBubble.appendChild(imageItem);
 
-							vomitBubble.classList.remove(`stage${stage}`);
-							stage = Math.min(stage + 1, maxStage);
-							vomitBubble.classList.add(`stage${stage}`);
-							vomitBubble.style.opacity = 1; /* Make bubble visible */
-						}
+						vomitBubble.classList.remove(`stage${stage}`);
+						stage = Math.min(stage + 1, maxStage);
+						vomitBubble.classList.add(`stage${stage}`);
 
-						// Play different sounds based on outputCount
-						let sound;
-						if (outputCount < 2) {
-							sound = new Audio("assets/sound-1.mp3");
-						} else {
-							sound = new Audio("assets/vomit.mp3");
-						}
+						mainImage.src = "img/IMG_0008.PNG";
+
+						const sound = new Audio("assets/vomit.mp3");
 						sound.play();
 
+						vomitBubble.style.opacity = 1; /* Make bubble visible */
+
 						randomBox.checked = false;
-						outputCount++;
 					}
 				});
 
 			document
 				.getElementById("resetButton")
 				.addEventListener("click", function () {
-					document.getElementById("firstOutput").src = "";
-					document.getElementById("secondOutput").src = "";
-
-					const vomitBubble1 = document.getElementById("vomitBubble1");
-					const vomitBubble2 = document.getElementById("vomitBubble2");
-					vomitBubble1.innerHTML = "";
-					vomitBubble2.innerHTML = "";
-					vomitBubble1.style.opacity = 0;
-					vomitBubble2.style.opacity = 0;
-					vomitBubble1.classList.remove(`stage${stage}`);
-					vomitBubble2.classList.remove(`stage${stage}`);
+					const vomitBubble = document.getElementById("vomitBubble");
+					vomitBubble.innerHTML = "";
+					vomitBubble.style.opacity = 0; /* Reset visibility */
+					vomitBubble.classList.remove(`stage${stage}`);
 					stage = 1;
-					vomitBubble1.classList.add(`stage${stage}`);
-					vomitBubble2.classList.add(`stage${stage}`);
+					vomitBubble.classList.add(`stage${stage}`);
 
 					const checkboxes = document.querySelectorAll(
 						".checkbox-container input[type='checkbox']"
 					);
 					checkboxes.forEach((cb) => (cb.checked = false));
-					outputCount = 0;
 				});
 		</script>
 	</body>
