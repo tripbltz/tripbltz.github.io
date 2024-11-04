@@ -5,24 +5,25 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<title>tester</title>
 		<style>
-			/* Your existing styles */
-			/* Additional styles for two-column layout */
 			.output-container {
 				display: flex;
 				justify-content: space-between;
 				gap: 20px;
 				margin-top: 20px;
 			}
+
 			.output-column {
 				text-align: center;
 				position: relative;
 				width: 48%;
 			}
+
 			.output-image {
 				width: 250px;
 				height: auto;
 				border-radius: 10px;
 			}
+
 			* {
 				box-sizing: border-box;
 				margin: 0;
@@ -51,7 +52,8 @@
 			.vomit-bubble {
 				position: absolute;
 				top: 100%;
-				left: 0;
+				left: 50%;
+				transform: translateX(-50%);
 				background-color: #8db600;
 				color: #fff;
 				font-size: 14px;
@@ -71,52 +73,52 @@
 			/* Stages 1-20 with progressively reversing height and width */
 			.vomit-bubble.stage1 {
 				width: 100px;
-				height: 130px; /* 30% higher than width */
+				height: 130px;
 				border-radius: 50%;
 			}
 			.vomit-bubble.stage2 {
 				width: 115px;
-				height: 150px; /* 30% higher than width */
+				height: 150px;
 				border-radius: 50% 40% 50% 30%;
 			}
 			.vomit-bubble.stage3 {
 				width: 134px;
-				height: 175px; /* 30% higher than width */
+				height: 175px;
 				border-radius: 40% 50% 30% 50%;
 			}
 			.vomit-bubble.stage4 {
 				width: 152px;
-				height: 180px; /* Slightly reduced height increment */
+				height: 180px;
 				border-radius: 30% 50% 40% 60%;
 			}
 			.vomit-bubble.stage5 {
 				width: 175px;
-				height: 190px; /* Approaching width parity */
+				height: 190px;
 				border-radius: 40% 60% 40% 50%;
 			}
 			.vomit-bubble.stage6 {
 				width: 201px;
-				height: 210px; /* Almost equal */
+				height: 210px;
 				border-radius: 50% 50% 30% 70%;
 			}
 			.vomit-bubble.stage7 {
 				width: 231px;
-				height: 225px; /* Heights now close to width */
+				height: 225px;
 				border-radius: 30% 70% 40% 60%;
 			}
 			.vomit-bubble.stage8 {
 				width: 266px;
-				height: 250px; /* Heights slightly smaller */
+				height: 250px;
 				border-radius: 60% 40% 50% 30%;
 			}
 			.vomit-bubble.stage9 {
 				width: 306px;
-				height: 285px; /* Width exceeds height */
+				height: 285px;
 				border-radius: 50% 30% 60% 50%;
 			}
 			.vomit-bubble.stage10 {
 				width: 352px;
-				height: 310px; /* Continuing width dominance */
+				height: 310px;
 				border-radius: 30% 60% 40% 70%;
 			}
 			.vomit-bubble.stage11 {
@@ -179,8 +181,8 @@
 
 			.checkbox-container {
 				position: absolute;
-				top: 20px;
-				right: 20px;
+				top: 40%;
+				right: 50px;
 				text-align: left;
 				display: flex;
 				flex-direction: column;
