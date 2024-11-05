@@ -1,89 +1,402 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 	<head>
-		<meta charset="utf-8" />
-		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
-		<title>Chris smells</title>
-		<meta name="description" content="" />
-		<meta name="viewport" content="width=device-width, initial-scale=1" />
-		<link rel="stylesheet" href="" />
-	</head>
-	<style>
-		body {
-			margin: 0;
-			padding: 0;
-			overflow: hidden;
-			background: #001f3f; /* Dark background for better visibility of snow */
-			height: 100vh;
-		}
-
-		.snow-container {
-			position: absolute;
-			top: 0;
-			left: 0;
-			width: 100%;
-			height: 100%;
-			pointer-events: none;
-		}
-
-		.snowflake {
-			position: absolute;
-			top: -10px;
-			background: white;
-			width: 10px;
-			height: 10px;
-			border-radius: 50%;
-			opacity: 0.8;
-			animation: fall linear infinite;
-		}
-
-		@keyframes fall {
-			to {
-				transform: translateY(100vh);
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>tester</title>
+		<style>
+			.output-container {
+				display: flex;
+				justify-content: space-between;
+				gap: 20px;
+				margin-top: 20px;
 			}
-		}
-	</style>
+
+			.output-column {
+				text-align: center;
+				position: relative;
+				width: 48%;
+			}
+
+			.output-image {
+				max-width: 250px;
+				height: auto;
+				border-radius: 10px;
+			}
+
+			* {
+				box-sizing: border-box;
+				margin: 0;
+				padding: 0;
+			}
+
+			body {
+				font-family: Arial, sans-serif;
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				height: 70vh;
+				background-color: #ee59da;
+			}
+
+			.container {
+				text-align: center;
+				position: relative;
+			}
+
+			.image-container {
+				position: relative;
+				display: inline-block;
+			}
+
+			.vomit-bubble {
+				position: absolute;
+				top: 100%;
+				left: 50%;
+				transform: translateX(-50%);
+				background-color: #8db600;
+				color: #fff;
+				font-size: 14px;
+				display: flex;
+				flex-wrap: wrap;
+				gap: 5px;
+				justify-content: center;
+				align-items: center;
+				text-align: center;
+				line-height: 1.5;
+				padding: 10px 15px;
+				transition: opacity 0.5s ease, width 3s ease, height 10s ease;
+				overflow: hidden;
+				opacity: 0; /* Start hidden */
+				border: 3px solid black;
+			}
+
+			/* Stages 1-20 with progressively reversing height and width */
+			.vomit-bubble.stage1 {
+				width: 100px;
+				height: 130px;
+				border-radius: 50%;
+			}
+			.vomit-bubble.stage2 {
+				width: 135px;
+				height: 150px;
+				border-radius: 50% 40% 50% 30%;
+			}
+			.vomit-bubble.stage3 {
+				width: 138px;
+				height: 175px;
+				border-radius: 40% 50% 30% 50%;
+			}
+			.vomit-bubble.stage4 {
+				width: 152px;
+				height: 180px;
+				border-radius: 30% 50% 40% 60%;
+			}
+			.vomit-bubble.stage5 {
+				width: 190px;
+				height: 210px;
+				border-radius: 40% 60% 40% 50%;
+			}
+			.vomit-bubble.stage6 {
+				width: 225px;
+				height: 218px;
+				border-radius: 50% 50% 30% 70%;
+			}
+			.vomit-bubble.stage7 {
+				width: 231px;
+				height: 225px;
+				border-radius: 30% 70% 40% 60%;
+			}
+			.vomit-bubble.stage8 {
+				width: 266px;
+				height: 250px;
+				border-radius: 60% 40% 50% 30%;
+			}
+			.vomit-bubble.stage9 {
+				width: 306px;
+				height: 285px;
+				border-radius: 50% 30% 60% 50%;
+			}
+			.vomit-bubble.stage10 {
+				width: 352px;
+				height: 310px;
+				border-radius: 30% 60% 40% 70%;
+			}
+			.vomit-bubble.stage11 {
+				width: 405px;
+				height: 340px;
+				border-radius: 50% 70% 50% 40%;
+			}
+			.vomit-bubble.stage12 {
+				width: 466px;
+				height: 375px;
+				border-radius: 60% 40% 70% 30%;
+			}
+			.vomit-bubble.stage13 {
+				width: 536px;
+				height: 410px;
+				border-radius: 30% 60% 50% 50%;
+			}
+			.vomit-bubble.stage14 {
+				width: 616px;
+				height: 440px;
+				border-radius: 70% 50% 30% 60%;
+			}
+			.vomit-bubble.stage15 {
+				width: 708px;
+				height: 470px;
+				border-radius: 40% 60% 50% 40%;
+			}
+			.vomit-bubble.stage16 {
+				width: 814px;
+				height: 500px;
+				border-radius: 50% 30% 60% 70%;
+			}
+			.vomit-bubble.stage17 {
+				width: 936px;
+				height: 525px;
+				border-radius: 60% 50% 70% 40%;
+			}
+			.vomit-bubble.stage18 {
+				width: 1076px;
+				height: 550px;
+				border-radius: 30% 50% 60% 60%;
+			}
+			.vomit-bubble.stage19 {
+				width: 1237px;
+				height: 570px;
+				border-radius: 70% 60% 40% 50%;
+			}
+			.vomit-bubble.stage20 {
+				width: 1422px;
+				height: 590px;
+				border-radius: 50% 50% 60% 30%;
+			}
+
+			#mainImage {
+				width: 200px;
+				height: auto;
+				border-radius: 10px;
+				transition: opacity 0.5s ease;
+			}
+
+			.checkbox-container {
+				position: absolute;
+				top: 30%;
+				right: 50px;
+				text-align: left;
+				display: flex;
+				flex-direction: column;
+			}
+
+			.checkbox-container label {
+				margin-bottom: 5px;
+			}
+
+			#showBubbleBtn {
+				margin-top: 10px;
+				padding: 10px 20px;
+				background-color: #007bff;
+				color: #fff;
+				border: none;
+				border-radius: 5px;
+				cursor: pointer;
+				font-size: 16px;
+			}
+
+			#showBubbleBtn:hover {
+				background-color: #0056b3;
+			}
+
+			.vomit-image {
+				max-width: 45px;
+			}
+
+			#hrElement {
+				border: medium solid #007bff;
+				border-radius: 5px;
+				display: none; /* Initially hidden */
+			}
+		</style>
+	</head>
 	<body>
-		<div class="snow-container">
-			<div style="padding: 60px 60px 60px 60px; color: white" ;>
-				<h1>Jingle Bells Chris Hyam Smells</h1>
-				<p>He smells really bad.</p>
+		<div class="container">
+			<img src="img/header.gif" />
+
+			<div class="output-container">
+				<div class="output-column">
+					<img id="firstOutput" class="output-image" />
+					<div class="vomit-bubble stage1" id="vomitBubble1"></div>
+				</div>
+				<hr id="hrElement" />
+				<div class="output-column">
+					<img id="secondOutput" class="output-image" />
+					<div class="vomit-bubble stage1" id="vomitBubble2"></div>
+				</div>
 			</div>
 		</div>
+
+		<div class="checkbox-container">
+			<label
+				><input
+					type="checkbox"
+					value="Chris"
+					data-image="img/Chris_Final.png"
+				/>
+				Chris</label
+			>
+			<label
+				><input type="checkbox" value="Ali" data-image="img/Ali_Final.png" />
+				Ali</label
+			>
+			<label
+				><input type="checkbox" value="Sam" data-image="img/Sam_Final.png" />
+				Sam</label
+			>
+			<label
+				><input
+					type="checkbox"
+					value="Snowy"
+					data-image="img/Snowy_Final.png"
+				/>
+				Snowy</label
+			>
+			<label
+				><input
+					type="checkbox"
+					value="Taylor"
+					data-image="img/Taylor_Final.png"
+				/>
+				Taylor</label
+			>
+			<label
+				><input type="checkbox" value="Josh" data-image="img/Josh_Final.png" />
+				Josh</label
+			>
+			<label
+				><input
+					type="checkbox"
+					value="Rosa"
+					data-image="img/Rosa_Final_2.png"
+				/>
+				Rosa</label
+			>
+			<label
+				><input
+					type="checkbox"
+					value="Neets"
+					data-image="img/Neets_Final.png"
+				/>
+				Neets</label
+			>
+			<label
+				><input
+					type="checkbox"
+					value="Lukas"
+					data-image="img/Lukas_Final_2.png"
+				/>
+				Lukas</label
+			>
+			<label
+				><input type="checkbox" value="Ash" data-image="img/Ash_Final.png" />
+				Ash</label
+			>
+			<label
+				><input
+					type="checkbox"
+					value="Other 1"
+					data-image="img/Unknown_Final.png"
+				/>
+				Other 1</label
+			>
+			<label
+				><input
+					type="checkbox"
+					value="Other 2"
+					data-image="img/Unknown_2_Final.png"
+				/>
+				Other 2</label
+			>
+			<button id="showBubbleBtn">Roll</button>
+		</div>
+
 		<script>
-			document.addEventListener("DOMContentLoaded", function () {
-				const snowContainer = document.querySelector(".snow-container");
-				const numberOfSnowflakes = 100;
+			let stage = 1;
+			const maxStage = 20;
+			let outputCount = 0;
 
-				function createSnowflake() {
-					const snowflake = document.createElement("div");
-					snowflake.classList.add("snowflake");
+			document
+				.getElementById("showBubbleBtn")
+				.addEventListener("click", function () {
+					const checkedBoxes = Array.from(
+						document.querySelectorAll(
+							".checkbox-container input[type='checkbox']:checked"
+						)
+					);
 
-					// Random position for each snowflake
-					snowflake.style.left = Math.random() * 100 + "vw";
+					if (checkedBoxes.length > 0) {
+						const randomBox =
+							checkedBoxes[Math.floor(Math.random() * checkedBoxes.length)];
+						const imageUrl = randomBox.getAttribute("data-image");
 
-					// Random animation duration
-					snowflake.style.animationDuration = Math.random() * 3 + 2 + "s";
+						if (outputCount === 0) {
+							document.getElementById("firstOutput").src = imageUrl;
+							document.getElementById("hrElement").style.display = "block"; // Show <hr> on first click
+						} else if (outputCount === 1) {
+							document.getElementById("secondOutput").src = imageUrl;
+						} else {
+							const bubble =
+								outputCount % 2 === 0 ? "vomitBubble1" : "vomitBubble2";
+							const vomitBubble = document.getElementById(bubble);
+							const imageItem = document.createElement("img");
+							imageItem.src = imageUrl;
+							imageItem.classList.add("vomit-image");
+							vomitBubble.appendChild(imageItem);
 
-					// Random size
-					const size = Math.random() * 5 + 5 + "px";
-					snowflake.style.width = size;
-					snowflake.style.height = size;
+							vomitBubble.classList.remove(`stage${stage}`);
+							stage = Math.min(stage + 1, maxStage);
+							vomitBubble.classList.add(`stage${stage}`);
+							vomitBubble.style.opacity = 1; /* Make bubble visible */
+						}
 
-					// Random delay
-					snowflake.style.animationDelay = Math.random() * 5 + "s";
+						// Play different sounds based on outputCount
+						let sound;
+						if (outputCount < 2) {
+							sound = new Audio("assets/sound-1.mp3");
+						} else {
+							sound = new Audio("assets/ta-da.mp3");
+						}
+						sound.play();
 
-					snowContainer.appendChild(snowflake);
+						randomBox.checked = false;
+						outputCount++;
+					}
+				});
 
-					// Remove snowflake after animation ends
-					snowflake.addEventListener("animationend", () => {
-						snowflake.remove();
-					});
-				}
+			document
+				.getElementById("resetButton")
+				.addEventListener("click", function () {
+					document.getElementById("firstOutput").src = "";
+					document.getElementById("secondOutput").src = "";
 
-				// Create snowflakes at regular intervals
-				setInterval(createSnowflake, 200);
-			});
+					const vomitBubble1 = document.getElementById("vomitBubble1");
+					const vomitBubble2 = document.getElementById("vomitBubble2");
+					vomitBubble1.innerHTML = "";
+					vomitBubble2.innerHTML = "";
+					vomitBubble1.style.opacity = 0;
+					vomitBubble2.style.opacity = 0;
+					vomitBubble1.classList.remove(`stage${stage}`);
+					vomitBubble2.classList.remove(`stage${stage}`);
+					stage = 1;
+					vomitBubble1.classList.add(`stage${stage}`);
+					vomitBubble2.classList.add(`stage${stage}`);
+					document.getElementById("hrElement").style.display = "none"; // Hide <hr> on reset
+					const checkboxes = document.querySelectorAll(
+						".checkbox-container input[type='checkbox']"
+					);
+					checkboxes.forEach((cb) => (cb.checked = false));
+					outputCount = 0;
+				});
 		</script>
 	</body>
 </html>
