@@ -51,12 +51,45 @@
 			color: white;
 			padding-bottom: 20px;
 		}
+
+		/* Header styling */
+		.header-container {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			text-align: center;
+		}
+
+		.header-image {
+			flex: 1; /* Images take up equal space on the sides */
+			max-width: 100px;
+		}
+
+		.header-title {
+			flex: 2; /* Title takes more space than the images */
+			font-size: 2em;
+			text-align: center;
+		}
 	</style>
+
 	<body>
 		<div class="container bg-black p-4 mt-5 shadow">
-			<h1 style="color: white; text-align: center; font-size: 50px">
-				Seasons greetings from the Ward-Smith household!
-			</h1>
+			<div class="header-container">
+				<img src="img/holly.png" alt="Left Image" class="header-image" />
+				<h1
+					class="header-title"
+					style="color: white; text-align: center; font-size: 50px"
+				>
+					Seasons greetings from the Ward&#8209;Smith household!
+				</h1>
+				<img
+					src="img/holly.png"
+					alt="Right Image"
+					class="header-image"
+					style="-webkit-transform: scaleX(-1); transform: scaleX(-1)"
+				/>
+			</div>
+
 			<!--DISPLAY TIME AND DATE-->
 			<div class="container">
 				<div class="display-date">
