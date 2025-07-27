@@ -1,0 +1,2548 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Warhammer 40K Battle Assistant</title>
+		<style>
+			* {
+				margin: 0;
+				padding: 0;
+				box-sizing: border-box;
+			}
+
+			body {
+				font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+				background: linear-gradient(135deg, #0a0a0a, #1a1a1a);
+				color: #fff;
+				min-height: 100vh;
+				overflow-x: hidden;
+			}
+
+			/* Header Styles */
+			.header {
+				background: linear-gradient(90deg, #8b0000, #4b0000);
+				padding: 1rem;
+				text-align: center;
+				border-bottom: 3px solid #ffd700;
+				box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+			}
+
+			.header h1 {
+				font-size: 2rem;
+				text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+				letter-spacing: 2px;
+			}
+
+			/* Setup Screen */
+			.setup-screen {
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				padding: 2rem;
+				gap: 1rem;
+				min-height: calc(100vh - 80px);
+			}
+
+			.setup-form {
+				background: rgba(0, 0, 0, 0.8);
+				padding: 2rem;
+				border-radius: 10px;
+				border: 2px solid #ffd700;
+				max-width: 800px;
+				width: 100%;
+				box-shadow: 0 8px 16px rgba(0, 0, 0, 0.6);
+			}
+
+			.setup-form h2 {
+				color: #ffd700;
+				margin-bottom: 1.5rem;
+				text-align: center;
+				font-size: 1.8rem;
+			}
+
+			.player-setup {
+				display: grid;
+				grid-template-columns: 1fr 1fr;
+				gap: 2rem;
+				margin-bottom: 2rem;
+			}
+
+			.player-form {
+				background: rgba(255, 255, 255, 0.05);
+				padding: 1.5rem;
+				border-radius: 8px;
+				border: 1px solid #333;
+			}
+
+			.player-form h3 {
+				color: #ffd700;
+				margin-bottom: 1rem;
+				text-align: center;
+			}
+
+			.form-group {
+				margin-bottom: 1rem;
+			}
+
+			.form-group label {
+				display: block;
+				margin-bottom: 0.5rem;
+				color: #ffd700;
+				font-weight: bold;
+				font-size: 0.9rem;
+			}
+
+			.form-group input,
+			.form-group select {
+				width: 100%;
+				padding: 0.75rem;
+				border: 1px solid #666;
+				border-radius: 4px;
+				background: rgba(255, 255, 255, 0.1);
+				color: #fff;
+				font-size: 1rem;
+			}
+
+			/* Button Styles */
+			.btn {
+				background: linear-gradient(45deg, #8b0000, #dc143c);
+				color: #fff;
+				border: none;
+				padding: 0.75rem 1.5rem;
+				border-radius: 6px;
+				cursor: pointer;
+				font-size: 1rem;
+				font-weight: bold;
+				transition: all 0.3s;
+				text-transform: uppercase;
+				letter-spacing: 1px;
+				box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+			}
+
+			.btn:hover {
+				background: linear-gradient(45deg, #dc143c, #ff6347);
+				transform: translateY(-2px);
+				box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+			}
+
+			.btn-secondary {
+				background: linear-gradient(45deg, #4b0082, #6a5acd);
+				padding: 0.5rem 1rem;
+				font-size: 0.9rem;
+			}
+
+			.btn-secondary:hover {
+				background: linear-gradient(45deg, #6a5acd, #9370db);
+			}
+
+			.btn-small {
+				padding: 0.4rem 0.8rem;
+				font-size: 0.85rem;
+			}
+
+			/* Game Container */
+			.game-container {
+				display: none;
+				padding: 1rem;
+				gap: 1rem;
+				grid-template-columns: 1fr 320px;
+				height: calc(100vh - 80px);
+			}
+
+			/* Phase Tracker */
+			.phase-tracker {
+				background: rgba(0, 0, 0, 0.8);
+				padding: 1rem;
+				border-radius: 10px;
+				border: 2px solid #ffd700;
+				margin-bottom: 1rem;
+			}
+
+			.phase-bar {
+				display: flex;
+				justify-content: space-between;
+				margin-bottom: 1rem;
+				gap: 4px;
+			}
+
+			.phase {
+				background: rgba(255, 255, 255, 0.1);
+				padding: 0.5rem;
+				border-radius: 5px;
+				border: 1px solid #666;
+				cursor: pointer;
+				transition: all 0.3s;
+				flex: 1;
+				text-align: center;
+				font-size: 0.9rem;
+			}
+
+			.phase.active {
+				background: linear-gradient(45deg, #ffd700, #ffa500);
+				color: #000;
+				border-color: #ffd700;
+				transform: scale(1.05);
+				font-weight: bold;
+			}
+
+			.turn-info {
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+				flex-wrap: wrap;
+				gap: 1rem;
+			}
+
+			/* Player Panels */
+			.players-area {
+				display: grid;
+				grid-template-columns: 1fr 1fr;
+				gap: 1rem;
+				height: calc(100% - 120px);
+			}
+
+			.player-panel {
+				background: rgba(0, 0, 0, 0.7);
+				border-radius: 10px;
+				border: 2px solid #666;
+				padding: 1rem;
+				display: flex;
+				flex-direction: column;
+				overflow: hidden;
+			}
+
+			.player-panel.active {
+				border-color: #ffd700;
+				box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
+			}
+
+			.player-header {
+				display: flex;
+				align-items: center;
+				gap: 1rem;
+				margin-bottom: 1rem;
+				padding-bottom: 1rem;
+				border-bottom: 1px solid #666;
+			}
+
+			.player-avatar {
+				width: 60px;
+				height: 60px;
+				border-radius: 50%;
+				background: linear-gradient(45deg, #8b0000, #dc143c);
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				font-size: 1.5rem;
+				font-weight: bold;
+				border: 2px solid #ffd700;
+			}
+
+			.player-stats {
+				flex: 1;
+			}
+
+			.stat-row {
+				display: flex;
+				justify-content: space-between;
+				margin-bottom: 0.5rem;
+				font-size: 0.95rem;
+			}
+
+			.stat-badge {
+				background: rgba(255, 215, 0, 0.2);
+				padding: 0.2rem 0.5rem;
+				border-radius: 4px;
+				font-weight: bold;
+			}
+
+			/* Units Section */
+			.units-section {
+				flex: 1;
+				overflow-y: auto;
+				margin-bottom: 1rem;
+				padding-right: 0.5rem;
+			}
+
+			.units-section h4 {
+				color: #ffd700;
+				margin-bottom: 0.75rem;
+				font-size: 1.1rem;
+			}
+
+			.unit-card {
+				background: rgba(255, 255, 255, 0.1);
+				padding: 0.75rem;
+				margin-bottom: 0.5rem;
+				border-radius: 5px;
+				border-left: 4px solid #ffd700;
+				cursor: pointer;
+				transition: all 0.3s;
+			}
+
+			.unit-card:hover {
+				background: rgba(255, 215, 0, 0.1);
+				transform: translateX(5px);
+			}
+
+			.unit-card.damaged {
+				border-left-color: #ffa500;
+			}
+
+			.unit-card.critical {
+				border-left-color: #ff4500;
+			}
+
+			.unit-card.destroyed {
+				opacity: 0.5;
+				border-left-color: #ff0000;
+			}
+
+			.unit-header {
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+				margin-bottom: 0.5rem;
+			}
+
+			.unit-name {
+				font-weight: bold;
+				color: #ffd700;
+			}
+
+			.unit-stats-row {
+				font-size: 0.85rem;
+				color: #ccc;
+				margin-bottom: 0.5rem;
+			}
+
+			.unit-wounds {
+				display: flex;
+				gap: 0.25rem;
+				margin-top: 0.5rem;
+				flex-wrap: wrap;
+			}
+
+			.wound-pip {
+				width: 10px;
+				height: 10px;
+				border-radius: 50%;
+				background: #00ff00;
+				border: 1px solid #fff;
+				transition: all 0.3s;
+			}
+
+			.wound-pip.lost {
+				background: #ff0000;
+			}
+
+			.unit-buffs {
+				margin-top: 0.5rem;
+				font-size: 0.8rem;
+			}
+
+			.buff-tag {
+				display: inline-block;
+				background: rgba(100, 149, 237, 0.3);
+				color: #87ceeb;
+				padding: 0.2rem 0.5rem;
+				border-radius: 3px;
+				margin-right: 0.5rem;
+				margin-bottom: 0.25rem;
+			}
+
+			/* Actions Section */
+			.actions-section {
+				border-top: 1px solid #666;
+				padding-top: 1rem;
+			}
+
+			.action-input {
+				display: flex;
+				gap: 0.5rem;
+				margin-bottom: 1rem;
+			}
+
+			.action-input input {
+				flex: 1;
+				padding: 0.5rem;
+				border: 1px solid #666;
+				border-radius: 4px;
+				background: rgba(255, 255, 255, 0.1);
+				color: #fff;
+				font-size: 0.9rem;
+			}
+
+			.quick-actions {
+				display: flex;
+				gap: 0.5rem;
+				flex-wrap: wrap;
+			}
+
+			/* Sidebar */
+			.sidebar {
+				display: flex;
+				flex-direction: column;
+				gap: 1rem;
+				overflow-y: auto;
+			}
+
+			/* Dice Section */
+			.dice-section {
+				background: rgba(0, 0, 0, 0.8);
+				padding: 1rem;
+				border-radius: 10px;
+				border: 2px solid #4b0082;
+			}
+
+			.dice-section h3 {
+				color: #9370db;
+				margin-bottom: 1rem;
+			}
+
+			.dice-controls {
+				display: flex;
+				gap: 0.5rem;
+				margin-bottom: 1rem;
+			}
+
+			.dice-input {
+				flex: 1;
+				padding: 0.5rem;
+				border: 1px solid #666;
+				border-radius: 4px;
+				background: rgba(255, 255, 255, 0.1);
+				color: #fff;
+			}
+
+			.dice-results {
+				background: rgba(255, 255, 255, 0.05);
+				padding: 1rem;
+				border-radius: 5px;
+				min-height: 120px;
+			}
+
+			.dice-visual {
+				display: flex;
+				flex-wrap: wrap;
+				gap: 0.5rem;
+				margin-bottom: 1rem;
+			}
+
+			.die {
+				width: 36px;
+				height: 36px;
+				background: #fff;
+				color: #000;
+				border-radius: 5px;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				font-weight: bold;
+				font-size: 1.2rem;
+				border: 2px solid #000;
+				animation: rollIn 0.5s ease-out;
+			}
+
+			@keyframes rollIn {
+				from {
+					transform: rotate(360deg) scale(0);
+					opacity: 0;
+				}
+				to {
+					transform: rotate(0) scale(1);
+					opacity: 1;
+				}
+			}
+
+			.die.success {
+				background: #00ff00;
+			}
+
+			.die.fail {
+				background: #ff6666;
+			}
+
+			/* Log Section */
+			.log-section {
+				background: rgba(0, 0, 0, 0.8);
+				padding: 1rem;
+				border-radius: 10px;
+				border: 2px solid #008000;
+				flex: 1;
+				display: flex;
+				flex-direction: column;
+				min-height: 300px;
+			}
+
+			.log-section h3 {
+				color: #00ff00;
+				margin-bottom: 1rem;
+			}
+
+			.log-content {
+				flex: 1;
+				overflow-y: auto;
+				background: rgba(255, 255, 255, 0.05);
+				padding: 0.5rem;
+				border-radius: 5px;
+				font-family: "Courier New", monospace;
+				font-size: 0.85rem;
+				max-height: 400px;
+			}
+
+			.log-entry {
+				margin-bottom: 0.5rem;
+				padding: 0.5rem;
+				border-left: 3px solid #ffd700;
+				padding-left: 0.75rem;
+				background: rgba(255, 255, 255, 0.02);
+			}
+
+			.log-timestamp {
+				color: #888;
+				font-size: 0.75rem;
+				font-weight: bold;
+			}
+
+			.log-phase {
+				color: #ffd700;
+				font-weight: bold;
+			}
+
+			.log-damage {
+				color: #ff6666;
+			}
+
+			.log-heal {
+				color: #66ff66;
+			}
+
+			.log-stratagem {
+				color: #9370db;
+				font-weight: bold;
+			}
+
+			/* Unit Selection Modal */
+			.modal {
+				display: none;
+				position: fixed;
+				top: 0;
+				left: 0;
+				width: 100%;
+				height: 100%;
+				background: rgba(0, 0, 0, 0.8);
+				z-index: 1000;
+				overflow-y: auto;
+			}
+
+			.modal-content {
+				background: #1a1a1a;
+				margin: 2rem auto;
+				padding: 2rem;
+				max-width: 800px;
+				border-radius: 10px;
+				border: 2px solid #ffd700;
+			}
+
+			.unit-selection-grid {
+				display: grid;
+				grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+				gap: 1rem;
+				margin: 1rem 0;
+			}
+
+			.unit-select-card {
+				background: rgba(255, 255, 255, 0.1);
+				padding: 1rem;
+				border-radius: 5px;
+				border: 2px solid #666;
+				cursor: pointer;
+				transition: all 0.3s;
+			}
+
+			.unit-select-card:hover {
+				border-color: #ffd700;
+				background: rgba(255, 215, 0, 0.1);
+			}
+
+			.unit-select-card.selected {
+				border-color: #00ff00;
+				background: rgba(0, 255, 0, 0.1);
+			}
+
+			/* Responsive Design */
+			@media (max-width: 1200px) {
+				.game-container {
+					grid-template-columns: 1fr;
+				}
+
+				.sidebar {
+					display: grid;
+					grid-template-columns: 1fr 1fr;
+					gap: 1rem;
+				}
+
+				.log-section {
+					grid-column: span 2;
+				}
+			}
+
+			@media (max-width: 768px) {
+				.player-setup {
+					grid-template-columns: 1fr;
+				}
+
+				.players-area {
+					grid-template-columns: 1fr;
+				}
+
+				.phase-bar {
+					flex-wrap: wrap;
+				}
+
+				.phase {
+					font-size: 0.8rem;
+					padding: 0.4rem;
+				}
+			}
+
+			/* Scrollbar Styling */
+			::-webkit-scrollbar {
+				width: 8px;
+			}
+
+			::-webkit-scrollbar-track {
+				background: rgba(255, 255, 255, 0.1);
+				border-radius: 4px;
+			}
+
+			::-webkit-scrollbar-thumb {
+				background: #ffd700;
+				border-radius: 4px;
+			}
+
+			::-webkit-scrollbar-thumb:hover {
+				background: #ffa500;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="header">
+			<h1>⚔️ WARHAMMER 40,000 BATTLE ASSISTANT ⚔️</h1>
+		</div>
+
+		<!-- Setup Screen -->
+		<div id="setupScreen" class="setup-screen">
+			<div class="setup-form">
+				<h2>🛡️ Prepare for Battle</h2>
+				<div class="player-setup">
+					<div class="player-form">
+						<h3>Player 1</h3>
+						<div class="form-group">
+							<label>Battle-Brother Name:</label>
+							<input
+								type="text"
+								id="player1Name"
+								placeholder="Enter commander name"
+								value=""
+							/>
+						</div>
+						<div class="form-group">
+							<label>Faction:</label>
+							<select id="player1Faction">
+								<option value="">Select Faction</option>
+								<option value="space-marines">Space Marines</option>
+								<option value="imperial-guard">Astra Militarum</option>
+								<option value="sisters">Adepta Sororitas</option>
+								<option value="custodes">Adeptus Custodes</option>
+								<option value="chaos-marines">Chaos Space Marines</option>
+								<option value="death-guard">Death Guard</option>
+								<option value="thousand-sons">Thousand Sons</option>
+								<option value="orks">Orks</option>
+								<option value="tau">T'au Empire</option>
+								<option value="necrons">Necrons</option>
+								<option value="eldar">Aeldari</option>
+								<option value="drukhari">Drukhari</option>
+								<option value="tyranids">Tyranids</option>
+								<option value="genestealer">Genestealer Cults</option>
+							</select>
+						</div>
+					</div>
+					<div class="player-form">
+						<h3>Player 2</h3>
+						<div class="form-group">
+							<label>Battle-Brother Name:</label>
+							<input
+								type="text"
+								id="player2Name"
+								placeholder="Enter commander name"
+								value=""
+							/>
+						</div>
+						<div class="form-group">
+							<label>Faction:</label>
+							<select id="player2Faction">
+								<option value="">Select Faction</option>
+								<option value="space-marines">Space Marines</option>
+								<option value="imperial-guard">Astra Militarum</option>
+								<option value="sisters">Adepta Sororitas</option>
+								<option value="custodes">Adeptus Custodes</option>
+								<option value="chaos-marines">Chaos Space Marines</option>
+								<option value="death-guard">Death Guard</option>
+								<option value="thousand-sons">Thousand Sons</option>
+								<option value="orks">Orks</option>
+								<option value="tau">T'au Empire</option>
+								<option value="necrons">Necrons</option>
+								<option value="eldar">Aeldari</option>
+								<option value="drukhari">Drukhari</option>
+								<option value="tyranids">Tyranids</option>
+								<option value="genestealer">Genestealer Cults</option>
+							</select>
+						</div>
+					</div>
+				</div>
+				<div class="setup-buttons" style="text-align: center">
+					<button class="btn" onclick="startBattle()">
+						⚡ Begin Battle ⚡
+					</button>
+				</div>
+			</div>
+		</div>
+
+		<!-- Unit Selection Modal -->
+		<div id="unitModal" class="modal">
+			<div class="modal-content">
+				<h2 id="modalTitle">Select Units</h2>
+				<div id="unitSelectionGrid" class="unit-selection-grid"></div>
+				<div style="text-align: center; margin-top: 2rem">
+					<button class="btn btn-secondary" onclick="closeUnitModal()">
+						Cancel
+					</button>
+					<button class="btn" onclick="confirmUnitSelection()">
+						Confirm Selection
+					</button>
+				</div>
+			</div>
+		</div>
+
+		<!-- Main Game Screen -->
+		<div id="gameScreen" class="game-container">
+			<div class="main-game">
+				<!-- Phase Tracker -->
+				<div class="phase-tracker">
+					<div class="phase-bar">
+						<div class="phase active" data-phase="command">Command</div>
+						<div class="phase" data-phase="movement">Movement</div>
+						<div class="phase" data-phase="shooting">Shooting</div>
+						<div class="phase" data-phase="charge">Charge</div>
+						<div class="phase" data-phase="fight">Fight</div>
+						<div class="phase" data-phase="morale">Morale</div>
+					</div>
+					<div class="turn-info">
+						<div>
+							<span style="font-size: 1.1rem"
+								>⚔️ Battle Round: <strong id="currentTurn">1</strong></span
+							>
+							<span style="margin-left: 1rem"
+								>👑 Active: <strong id="activePlayer">-</strong></span
+							>
+						</div>
+						<div>
+							<button class="btn btn-small" onclick="nextPhase()">
+								Next Phase →
+							</button>
+							<button class="btn btn-secondary btn-small" onclick="endTurn()">
+								End Turn
+							</button>
+							<button class="btn btn-secondary btn-small" onclick="resetGame()">
+								Reset
+							</button>
+						</div>
+					</div>
+				</div>
+
+				<!-- Players Area -->
+				<div class="players-area">
+					<!-- Player 1 Panel -->
+					<div class="player-panel" id="player1Panel">
+						<div class="player-header">
+							<div class="player-avatar">P1</div>
+							<div class="player-stats">
+								<div class="stat-row">
+									<span
+										style="font-size: 1.1rem; font-weight: bold"
+										id="player1NameDisplay"
+										>Player 1</span
+									>
+								</div>
+								<div class="stat-row">
+									<span class="stat-badge"
+										>⚡ CP: <span id="player1CP">0</span></span
+									>
+									<span class="stat-badge"
+										>🎯 VP: <span id="player1VP">0</span></span
+									>
+								</div>
+							</div>
+						</div>
+
+						<div class="units-section">
+							<h4>🛡️ Battle Forces</h4>
+							<div id="player1Units"></div>
+						</div>
+
+						<div class="actions-section">
+							<h4 style="color: #ffd700; margin-bottom: 0.5rem">
+								⚔️ Battle Commands
+							</h4>
+							<div class="action-input">
+								<input
+									type="text"
+									id="player1Input"
+									placeholder="e.g., 'Space Marine takes 2 wounds', 'use Transhuman'"
+								/>
+								<button class="btn btn-small" onclick="processAction(1)">
+									Execute
+								</button>
+							</div>
+							<div class="quick-actions">
+								<button
+									class="btn btn-secondary btn-small"
+									onclick="quickAction(1, 'spend-cp')"
+								>
+									Use CP
+								</button>
+								<button
+									class="btn btn-secondary btn-small"
+									onclick="quickAction(1, 'gain-vp')"
+								>
+									Score VP
+								</button>
+								<button
+									class="btn btn-secondary btn-small"
+									onclick="rollDiceFor(1)"
+								>
+									Roll Dice
+								</button>
+								<button
+									class="btn btn-secondary btn-small"
+									onclick="selectUnitsForPlayer(1)"
+								>
+									Add Units
+								</button>
+							</div>
+						</div>
+					</div>
+
+					<!-- Player 2 Panel -->
+					<div class="player-panel" id="player2Panel">
+						<div class="player-header">
+							<div class="player-avatar">P2</div>
+							<div class="player-stats">
+								<div class="stat-row">
+									<span
+										style="font-size: 1.1rem; font-weight: bold"
+										id="player2NameDisplay"
+										>Player 2</span
+									>
+								</div>
+								<div class="stat-row">
+									<span class="stat-badge"
+										>⚡ CP: <span id="player2CP">0</span></span
+									>
+									<span class="stat-badge"
+										>🎯 VP: <span id="player2VP">0</span></span
+									>
+								</div>
+							</div>
+						</div>
+
+						<div class="units-section">
+							<h4>🛡️ Battle Forces</h4>
+							<div id="player2Units"></div>
+						</div>
+
+						<div class="actions-section">
+							<h4 style="color: #ffd700; margin-bottom: 0.5rem">
+								⚔️ Battle Commands
+							</h4>
+							<div class="action-input">
+								<input
+									type="text"
+									id="player2Input"
+									placeholder="e.g., 'Ork Boy takes 1 wound', 'WAAAGH!'"
+								/>
+								<button class="btn btn-small" onclick="processAction(2)">
+									Execute
+								</button>
+							</div>
+							<div class="quick-actions">
+								<button
+									class="btn btn-secondary btn-small"
+									onclick="quickAction(2, 'spend-cp')"
+								>
+									Use CP
+								</button>
+								<button
+									class="btn btn-secondary btn-small"
+									onclick="quickAction(2, 'gain-vp')"
+								>
+									Score VP
+								</button>
+								<button
+									class="btn btn-secondary btn-small"
+									onclick="rollDiceFor(2)"
+								>
+									Roll Dice
+								</button>
+								<button
+									class="btn btn-secondary btn-small"
+									onclick="selectUnitsForPlayer(2)"
+								>
+									Add Units
+								</button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- Sidebar -->
+			<div class="sidebar">
+				<!-- Dice Section -->
+				<div class="dice-section">
+					<h3>🎲 Dice Engine</h3>
+					<div class="dice-controls">
+						<input
+							type="text"
+							class="dice-input"
+							id="diceInput"
+							placeholder="e.g., '6d6', '2d6+1', 'roll 5'"
+						/>
+						<button class="btn btn-small" onclick="rollDice()">Roll!</button>
+					</div>
+					<div class="dice-results" id="diceResults">
+						<div style="text-align: center; color: #888">Ready to roll...</div>
+					</div>
+				</div>
+
+				<!-- Game Log -->
+				<div class="log-section">
+					<h3>📜 Battle Chronicle</h3>
+					<div class="log-content" id="gameLog"></div>
+					<div style="margin-top: 0.5rem; display: flex; gap: 0.5rem">
+						<button class="btn btn-secondary btn-small" onclick="clearLog()">
+							Clear
+						</button>
+						<button class="btn btn-secondary btn-small" onclick="exportLog()">
+							Export
+						</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<script>
+			// Comprehensive unit database for all factions
+			const unitDatabase = {
+				"space-marines": [
+					{
+						name: "Intercessor Squad",
+						wounds: 2,
+						models: 10,
+						save: 3,
+						leadership: 6,
+						oc: 2,
+						movement: 6,
+						toughness: 4,
+						role: "Battleline",
+					},
+					{
+						name: "Assault Intercessors",
+						wounds: 2,
+						models: 10,
+						save: 3,
+						leadership: 6,
+						oc: 2,
+						movement: 6,
+						toughness: 4,
+						role: "Battleline",
+					},
+					{
+						name: "Heavy Intercessors",
+						wounds: 3,
+						models: 5,
+						save: 3,
+						leadership: 6,
+						oc: 1,
+						movement: 5,
+						toughness: 6,
+						role: "Battleline",
+					},
+					{
+						name: "Tactical Squad",
+						wounds: 2,
+						models: 10,
+						save: 3,
+						leadership: 6,
+						oc: 2,
+						movement: 6,
+						toughness: 4,
+						role: "Battleline",
+					},
+					{
+						name: "Hellblasters",
+						wounds: 2,
+						models: 5,
+						save: 3,
+						leadership: 6,
+						oc: 1,
+						movement: 6,
+						toughness: 4,
+						role: "Fire Support",
+					},
+					{
+						name: "Inceptors",
+						wounds: 3,
+						models: 3,
+						save: 3,
+						leadership: 6,
+						oc: 1,
+						movement: 10,
+						toughness: 5,
+						role: "Close Support",
+					},
+					{
+						name: "Eradicators",
+						wounds: 3,
+						models: 3,
+						save: 3,
+						leadership: 6,
+						oc: 1,
+						movement: 5,
+						toughness: 6,
+						role: "Fire Support",
+					},
+					{
+						name: "Captain",
+						wounds: 5,
+						models: 1,
+						save: 3,
+						leadership: 6,
+						oc: 1,
+						movement: 6,
+						toughness: 4,
+						role: "Character",
+					},
+					{
+						name: "Primaris Captain",
+						wounds: 6,
+						models: 1,
+						save: 3,
+						leadership: 6,
+						oc: 1,
+						movement: 6,
+						toughness: 4,
+						role: "Character",
+					},
+					{
+						name: "Lieutenant",
+						wounds: 4,
+						models: 1,
+						save: 3,
+						leadership: 6,
+						oc: 1,
+						movement: 6,
+						toughness: 4,
+						role: "Character",
+					},
+					{
+						name: "Chaplain",
+						wounds: 4,
+						models: 1,
+						save: 3,
+						leadership: 5,
+						oc: 1,
+						movement: 6,
+						toughness: 4,
+						role: "Character",
+					},
+					{
+						name: "Apothecary",
+						wounds: 4,
+						models: 1,
+						save: 3,
+						leadership: 6,
+						oc: 1,
+						movement: 6,
+						toughness: 4,
+						role: "Character",
+					},
+					{
+						name: "Dreadnought",
+						wounds: 8,
+						models: 1,
+						save: 2,
+						leadership: 6,
+						oc: 3,
+						movement: 6,
+						toughness: 10,
+						role: "Vehicle",
+					},
+				],
+				"imperial-guard": [
+					{
+						name: "Infantry Squad",
+						wounds: 1,
+						models: 10,
+						save: 5,
+						leadership: 7,
+						oc: 2,
+						movement: 6,
+						toughness: 3,
+						role: "Battleline",
+					},
+					{
+						name: "Cadian Shock Troops",
+						wounds: 1,
+						models: 10,
+						save: 5,
+						leadership: 7,
+						oc: 2,
+						movement: 6,
+						toughness: 3,
+						role: "Battleline",
+					},
+					{
+						name: "Heavy Weapons Squad",
+						wounds: 2,
+						models: 3,
+						save: 5,
+						leadership: 7,
+						oc: 1,
+						movement: 6,
+						toughness: 3,
+						role: "Fire Support",
+					},
+					{
+						name: "Kasrkin",
+						wounds: 1,
+						models: 10,
+						save: 4,
+						leadership: 6,
+						oc: 1,
+						movement: 6,
+						toughness: 3,
+						role: "Elite",
+					},
+					{
+						name: "Bullgryn Squad",
+						wounds: 3,
+						models: 3,
+						save: 4,
+						leadership: 6,
+						oc: 1,
+						movement: 6,
+						toughness: 6,
+						role: "Elite",
+					},
+					{
+						name: "Company Commander",
+						wounds: 3,
+						models: 1,
+						save: 5,
+						leadership: 7,
+						oc: 1,
+						movement: 6,
+						toughness: 3,
+						role: "Character",
+					},
+					{
+						name: "Tank Commander",
+						wounds: 13,
+						models: 1,
+						save: 2,
+						leadership: 7,
+						oc: 3,
+						movement: 10,
+						toughness: 11,
+						role: "Character Vehicle",
+					},
+					{
+						name: "Leman Russ Battle Tank",
+						wounds: 13,
+						models: 1,
+						save: 2,
+						leadership: 7,
+						oc: 3,
+						movement: 10,
+						toughness: 11,
+						role: "Vehicle",
+					},
+					{
+						name: "Sentinel",
+						wounds: 7,
+						models: 1,
+						save: 3,
+						leadership: 7,
+						oc: 2,
+						movement: 10,
+						toughness: 7,
+						role: "Vehicle",
+					},
+				],
+				orks: [
+					{
+						name: "Boyz",
+						wounds: 1,
+						models: 10,
+						save: 6,
+						leadership: 7,
+						oc: 2,
+						movement: 6,
+						toughness: 5,
+						role: "Battleline",
+					},
+					{
+						name: "Gretchin",
+						wounds: 1,
+						models: 10,
+						save: 6,
+						leadership: 5,
+						oc: 1,
+						movement: 6,
+						toughness: 2,
+						role: "Battleline",
+					},
+					{
+						name: "Nobz",
+						wounds: 2,
+						models: 5,
+						save: 4,
+						leadership: 7,
+						oc: 1,
+						movement: 6,
+						toughness: 5,
+						role: "Elite",
+					},
+					{
+						name: "Meganobz",
+						wounds: 3,
+						models: 3,
+						save: 2,
+						leadership: 7,
+						oc: 1,
+						movement: 5,
+						toughness: 6,
+						role: "Elite",
+					},
+					{
+						name: "Lootas",
+						wounds: 1,
+						models: 5,
+						save: 6,
+						leadership: 7,
+						oc: 1,
+						movement: 6,
+						toughness: 5,
+						role: "Fire Support",
+					},
+					{
+						name: "Warboss",
+						wounds: 6,
+						models: 1,
+						save: 4,
+						leadership: 6,
+						oc: 1,
+						movement: 6,
+						toughness: 5,
+						role: "Character",
+					},
+					{
+						name: "Weirdboy",
+						wounds: 4,
+						models: 1,
+						save: 6,
+						leadership: 7,
+						oc: 1,
+						movement: 6,
+						toughness: 5,
+						role: "Character Psyker",
+					},
+					{
+						name: "Deff Dread",
+						wounds: 8,
+						models: 1,
+						save: 3,
+						leadership: 7,
+						oc: 3,
+						movement: 6,
+						toughness: 10,
+						role: "Vehicle",
+					},
+				],
+				necrons: [
+					{
+						name: "Necron Warriors",
+						wounds: 1,
+						models: 10,
+						save: 4,
+						leadership: 10,
+						oc: 2,
+						movement: 5,
+						toughness: 4,
+						role: "Battleline",
+					},
+					{
+						name: "Immortals",
+						wounds: 1,
+						models: 10,
+						save: 3,
+						leadership: 10,
+						oc: 2,
+						movement: 5,
+						toughness: 5,
+						role: "Battleline",
+					},
+					{
+						name: "Lychguard",
+						wounds: 2,
+						models: 5,
+						save: 3,
+						leadership: 10,
+						oc: 1,
+						movement: 5,
+						toughness: 5,
+						role: "Elite",
+					},
+					{
+						name: "Deathmarks",
+						wounds: 1,
+						models: 5,
+						save: 3,
+						leadership: 10,
+						oc: 1,
+						movement: 5,
+						toughness: 4,
+						role: "Elite",
+					},
+					{
+						name: "Overlord",
+						wounds: 6,
+						models: 1,
+						save: 3,
+						leadership: 10,
+						oc: 1,
+						movement: 5,
+						toughness: 5,
+						role: "Character",
+					},
+					{
+						name: "Royal Warden",
+						wounds: 5,
+						models: 1,
+						save: 3,
+						leadership: 10,
+						oc: 1,
+						movement: 5,
+						toughness: 5,
+						role: "Character",
+					},
+					{
+						name: "Canoptek Scarabs",
+						wounds: 3,
+						models: 3,
+						save: 4,
+						leadership: 10,
+						oc: 0,
+						movement: 10,
+						toughness: 2,
+						role: "Swarm",
+					},
+				],
+				tau: [
+					{
+						name: "Fire Warriors",
+						wounds: 1,
+						models: 10,
+						save: 4,
+						leadership: 7,
+						oc: 2,
+						movement: 6,
+						toughness: 3,
+						role: "Battleline",
+					},
+					{
+						name: "Kroot Carnivores",
+						wounds: 1,
+						models: 10,
+						save: 6,
+						leadership: 7,
+						oc: 2,
+						movement: 7,
+						toughness: 3,
+						role: "Battleline",
+					},
+					{
+						name: "Crisis Battlesuits",
+						wounds: 4,
+						models: 3,
+						save: 3,
+						leadership: 7,
+						oc: 2,
+						movement: 10,
+						toughness: 5,
+						role: "Elite",
+					},
+					{
+						name: "Stealth Battlesuits",
+						wounds: 2,
+						models: 3,
+						save: 3,
+						leadership: 7,
+						oc: 1,
+						movement: 8,
+						toughness: 4,
+						role: "Elite",
+					},
+					{
+						name: "Commander",
+						wounds: 6,
+						models: 1,
+						save: 3,
+						leadership: 7,
+						oc: 2,
+						movement: 10,
+						toughness: 5,
+						role: "Character",
+					},
+					{
+						name: "Ethereal",
+						wounds: 3,
+						models: 1,
+						save: 5,
+						leadership: 7,
+						oc: 1,
+						movement: 6,
+						toughness: 3,
+						role: "Character",
+					},
+				],
+				"chaos-marines": [
+					{
+						name: "Chaos Space Marines",
+						wounds: 2,
+						models: 10,
+						save: 3,
+						leadership: 6,
+						oc: 2,
+						movement: 6,
+						toughness: 4,
+						role: "Battleline",
+					},
+					{
+						name: "Cultists",
+						wounds: 1,
+						models: 10,
+						save: 6,
+						leadership: 7,
+						oc: 1,
+						movement: 6,
+						toughness: 3,
+						role: "Battleline",
+					},
+					{
+						name: "Chosen",
+						wounds: 3,
+						models: 5,
+						save: 3,
+						leadership: 6,
+						oc: 1,
+						movement: 6,
+						toughness: 4,
+						role: "Elite",
+					},
+					{
+						name: "Terminators",
+						wounds: 3,
+						models: 5,
+						save: 2,
+						leadership: 6,
+						oc: 1,
+						movement: 5,
+						toughness: 5,
+						role: "Elite",
+					},
+					{
+						name: "Chaos Lord",
+						wounds: 5,
+						models: 1,
+						save: 3,
+						leadership: 6,
+						oc: 1,
+						movement: 6,
+						toughness: 4,
+						role: "Character",
+					},
+					{
+						name: "Dark Apostle",
+						wounds: 4,
+						models: 1,
+						save: 3,
+						leadership: 6,
+						oc: 1,
+						movement: 6,
+						toughness: 4,
+						role: "Character",
+					},
+				],
+				tyranids: [
+					{
+						name: "Termagants",
+						wounds: 1,
+						models: 10,
+						save: 5,
+						leadership: 8,
+						oc: 2,
+						movement: 6,
+						toughness: 3,
+						role: "Battleline",
+					},
+					{
+						name: "Hormagaunts",
+						wounds: 1,
+						models: 10,
+						save: 5,
+						leadership: 8,
+						oc: 2,
+						movement: 10,
+						toughness: 3,
+						role: "Battleline",
+					},
+					{
+						name: "Genestealers",
+						wounds: 1,
+						models: 10,
+						save: 5,
+						leadership: 7,
+						oc: 1,
+						movement: 8,
+						toughness: 4,
+						role: "Elite",
+					},
+					{
+						name: "Warriors",
+						wounds: 3,
+						models: 3,
+						save: 4,
+						leadership: 7,
+						oc: 1,
+						movement: 6,
+						toughness: 5,
+						role: "Elite",
+					},
+					{
+						name: "Hive Tyrant",
+						wounds: 10,
+						models: 1,
+						save: 2,
+						leadership: 7,
+						oc: 3,
+						movement: 8,
+						toughness: 10,
+						role: "Character Monster",
+					},
+					{
+						name: "Carnifex",
+						wounds: 9,
+						models: 1,
+						save: 2,
+						leadership: 8,
+						oc: 3,
+						movement: 7,
+						toughness: 9,
+						role: "Monster",
+					},
+				],
+				eldar: [
+					{
+						name: "Guardian Defenders",
+						wounds: 1,
+						models: 10,
+						save: 4,
+						leadership: 6,
+						oc: 2,
+						movement: 7,
+						toughness: 3,
+						role: "Battleline",
+					},
+					{
+						name: "Rangers",
+						wounds: 1,
+						models: 5,
+						save: 5,
+						leadership: 6,
+						oc: 1,
+						movement: 7,
+						toughness: 3,
+						role: "Elite",
+					},
+					{
+						name: "Dire Avengers",
+						wounds: 1,
+						models: 10,
+						save: 4,
+						leadership: 6,
+						oc: 2,
+						movement: 7,
+						toughness: 3,
+						role: "Battleline",
+					},
+					{
+						name: "Howling Banshees",
+						wounds: 1,
+						models: 5,
+						save: 4,
+						leadership: 6,
+						oc: 1,
+						movement: 8,
+						toughness: 3,
+						role: "Elite",
+					},
+					{
+						name: "Farseer",
+						wounds: 4,
+						models: 1,
+						save: 4,
+						leadership: 6,
+						oc: 1,
+						movement: 7,
+						toughness: 3,
+						role: "Character Psyker",
+					},
+					{
+						name: "Autarch",
+						wounds: 4,
+						models: 1,
+						save: 3,
+						leadership: 6,
+						oc: 1,
+						movement: 7,
+						toughness: 3,
+						role: "Character",
+					},
+				],
+			};
+
+			// Game State Management
+			let gameState = {
+				currentTurn: 1,
+				currentPhase: "command",
+				activePlayer: 1,
+				phases: [
+					"command",
+					"movement",
+					"shooting",
+					"charge",
+					"fight",
+					"morale",
+				],
+				players: {
+					1: {
+						name: "Player 1",
+						faction: "",
+						cp: 0,
+						vp: 0,
+						units: [],
+						stratagems: [],
+						objectives: [],
+					},
+					2: {
+						name: "Player 2",
+						faction: "",
+						cp: 0,
+						vp: 0,
+						units: [],
+						stratagems: [],
+						objectives: [],
+					},
+				},
+				log: [],
+				objectives: [],
+				secondaryObjectives: [],
+				currentUnitSelection: null,
+				selectedUnits: [],
+			};
+
+			// Initialize
+			function init() {
+				logEntry(
+					"Welcome to Warhammer 40,000 10th Edition Battle Assistant!",
+					"system"
+				);
+				loadGameState();
+			}
+
+			// Start Battle
+			function startBattle() {
+				const p1Name =
+					document.getElementById("player1Name").value || "Player 1";
+				const p2Name =
+					document.getElementById("player2Name").value || "Player 2";
+				const p1Faction = document.getElementById("player1Faction").value;
+				const p2Faction = document.getElementById("player2Faction").value;
+
+				if (!p1Faction || !p2Faction) {
+					alert("Please select factions for both players!");
+					return;
+				}
+
+				gameState.players[1].name = p1Name;
+				gameState.players[2].name = p2Name;
+				gameState.players[1].faction = p1Faction;
+				gameState.players[2].faction = p2Faction;
+
+				document.getElementById("player1NameDisplay").textContent = p1Name;
+				document.getElementById("player2NameDisplay").textContent = p2Name;
+
+				// Initial CP allocation (3 CP at game start)
+				gameState.players[1].cp = 3;
+				gameState.players[2].cp = 3;
+
+				document.getElementById("setupScreen").style.display = "none";
+				document.getElementById("gameScreen").style.display = "grid";
+
+				updateDisplay();
+				logEntry(
+					`BATTLE COMMENCES! ${p1Name} (${p1Faction}) vs ${p2Name} (${p2Faction})`,
+					"system"
+				);
+
+				// Prompt for unit selection
+				setTimeout(() => {
+					selectUnitsForPlayer(1);
+				}, 500);
+			}
+
+			// Unit Selection
+			function selectUnitsForPlayer(playerNum) {
+				gameState.currentUnitSelection = playerNum;
+				gameState.selectedUnits = [];
+
+				const modal = document.getElementById("unitModal");
+				const modalTitle = document.getElementById("modalTitle");
+				const grid = document.getElementById("unitSelectionGrid");
+
+				modalTitle.textContent = `Select Units for ${gameState.players[playerNum].name}`;
+
+				const faction = gameState.players[playerNum].faction;
+				const availableUnits = unitDatabase[faction] || [];
+
+				grid.innerHTML = "";
+
+				availableUnits.forEach((unit, index) => {
+					const card = document.createElement("div");
+					card.className = "unit-select-card";
+					card.dataset.unitIndex = index;
+
+					card.innerHTML = `
+			            <h4 style="color: #FFD700; margin-bottom: 0.5rem;">${unit.name}</h4>
+			            <div style="font-size: 0.85rem; line-height: 1.5;">
+			                <div>Role: ${unit.role}</div>
+			                <div>Models: ${unit.models} | Wounds: ${unit.wounds}</div>
+			                <div>M: ${unit.movement}" | T: ${unit.toughness} | Sv: ${unit.save}+ | Ld: ${unit.leadership}+</div>
+			                <div>OC: ${unit.oc}</div>
+			            </div>
+			        `;
+
+					card.onclick = () => toggleUnitSelection(card, unit);
+					grid.appendChild(card);
+				});
+
+				modal.style.display = "block";
+			}
+
+			function toggleUnitSelection(card, unit) {
+				card.classList.toggle("selected");
+
+				if (card.classList.contains("selected")) {
+					gameState.selectedUnits.push(unit);
+				} else {
+					const index = gameState.selectedUnits.findIndex(
+						(u) => u.name === unit.name
+					);
+					if (index > -1) {
+						gameState.selectedUnits.splice(index, 1);
+					}
+				}
+			}
+
+			function confirmUnitSelection() {
+				const playerNum = gameState.currentUnitSelection;
+
+				if (gameState.selectedUnits.length === 0) {
+					alert("Please select at least one unit!");
+					return;
+				}
+
+				// Add selected units to player's army
+				gameState.selectedUnits.forEach((unit) => {
+					const newUnit = {
+						...unit,
+						id: Date.now() + Math.random(),
+						currentWounds: unit.wounds * unit.models,
+						maxWounds: unit.wounds * unit.models,
+						currentModels: unit.models,
+						status: "active",
+						buffs: [],
+						damageTaken: 0,
+					};
+					gameState.players[playerNum].units.push(newUnit);
+				});
+
+				closeUnitModal();
+				updateUnitsDisplay(playerNum);
+				logEntry(
+					`${gameState.players[playerNum].name} has deployed ${gameState.selectedUnits.length} units!`,
+					"system"
+				);
+
+				// If player 1 just selected, prompt player 2
+				if (playerNum === 1 && gameState.players[2].units.length === 0) {
+					setTimeout(() => {
+						selectUnitsForPlayer(2);
+					}, 500);
+				}
+
+				saveGameState();
+			}
+
+			function closeUnitModal() {
+				document.getElementById("unitModal").style.display = "none";
+				gameState.currentUnitSelection = null;
+				gameState.selectedUnits = [];
+			}
+
+			// Display Updates
+			function updateDisplay() {
+				// Update phase display
+				document.querySelectorAll(".phase").forEach((phase) => {
+					phase.classList.remove("active");
+					if (phase.dataset.phase === gameState.currentPhase) {
+						phase.classList.add("active");
+					}
+				});
+
+				// Update turn and active player
+				document.getElementById("currentTurn").textContent =
+					gameState.currentTurn;
+				document.getElementById("activePlayer").textContent =
+					gameState.players[gameState.activePlayer].name;
+
+				// Update player panels
+				document
+					.querySelectorAll(".player-panel")
+					.forEach((panel) => panel.classList.remove("active"));
+				document
+					.getElementById(`player${gameState.activePlayer}Panel`)
+					.classList.add("active");
+
+				// Update CP and VP
+				document.getElementById("player1CP").textContent =
+					gameState.players[1].cp;
+				document.getElementById("player1VP").textContent =
+					gameState.players[1].vp;
+				document.getElementById("player2CP").textContent =
+					gameState.players[2].cp;
+				document.getElementById("player2VP").textContent =
+					gameState.players[2].vp;
+
+				// Update units
+				updateUnitsDisplay(1);
+				updateUnitsDisplay(2);
+			}
+
+			function updateUnitsDisplay(playerNum) {
+				const container = document.getElementById(`player${playerNum}Units`);
+				if (!container) return;
+
+				container.innerHTML = "";
+
+				gameState.players[playerNum].units.forEach((unit) => {
+					const unitDiv = document.createElement("div");
+					unitDiv.className = "unit-card";
+
+					// Add status classes
+					const woundPercent = (unit.currentWounds / unit.maxWounds) * 100;
+					if (unit.status === "destroyed") {
+						unitDiv.classList.add("destroyed");
+					} else if (woundPercent <= 25) {
+						unitDiv.classList.add("critical");
+					} else if (woundPercent <= 50) {
+						unitDiv.classList.add("damaged");
+					}
+
+					// Create wound display
+					let woundPips = "";
+					const maxPipsToShow = Math.min(unit.maxWounds, 20);
+					for (let i = 0; i < maxPipsToShow; i++) {
+						woundPips += `<div class="wound-pip ${
+							i >= unit.currentWounds ? "lost" : ""
+						}"></div>`;
+					}
+
+					// Create buffs display
+					let buffsHtml = "";
+					if (unit.buffs && unit.buffs.length > 0) {
+						buffsHtml = '<div class="unit-buffs">';
+						unit.buffs.forEach((buff) => {
+							buffsHtml += `<span class="buff-tag">${buff.name}</span>`;
+						});
+						buffsHtml += "</div>";
+					}
+
+					unitDiv.innerHTML = `
+			            <div class="unit-header">
+			                <span class="unit-name">${unit.name}</span>
+			                <span>${unit.currentModels}/${unit.models} models</span>
+			            </div>
+			            <div class="unit-stats-row">
+			                M: ${unit.movement}" | T: ${unit.toughness} | Sv: ${unit.save}+ | W: ${unit.wounds} | Ld: ${unit.leadership}+ | OC: ${unit.oc}
+			            </div>
+			            <div class="unit-wounds">${woundPips}</div>
+			            <div style="font-size: 0.8rem; margin-top: 0.5rem; color: #ccc;">
+			                Wounds: ${unit.currentWounds}/${unit.maxWounds} | ${unit.role}
+			            </div>
+			            ${buffsHtml}
+			        `;
+
+					unitDiv.onclick = () => selectUnit(unit, playerNum);
+					container.appendChild(unitDiv);
+				});
+			}
+
+			// Natural Language Processing
+			function processAction(playerNum) {
+				const input = document
+					.getElementById(`player${playerNum}Input`)
+					.value.trim();
+				if (!input) return;
+
+				const lowerInput = input.toLowerCase();
+
+				// Process different types of commands
+				if (
+					lowerInput.includes("takes") ||
+					lowerInput.includes("suffers") ||
+					lowerInput.includes("loses")
+				) {
+					processDamage(input, playerNum);
+				} else if (
+					lowerInput.includes("heals") ||
+					lowerInput.includes("regains")
+				) {
+					processHealing(input, playerNum);
+				} else if (lowerInput.includes("spend") && lowerInput.includes("cp")) {
+					processCP(input, playerNum, "spend");
+				} else if (
+					lowerInput.includes("gain") &&
+					(lowerInput.includes("cp") || lowerInput.includes("command"))
+				) {
+					processCP(input, playerNum, "gain");
+				} else if (
+					lowerInput.includes("score") ||
+					lowerInput.includes("vp") ||
+					lowerInput.includes("victory")
+				) {
+					processVP(input, playerNum);
+				} else if (
+					lowerInput.includes("use") ||
+					lowerInput.includes("stratagem")
+				) {
+					processStratagem(input, playerNum);
+				} else if (lowerInput.includes("roll")) {
+					processDiceRoll(input, playerNum);
+				} else if (lowerInput.includes("charge")) {
+					processCharge(input, playerNum);
+				} else if (
+					lowerInput.includes("+") &&
+					(lowerInput.includes("hit") ||
+						lowerInput.includes("wound") ||
+						lowerInput.includes("save"))
+				) {
+					processBuff(input, playerNum);
+				} else {
+					// Generic action logging
+					logEntry(`${gameState.players[playerNum].name}: ${input}`, "action");
+				}
+
+				// Clear input
+				document.getElementById(`player${playerNum}Input`).value = "";
+				updateDisplay();
+				saveGameState();
+			}
+
+			function processDamage(input, playerNum) {
+				const match = input.match(
+					/(.+?)\s+(?:takes?|suffers?|loses?)\s+(\d+)\s*(?:wounds?|damage|mortal\s+wounds?)?/i
+				);
+
+				if (match) {
+					const unitName = match[1].trim();
+					const damage = parseInt(match[2]);
+
+					const unit = findUnit(unitName, playerNum);
+					if (unit) {
+						unit.currentWounds = Math.max(0, unit.currentWounds - damage);
+						unit.damageTaken += damage;
+
+						// Calculate models lost
+						const modelsLost = Math.floor(
+							(unit.maxWounds - unit.currentWounds) / unit.wounds
+						);
+						unit.currentModels = unit.models - modelsLost;
+
+						if (unit.currentWounds === 0) {
+							unit.status = "destroyed";
+							logEntry(`${unit.name} has been DESTROYED!`, "damage");
+						} else {
+							logEntry(
+								`${unit.name} takes ${damage} wounds (${unit.currentWounds}/${unit.maxWounds} remaining)`,
+								"damage"
+							);
+
+							// Check for morale if at half strength
+							if (
+								unit.currentModels <= unit.models / 2 &&
+								unit.currentModels > 0
+							) {
+								logEntry(
+									`${unit.name} is below half strength - Battle-shock test required!`,
+									"morale"
+								);
+							}
+						}
+					} else {
+						logEntry(
+							`Unit "${unitName}" not found for ${gameState.players[playerNum].name}`,
+							"error"
+						);
+					}
+				}
+			}
+
+			function processHealing(input, playerNum) {
+				const match = input.match(
+					/(.+?)\s+(?:heals?|regains?|restores?)\s+(\d+)\s*(?:wounds?)?/i
+				);
+
+				if (match) {
+					const unitName = match[1].trim();
+					const healing = parseInt(match[2]);
+
+					const unit = findUnit(unitName, playerNum);
+					if (unit && unit.status !== "destroyed") {
+						const actualHealing = Math.min(
+							healing,
+							unit.maxWounds - unit.currentWounds
+						);
+						unit.currentWounds += actualHealing;
+
+						logEntry(
+							`${unit.name} heals ${actualHealing} wounds (${unit.currentWounds}/${unit.maxWounds})`,
+							"heal"
+						);
+					}
+				}
+			}
+
+			function processCP(input, playerNum, action) {
+				const match = input.match(/(\d+)\s*cp/i);
+				const amount = match ? parseInt(match[1]) : 1;
+
+				if (action === "spend") {
+					if (gameState.players[playerNum].cp >= amount) {
+						gameState.players[playerNum].cp -= amount;
+						logEntry(
+							`${gameState.players[playerNum].name} spends ${amount} CP (${gameState.players[playerNum].cp} remaining)`,
+							"stratagem"
+						);
+					} else {
+						logEntry(
+							`Insufficient CP! ${gameState.players[playerNum].name} has only ${gameState.players[playerNum].cp} CP`,
+							"error"
+						);
+					}
+				} else {
+					gameState.players[playerNum].cp += amount;
+					logEntry(
+						`${gameState.players[playerNum].name} gains ${amount} CP (${gameState.players[playerNum].cp} total)`,
+						"system"
+					);
+				}
+			}
+
+			function processVP(input, playerNum) {
+				const match = input.match(/(\d+)\s*(?:vp|victory|points?)/i);
+				const amount = match ? parseInt(match[1]) : 1;
+
+				gameState.players[playerNum].vp += amount;
+				logEntry(
+					`${gameState.players[playerNum].name} scores ${amount} VP (${gameState.players[playerNum].vp} total)`,
+					"objective"
+				);
+			}
+
+			function processStratagem(input, playerNum) {
+				const stratagemName = input.replace(/use\s+/i, "").trim();
+				gameState.players[playerNum].stratagems.push({
+					name: stratagemName,
+					phase: gameState.currentPhase,
+					turn: gameState.currentTurn,
+				});
+
+				logEntry(
+					`${gameState.players[playerNum].name} uses stratagem: ${stratagemName}`,
+					"stratagem"
+				);
+			}
+
+			function processBuff(input, playerNum) {
+				const match = input.match(/(.+?)\s+gets?\s+(.+)/i);
+				if (match) {
+					const unitName = match[1].trim();
+					const buffDescription = match[2].trim();
+
+					const unit = findUnit(unitName, playerNum);
+					if (unit) {
+						unit.buffs.push({
+							name: buffDescription,
+							appliedTurn: gameState.currentTurn,
+							appliedPhase: gameState.currentPhase,
+						});
+
+						logEntry(`${unit.name} gains buff: ${buffDescription}`, "buff");
+					}
+				}
+			}
+
+			function findUnit(unitName, playerNum) {
+				const units = gameState.players[playerNum].units;
+				return units.find(
+					(unit) =>
+						unit.name.toLowerCase().includes(unitName.toLowerCase()) ||
+						unitName.toLowerCase().includes(unit.name.toLowerCase())
+				);
+			}
+
+			// Quick Actions
+			function quickAction(playerNum, action) {
+				switch (action) {
+					case "spend-cp":
+						processCP("spend 1 CP", playerNum, "spend");
+						break;
+					case "gain-vp":
+						processVP("score 1 VP", playerNum);
+						break;
+				}
+				updateDisplay();
+				saveGameState();
+			}
+
+			// Dice Rolling
+			function rollDice(inputOverride = null) {
+				const input =
+					inputOverride || document.getElementById("diceInput").value.trim();
+				if (!input) return;
+
+				let numDice = 1;
+				let diceType = 6;
+				let modifier = 0;
+
+				// Parse various dice notations
+				const diceMatch = input.match(/(\d+)?d(\d+)([+-]\d+)?/i);
+				const rollMatch = input.match(/roll\s+(\d+)/i);
+
+				if (diceMatch) {
+					numDice = parseInt(diceMatch[1]) || 1;
+					diceType = parseInt(diceMatch[2]);
+					modifier = diceMatch[3] ? parseInt(diceMatch[3]) : 0;
+				} else if (rollMatch) {
+					numDice = parseInt(rollMatch[1]);
+				} else {
+					const simpleMatch = input.match(/(\d+)/);
+					if (simpleMatch) {
+						numDice = parseInt(simpleMatch[1]);
+					}
+				}
+
+				// Roll the dice
+				const rolls = [];
+				let total = 0;
+
+				for (let i = 0; i < numDice; i++) {
+					const roll = Math.floor(Math.random() * diceType) + 1;
+					rolls.push(roll);
+					total += roll;
+				}
+
+				total += modifier;
+
+				// Display results
+				const resultsDiv = document.getElementById("diceResults");
+				let html = '<div class="dice-visual">';
+
+				rolls.forEach((roll) => {
+					let dieClass = "die";
+					if (diceType === 6) {
+						if (roll >= 5) dieClass += " success";
+						else if (roll === 1) dieClass += " fail";
+					}
+					html += `<div class="${dieClass}">${roll}</div>`;
+				});
+
+				html += "</div>";
+				html += `<div style="text-align: center; margin-top: 1rem;">`;
+				html += `<div style="font-size: 1.2rem; font-weight: bold;">Total: ${total}</div>`;
+
+				if (modifier !== 0) {
+					html += `<div style="font-size: 0.9rem; color: #888;">Base: ${
+						total - modifier
+					} ${modifier > 0 ? "+" : ""}${modifier}</div>`;
+				}
+
+				// Count successes for d6 rolls
+				if (diceType === 6) {
+					const successes = rolls.filter((r) => r >= 4).length;
+					const sixes = rolls.filter((r) => r === 6).length;
+					html += `<div style="margin-top: 0.5rem; font-size: 0.9rem;">`;
+					html += `Successes (4+): ${successes}<br>`;
+					if (sixes > 0) html += `Natural 6s: ${sixes}`;
+					html += `</div>`;
+				}
+
+				html += "</div>";
+				resultsDiv.innerHTML = html;
+
+				// Log the roll
+				logEntry(
+					`Dice Roll: ${numDice}d${diceType}${
+						modifier !== 0 ? (modifier > 0 ? "+" : "") + modifier : ""
+					} = [${rolls.join(", ")}] = ${total}`,
+					"dice"
+				);
+
+				// Clear input
+				document.getElementById("diceInput").value = "";
+			}
+
+			function rollDiceFor(playerNum) {
+				const input = prompt(
+					`Enter dice to roll for ${gameState.players[playerNum].name}:`,
+					"2d6"
+				);
+				if (input) {
+					rollDice(input);
+				}
+			}
+
+			// Phase Management
+			function nextPhase() {
+				const currentIndex = gameState.phases.indexOf(gameState.currentPhase);
+
+				if (currentIndex < gameState.phases.length - 1) {
+					gameState.currentPhase = gameState.phases[currentIndex + 1];
+					logEntry(
+						`Entering ${gameState.currentPhase.toUpperCase()} PHASE`,
+						"phase"
+					);
+
+					// Phase-specific actions
+					handlePhaseStart();
+				} else {
+					endTurn();
+				}
+
+				updateDisplay();
+				saveGameState();
+			}
+
+			function handlePhaseStart() {
+				switch (gameState.currentPhase) {
+					case "command":
+						// Gain 1 CP at start of Command Phase
+						gameState.players[gameState.activePlayer].cp += 1;
+						logEntry(
+							`${
+								gameState.players[gameState.activePlayer].name
+							} gains 1 CP in Command Phase`,
+							"system"
+						);
+						break;
+
+					case "movement":
+						logEntry(
+							"Units may now move up to their Movement characteristic",
+							"system"
+						);
+						break;
+
+					case "shooting":
+						logEntry("Eligible units may now make ranged attacks", "system");
+						break;
+
+					case "charge":
+						logEntry(
+							"Eligible units may attempt to charge enemy units",
+							"system"
+						);
+						break;
+
+					case "fight":
+						logEntry(
+							"Units in engagement range make close combat attacks",
+							"system"
+						);
+						break;
+
+					case "morale":
+						logEntry(
+							"Check for Battle-shock tests on units below half strength",
+							"system"
+						);
+						checkMorale();
+						break;
+				}
+			}
+
+			function checkMorale() {
+				[1, 2].forEach((playerNum) => {
+					gameState.players[playerNum].units.forEach((unit) => {
+						if (
+							unit.status === "active" &&
+							unit.currentModels <= unit.models / 2
+						) {
+							logEntry(
+								`${unit.name} must take a Battle-shock test (below half strength)`,
+								"morale"
+							);
+						}
+					});
+				});
+			}
+
+			function endTurn() {
+				// Clear turn-based buffs
+				[1, 2].forEach((playerNum) => {
+					gameState.players[playerNum].units.forEach((unit) => {
+						unit.buffs = unit.buffs.filter((buff) => {
+							if (
+								buff.duration === "turn" &&
+								buff.appliedTurn < gameState.currentTurn
+							) {
+								logEntry(`${unit.name} loses buff: ${buff.name}`, "system");
+								return false;
+							}
+							return true;
+						});
+					});
+				});
+
+				// Switch active player
+				gameState.activePlayer = gameState.activePlayer === 1 ? 2 : 1;
+
+				// If back to player 1, increment turn
+				if (gameState.activePlayer === 1) {
+					gameState.currentTurn++;
+				}
+
+				// Reset to Command Phase
+				gameState.currentPhase = "command";
+
+				logEntry(
+					`--- TURN ${gameState.currentTurn} - ${
+						gameState.players[gameState.activePlayer].name
+					}'s turn begins ---`,
+					"turn"
+				);
+
+				handlePhaseStart();
+				updateDisplay();
+				saveGameState();
+			}
+
+			// Unit Selection
+			function selectUnit(unit, playerNum) {
+				const actions = [
+					`Take wounds: ${unit.name} takes X wounds`,
+					`Heal wounds: ${unit.name} heals X wounds`,
+					`Add buff: ${unit.name} gets +1 to hit`,
+					`Use ability: ${unit.name} uses [ability name]`,
+				];
+
+				const action = prompt(
+					`Selected: ${unit.name}\n\nExample actions:\n${actions.join(
+						"\n"
+					)}\n\nEnter action:`
+				);
+
+				if (action) {
+					document.getElementById(`player${playerNum}Input`).value = action;
+					processAction(playerNum);
+				}
+			}
+
+			// Logging
+			function logEntry(message, type = "normal") {
+				const timestamp = new Date().toLocaleTimeString();
+				const phase = gameState.currentPhase;
+
+				const entry = {
+					timestamp,
+					turn: gameState.currentTurn,
+					phase,
+					message,
+					type,
+				};
+
+				gameState.log.push(entry);
+
+				const logDiv = document.getElementById("gameLog");
+				const entryDiv = document.createElement("div");
+				entryDiv.className = "log-entry";
+
+				let messageClass = "";
+				if (type === "damage") messageClass = "log-damage";
+				else if (type === "heal") messageClass = "log-heal";
+				else if (type === "stratagem") messageClass = "log-stratagem";
+				else if (type === "phase") messageClass = "log-phase";
+
+				entryDiv.innerHTML = `
+			        <div class="log-timestamp">Turn ${entry.turn} - ${
+					phase.charAt(0).toUpperCase() + phase.slice(1)
+				} - ${timestamp}</div>
+			        <div class="${messageClass}">${message}</div>
+			    `;
+
+				logDiv.appendChild(entryDiv);
+				logDiv.scrollTop = logDiv.scrollHeight;
+			}
+
+			function clearLog() {
+				if (confirm("Clear the battle log? This cannot be undone.")) {
+					gameState.log = [];
+					document.getElementById("gameLog").innerHTML = "";
+					logEntry("Battle log cleared", "system");
+				}
+			}
+
+			function exportLog() {
+				const logText = gameState.log
+					.map(
+						(entry) =>
+							`[Turn ${entry.turn} - ${entry.phase} - ${entry.timestamp}] ${entry.message}`
+					)
+					.join("\n");
+
+				const blob = new Blob([logText], { type: "text/plain" });
+				const url = URL.createObjectURL(blob);
+				const a = document.createElement("a");
+				a.href = url;
+				a.download = `battle_log_turn${gameState.currentTurn}.txt`;
+				a.click();
+				URL.revokeObjectURL(url);
+			}
+
+			// Game State Persistence
+			function saveGameState() {
+				try {
+					localStorage.setItem("wh40k_gamestate", JSON.stringify(gameState));
+				} catch (e) {
+					console.error("Failed to save game state:", e);
+				}
+			}
+
+			function loadGameState() {
+				try {
+					const saved = localStorage.getItem("wh40k_gamestate");
+					if (saved) {
+						const loadedState = JSON.parse(saved);
+
+						// Check if there's an active game
+						if (
+							loadedState.players[1].faction &&
+							loadedState.players[2].faction
+						) {
+							if (confirm("Resume previous battle?")) {
+								gameState = loadedState;
+								document.getElementById("setupScreen").style.display = "none";
+								document.getElementById("gameScreen").style.display = "grid";
+
+								// Update display with loaded names
+								document.getElementById("player1NameDisplay").textContent =
+									gameState.players[1].name;
+								document.getElementById("player2NameDisplay").textContent =
+									gameState.players[2].name;
+
+								updateDisplay();
+								logEntry("Battle resumed from saved state", "system");
+							} else {
+								localStorage.removeItem("wh40k_gamestate");
+							}
+						}
+					}
+				} catch (e) {
+					console.error("Failed to load game state:", e);
+				}
+			}
+
+			function resetGame() {
+				if (confirm("Reset the entire battle? This will clear all data!")) {
+					localStorage.removeItem("wh40k_gamestate");
+					location.reload();
+				}
+			}
+
+			// Process various natural language inputs
+			function processDiceRoll(input, playerNum) {
+				const match = input.match(/roll\s+(.+)/i);
+				if (match) {
+					rollDice(match[1]);
+				}
+			}
+
+			function processCharge(input, playerNum) {
+				const match = input.match(/(.+?)\s+charges?\s+(.+)/i);
+				if (match) {
+					const chargingUnit = match[1].trim();
+					const targetUnit = match[2].trim();
+
+					logEntry(
+						`${chargingUnit} declares a charge against ${targetUnit}!`,
+						"charge"
+					);
+					logEntry(`Roll 2d6 for charge distance`, "system");
+
+					// Auto-roll charge
+					setTimeout(() => {
+						rollDice("2d6");
+					}, 500);
+				}
+			}
+
+			// Initialize the app
+			window.onload = init;
+
+			// Prevent modal close on escape
+			window.onclick = function (event) {
+				const modal = document.getElementById("unitModal");
+				if (event.target == modal) {
+					// Don't close on background click during unit selection
+					return false;
+				}
+			};
+		</script>
+	</body>
+</html>
