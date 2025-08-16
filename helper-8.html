@@ -1,0 +1,2112 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Warhammer 40K Battle Assistant</title>
+		<style>
+			* {
+				margin: 0;
+				padding: 0;
+				box-sizing: border-box;
+			}
+
+			body {
+				font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+				background: linear-gradient(135deg, #0a0a0a, #1a1a1a);
+				color: #fff;
+				min-height: 100vh;
+				overflow-x: hidden;
+			}
+
+			/* Header Styles */
+			.header {
+				background: linear-gradient(90deg, #8b0000, #4b0000);
+				padding: 1rem;
+				text-align: center;
+				border-bottom: 3px solid #ffd700;
+				box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+			}
+
+			.header h1 {
+				font-size: 2rem;
+				text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+				letter-spacing: 2px;
+			}
+
+			/* Setup Screen */
+			.setup-screen {
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				padding: 2rem;
+				gap: 1rem;
+				min-height: calc(100vh - 80px);
+			}
+
+			.setup-form {
+				background: rgba(0, 0, 0, 0.8);
+				padding: 2rem;
+				border-radius: 10px;
+				border: 2px solid #ffd700;
+				max-width: 800px;
+				width: 100%;
+				box-shadow: 0 8px 16px rgba(0, 0, 0, 0.6);
+			}
+
+			.setup-form h2 {
+				color: #ffd700;
+				margin-bottom: 1.5rem;
+				text-align: center;
+				font-size: 1.8rem;
+			}
+
+			.player-setup {
+				display: grid;
+				grid-template-columns: 1fr 1fr;
+				gap: 2rem;
+				margin-bottom: 2rem;
+			}
+
+			.player-form {
+				background: rgba(255, 255, 255, 0.05);
+				padding: 1.5rem;
+				border-radius: 8px;
+				border: 1px solid #333;
+			}
+
+			.player-form h3 {
+				color: #ffd700;
+				margin-bottom: 1rem;
+				text-align: center;
+			}
+
+			.form-group {
+				margin-bottom: 1rem;
+			}
+
+			.form-group label {
+				display: block;
+				margin-bottom: 0.5rem;
+				color: #ffd700;
+				font-weight: bold;
+				font-size: 0.9rem;
+			}
+
+			.form-group input,
+			.form-group select {
+				width: 100%;
+				padding: 0.75rem;
+				border: 1px solid #666;
+				border-radius: 4px;
+				background: rgba(255, 255, 255, 0.1);
+				color: #fff;
+				font-size: 1rem;
+			}
+
+			/* Button Styles */
+			.btn {
+				background: linear-gradient(45deg, #8b0000, #dc143c);
+				color: #fff;
+				border: none;
+				padding: 0.75rem 1.5rem;
+				border-radius: 6px;
+				cursor: pointer;
+				font-size: 1rem;
+				font-weight: bold;
+				transition: all 0.3s;
+				text-transform: uppercase;
+				letter-spacing: 1px;
+				box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+			}
+
+			.btn:hover {
+				background: linear-gradient(45deg, #dc143c, #ff6347);
+				transform: translateY(-2px);
+				box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+			}
+
+			.btn-secondary {
+				background: linear-gradient(45deg, #4b0082, #6a5acd);
+				padding: 0.5rem 1rem;
+				font-size: 0.9rem;
+			}
+
+			.btn-secondary:hover {
+				background: linear-gradient(45deg, #6a5acd, #9370db);
+			}
+
+			.btn-small {
+				padding: 0.4rem 0.8rem;
+				font-size: 0.85rem;
+			}
+
+			/* Game Container */
+			.game-container {
+				display: none;
+				padding: 1rem;
+				gap: 1rem;
+				grid-template-columns: 1fr 320px;
+				height: calc(100vh - 80px);
+			}
+
+			/* Phase Tracker */
+			.phase-tracker {
+				background: rgba(0, 0, 0, 0.8);
+				padding: 1rem;
+				border-radius: 10px;
+				border: 2px solid #ffd700;
+				margin-bottom: 1rem;
+			}
+
+			.phase-bar {
+				display: flex;
+				justify-content: space-between;
+				margin-bottom: 1rem;
+				gap: 4px;
+			}
+
+			.phase {
+				background: rgba(255, 255, 255, 0.1);
+				padding: 0.5rem;
+				border-radius: 5px;
+				border: 1px solid #666;
+				cursor: pointer;
+				transition: all 0.3s;
+				flex: 1;
+				text-align: center;
+				font-size: 0.9rem;
+			}
+
+			.phase.active {
+				background: linear-gradient(45deg, #ffd700, #ffa500);
+				color: #000;
+				border-color: #ffd700;
+				transform: scale(1.05);
+				font-weight: bold;
+			}
+
+			.turn-info {
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+				flex-wrap: wrap;
+				gap: 1rem;
+			}
+
+			/* Player Panels */
+			.players-area {
+				display: grid;
+				grid-template-columns: 1fr 1fr;
+				gap: 1rem;
+				height: calc(100% - 120px);
+			}
+
+			.player-panel {
+				background: rgba(0, 0, 0, 0.7);
+				border-radius: 10px;
+				border: 2px solid #666;
+				padding: 1rem;
+				display: flex;
+				flex-direction: column;
+				overflow: hidden;
+			}
+
+			.player-panel.active {
+				border-color: #ffd700;
+				box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
+			}
+
+			.player-header {
+				display: flex;
+				align-items: center;
+				gap: 1rem;
+				margin-bottom: 1rem;
+				padding-bottom: 1rem;
+				border-bottom: 1px solid #666;
+			}
+
+			.player-avatar {
+				width: 60px;
+				height: 60px;
+				border-radius: 50%;
+				background: linear-gradient(45deg, #8b0000, #dc143c);
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				font-size: 1.5rem;
+				font-weight: bold;
+				border: 2px solid #ffd700;
+			}
+
+			.player-stats {
+				flex: 1;
+			}
+
+			.stat-row {
+				display: flex;
+				justify-content: space-between;
+				margin-bottom: 0.5rem;
+				font-size: 0.95rem;
+			}
+
+			.stat-badge {
+				background: rgba(255, 215, 0, 0.2);
+				padding: 0.2rem 0.5rem;
+				border-radius: 4px;
+				font-weight: bold;
+			}
+
+			/* Units Section */
+			.units-section {
+				flex: 1;
+				overflow-y: auto;
+				margin-bottom: 1rem;
+				padding-right: 0.5rem;
+			}
+
+			.units-section h4 {
+				color: #ffd700;
+				margin-bottom: 0.75rem;
+				font-size: 1.1rem;
+			}
+
+			.unit-card {
+				background: rgba(255, 255, 255, 0.1);
+				padding: 0.75rem;
+				margin-bottom: 0.5rem;
+				border-radius: 5px;
+				border-left: 4px solid #ffd700;
+				cursor: pointer;
+				transition: all 0.3s;
+			}
+
+			.unit-card:hover {
+				background: rgba(255, 215, 0, 0.1);
+				transform: translateX(5px);
+			}
+
+			.unit-card.damaged {
+				border-left-color: #ffa500;
+			}
+
+			.unit-card.critical {
+				border-left-color: #ff4500;
+			}
+
+			.unit-card.destroyed {
+				opacity: 0.5;
+				border-left-color: #ff0000;
+			}
+
+			.unit-card.battleshocked {
+				border-left-color: #ff00ff;
+				background: rgba(255, 0, 255, 0.1);
+			}
+
+			.unit-card.engaged {
+				border-left-color: #ff6600;
+				background: rgba(255, 102, 0, 0.1);
+			}
+
+			.unit-header {
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+				margin-bottom: 0.5rem;
+			}
+
+			.unit-name {
+				font-weight: bold;
+				color: #ffd700;
+			}
+
+			.unit-stats-row {
+				font-size: 0.85rem;
+				color: #ccc;
+				margin-bottom: 0.5rem;
+			}
+
+			.unit-wounds {
+				display: flex;
+				gap: 0.25rem;
+				margin-top: 0.5rem;
+				flex-wrap: wrap;
+			}
+
+			.wound-pip {
+				width: 10px;
+				height: 10px;
+				border-radius: 50%;
+				background: #00ff00;
+				border: 1px solid #fff;
+				transition: all 0.3s;
+			}
+
+			.wound-pip.lost {
+				background: #ff0000;
+			}
+
+			.unit-weapons {
+				margin-top: 0.5rem;
+				padding-top: 0.5rem;
+				border-top: 1px solid rgba(255, 255, 255, 0.2);
+				font-size: 0.75rem;
+				color: #aaa;
+			}
+
+			.weapon-profile {
+				margin-bottom: 0.25rem;
+			}
+
+			.unit-buffs {
+				margin-top: 0.5rem;
+				font-size: 0.8rem;
+			}
+
+			.buff-tag {
+				display: inline-block;
+				background: rgba(100, 149, 237, 0.3);
+				color: #87ceeb;
+				padding: 0.2rem 0.5rem;
+				border-radius: 3px;
+				margin-right: 0.5rem;
+				margin-bottom: 0.25rem;
+			}
+
+			.battleshock-badge {
+				background: #ff00ff;
+				color: #fff;
+				padding: 0.2rem 0.5rem;
+				border-radius: 3px;
+				font-size: 0.75rem;
+				font-weight: bold;
+				margin-left: 0.5rem;
+			}
+
+			.engaged-badge {
+				background: #ff6600;
+				color: #fff;
+				padding: 0.2rem 0.5rem;
+				border-radius: 3px;
+				font-size: 0.75rem;
+				font-weight: bold;
+				margin-left: 0.5rem;
+			}
+
+			/* Actions Section */
+			.actions-section {
+				border-top: 1px solid #666;
+				padding-top: 1rem;
+			}
+
+			.action-input {
+				display: flex;
+				gap: 0.5rem;
+				margin-bottom: 1rem;
+			}
+
+			.action-input input {
+				flex: 1;
+				padding: 0.5rem;
+				border: 1px solid #666;
+				border-radius: 4px;
+				background: rgba(255, 255, 255, 0.1);
+				color: #fff;
+				font-size: 0.9rem;
+			}
+
+			.quick-actions {
+				display: flex;
+				gap: 0.5rem;
+				flex-wrap: wrap;
+			}
+
+			/* Sidebar */
+			.sidebar {
+				display: flex;
+				flex-direction: column;
+				gap: 1rem;
+				overflow-y: auto;
+			}
+
+			/* Dice Section */
+			.dice-section {
+				background: rgba(0, 0, 0, 0.8);
+				padding: 1rem;
+				border-radius: 10px;
+				border: 2px solid #4b0082;
+			}
+
+			.dice-section h3 {
+				color: #9370db;
+				margin-bottom: 1rem;
+			}
+
+			.dice-controls {
+				display: flex;
+				gap: 0.5rem;
+				margin-bottom: 1rem;
+			}
+
+			.dice-input {
+				flex: 1;
+				padding: 0.5rem;
+				border: 1px solid #666;
+				border-radius: 4px;
+				background: rgba(255, 255, 255, 0.1);
+				color: #fff;
+			}
+
+			.dice-results {
+				background: rgba(255, 255, 255, 0.05);
+				padding: 1rem;
+				border-radius: 5px;
+				min-height: 120px;
+			}
+
+			.dice-visual {
+				display: flex;
+				flex-wrap: wrap;
+				gap: 0.5rem;
+				margin-bottom: 1rem;
+			}
+
+			.die {
+				width: 36px;
+				height: 36px;
+				background: #fff;
+				color: #000;
+				border-radius: 5px;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				font-weight: bold;
+				font-size: 1.2rem;
+				border: 2px solid #000;
+				animation: rollIn 0.5s ease-out;
+			}
+
+			@keyframes rollIn {
+				from {
+					transform: rotate(360deg) scale(0);
+					opacity: 0;
+				}
+				to {
+					transform: rotate(0) scale(1);
+					opacity: 1;
+				}
+			}
+
+			.die.success {
+				background: #00ff00;
+			}
+
+			.die.fail {
+				background: #ff6666;
+			}
+
+			/* Log Section */
+			.log-section {
+				background: rgba(0, 0, 0, 0.8);
+				padding: 1rem;
+				border-radius: 10px;
+				border: 2px solid #008000;
+				flex: 1;
+				display: flex;
+				flex-direction: column;
+				min-height: 300px;
+			}
+
+			.log-section h3 {
+				color: #00ff00;
+				margin-bottom: 1rem;
+			}
+
+			.log-content {
+				flex: 1;
+				overflow-y: auto;
+				background: rgba(255, 255, 255, 0.05);
+				padding: 0.5rem;
+				border-radius: 5px;
+				font-family: "Courier New", monospace;
+				font-size: 0.85rem;
+				max-height: 400px;
+			}
+
+			.log-entry {
+				margin-bottom: 0.5rem;
+				padding: 0.5rem;
+				border-left: 3px solid #ffd700;
+				padding-left: 0.75rem;
+				background: rgba(255, 255, 255, 0.02);
+			}
+
+			.log-timestamp {
+				color: #888;
+				font-size: 0.75rem;
+				font-weight: bold;
+			}
+
+			.log-phase {
+				color: #ffd700;
+				font-weight: bold;
+			}
+
+			.log-damage {
+				color: #ff6666;
+			}
+
+			.log-heal {
+				color: #66ff66;
+			}
+
+			.log-stratagem {
+				color: #9370db;
+				font-weight: bold;
+			}
+
+			.log-shooting {
+				color: #ffa500;
+				font-weight: bold;
+			}
+
+			.log-morale {
+				color: #ff00ff;
+				font-weight: bold;
+			}
+
+			.log-charge {
+				color: #ff6600;
+				font-weight: bold;
+			}
+
+			/* Objectives */
+			.objectives-section {
+				background: rgba(0, 0, 0, 0.8);
+				padding: 1rem;
+				border-radius: 10px;
+				border: 2px solid #ffd700;
+			}
+
+			.objective-card {
+				background: rgba(255, 255, 255, 0.07);
+				border-left: 4px solid #ffd700;
+				margin-bottom: 0.5rem;
+				padding: 0.7rem;
+				border-radius: 6px;
+				font-size: 0.98rem;
+				display: flex;
+				flex-direction: column;
+				gap: 0.25rem;
+			}
+
+			.objective-control-select,
+			.objective-terrain-select {
+				background: rgba(0, 0, 0, 0.6);
+				color: #ffd700;
+				border: 1px solid #ffd700;
+				border-radius: 4px;
+				margin-right: 0.5rem;
+			}
+
+			/* Unit Selection Modal */
+			.modal {
+				display: none;
+				position: fixed;
+				top: 0;
+				left: 0;
+				width: 100%;
+				height: 100%;
+				background: rgba(0, 0, 0, 0.8);
+				z-index: 1000;
+				overflow-y: auto;
+			}
+
+			.modal-content {
+				background: #1a1a1a;
+				margin: 2rem auto;
+				padding: 2rem;
+				max-width: 800px;
+				border-radius: 10px;
+				border: 2px solid #ffd700;
+			}
+
+			.unit-selection-grid {
+				display: grid;
+				grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+				gap: 1rem;
+				margin: 1rem 0;
+			}
+
+			.unit-select-card {
+				background: rgba(255, 255, 255, 0.1);
+				padding: 1rem;
+				border-radius: 5px;
+				border: 2px solid #666;
+				cursor: pointer;
+				transition: all 0.3s;
+			}
+
+			.unit-select-card:hover {
+				border-color: #ffd700;
+				background: rgba(255, 215, 0, 0.1);
+			}
+
+			.unit-select-card.selected {
+				border-color: #00ff00;
+				background: rgba(0, 255, 0, 0.1);
+			}
+
+			/* Shooting Modal */
+			.shooting-modal {
+				background: #1a1a1a;
+				margin: 5rem auto;
+				padding: 2rem;
+				max-width: 600px;
+				border-radius: 10px;
+				border: 2px solid #ffa500;
+			}
+
+			.shooting-modal h2 {
+				color: #ffa500;
+				margin-bottom: 1rem;
+			}
+
+			.shooting-step {
+				background: rgba(255, 255, 255, 0.05);
+				padding: 1rem;
+				margin-bottom: 1rem;
+				border-radius: 5px;
+				border: 1px solid #666;
+			}
+
+			.shooting-step h3 {
+				color: #ffd700;
+				margin-bottom: 0.5rem;
+			}
+
+			.roll-result {
+				background: rgba(255, 165, 0, 0.1);
+				padding: 0.75rem;
+				border-radius: 5px;
+				margin-top: 0.5rem;
+				border: 1px solid #ffa500;
+			}
+
+			/* Morale Modal */
+			.morale-test-modal {
+				background: #1a1a1a;
+				margin: 5rem auto;
+				padding: 2rem;
+				max-width: 500px;
+				border-radius: 10px;
+				border: 2px solid #ff00ff;
+			}
+
+			.morale-test-modal h2 {
+				color: #ff00ff;
+				margin-bottom: 1rem;
+			}
+
+			.test-info {
+				background: rgba(255, 255, 255, 0.05);
+				padding: 1rem;
+				border-radius: 5px;
+				margin-bottom: 1rem;
+			}
+
+			.test-info h3 {
+				color: #ffd700;
+				margin-bottom: 0.75rem;
+			}
+
+			.test-info p {
+				margin-bottom: 0.5rem;
+				line-height: 1.5;
+			}
+
+			.test-result {
+				background: rgba(255, 255, 255, 0.05);
+				padding: 1rem;
+				border-radius: 5px;
+				margin-top: 1rem;
+				text-align: center;
+				border: 2px solid #666;
+				transition: all 0.3s;
+			}
+
+			.test-result.passed {
+				border: 2px solid #00ff00;
+				background: rgba(0, 255, 0, 0.1);
+			}
+
+			.test-result.failed {
+				border: 2px solid #ff0000;
+				background: rgba(255, 0, 0, 0.1);
+			}
+
+			/* Charge Modal */
+			.charge-modal {
+				background: #1a1a1a;
+				margin: 3rem auto;
+				padding: 2rem;
+				max-width: 700px;
+				border-radius: 10px;
+				border: 2px solid #ff6600;
+			}
+
+			.charge-modal h2 {
+				color: #ff6600;
+				margin-bottom: 1rem;
+				text-align: center;
+			}
+
+			.charge-step {
+				background: rgba(255, 255, 255, 0.05);
+				padding: 1.5rem;
+				border-radius: 8px;
+			}
+
+			.charge-step h3 {
+				color: #ffd700;
+				margin-bottom: 1rem;
+			}
+
+			.charge-info {
+				background: rgba(255, 102, 0, 0.1);
+				border: 1px solid #ff6600;
+				padding: 1rem;
+				border-radius: 5px;
+				margin: 1rem 0;
+			}
+
+			.charge-info p {
+				margin: 0.5rem 0;
+				font-size: 0.95rem;
+			}
+
+			.overwatch-option {
+				background: rgba(255, 165, 0, 0.1);
+				border: 1px solid #ffa500;
+				padding: 1rem;
+				margin-bottom: 1rem;
+				border-radius: 5px;
+			}
+
+			.overwatch-option h4 {
+				color: #ffa500;
+				margin-bottom: 0.5rem;
+			}
+
+			.charge-roll-section {
+				background: rgba(255, 255, 255, 0.08);
+				padding: 1.5rem;
+				border-radius: 8px;
+				margin-top: 1rem;
+				text-align: center;
+			}
+
+			.charge-roll-section h3 {
+				color: #ff6600;
+				margin-bottom: 1rem;
+			}
+
+			.charge-success {
+				border-color: #00ff00 !important;
+				background: rgba(0, 255, 0, 0.15) !important;
+			}
+
+			.charge-failed {
+				border-color: #ff0000 !important;
+				background: rgba(255, 0, 0, 0.15) !important;
+			}
+
+			/* Responsive Design */
+			@media (max-width: 1200px) {
+				.game-container {
+					grid-template-columns: 1fr;
+				}
+
+				.sidebar {
+					display: grid;
+					grid-template-columns: 1fr 1fr;
+					gap: 1rem;
+				}
+
+				.log-section {
+					grid-column: span 2;
+				}
+			}
+
+			@media (max-width: 768px) {
+				.player-setup {
+					grid-template-columns: 1fr;
+				}
+
+				.players-area {
+					grid-template-columns: 1fr;
+				}
+
+				.phase-bar {
+					flex-wrap: wrap;
+				}
+
+				.phase {
+					font-size: 0.8rem;
+					padding: 0.4rem;
+				}
+			}
+
+			/* Scrollbar Styling */
+			::-webkit-scrollbar {
+				width: 8px;
+			}
+
+			::-webkit-scrollbar-track {
+				background: rgba(255, 255, 255, 0.1);
+				border-radius: 4px;
+			}
+
+			::-webkit-scrollbar-thumb {
+				background: #ffd700;
+				border-radius: 4px;
+			}
+
+			::-webkit-scrollbar-thumb:hover {
+				background: #ffa500;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="header">
+			<h1>⚔️ WARHAMMER 40,000 BATTLE ASSISTANT ⚔️</h1>
+		</div>
+
+		<!-- Setup Screen -->
+		<div id="setupScreen" class="setup-screen">
+			<div class="setup-form">
+				<h2>🛡️ Prepare for Battle</h2>
+				<div class="player-setup">
+					<div class="player-form">
+						<h3>Player 1</h3>
+						<div class="form-group">
+							<label>Battle-Brother Name:</label>
+							<input
+								type="text"
+								id="player1Name"
+								placeholder="Enter commander name"
+								value=""
+							/>
+						</div>
+						<div class="form-group">
+							<label>Faction:</label>
+							<select id="player1Faction">
+								<option value="">Select Faction</option>
+								<option value="space-marines">Space Marines</option>
+								<option value="imperial-guard">Astra Militarum</option>
+								<option value="sisters">Adepta Sororitas</option>
+								<option value="custodes">Adeptus Custodes</option>
+								<option value="chaos-marines">Chaos Space Marines</option>
+								<option value="death-guard">Death Guard</option>
+								<option value="thousand-sons">Thousand Sons</option>
+								<option value="orks">Orks</option>
+								<option value="tau">T'au Empire</option>
+								<option value="necrons">Necrons</option>
+								<option value="eldar">Aeldari</option>
+								<option value="drukhari">Drukhari</option>
+								<option value="tyranids">Tyranids</option>
+								<option value="genestealer">Genestealer Cults</option>
+							</select>
+						</div>
+					</div>
+					<div class="player-form">
+						<h3>Player 2</h3>
+						<div class="form-group">
+							<label>Battle-Brother Name:</label>
+							<input
+								type="text"
+								id="player2Name"
+								placeholder="Enter commander name"
+								value=""
+							/>
+						</div>
+						<div class="form-group">
+							<label>Faction:</label>
+							<select id="player2Faction">
+								<option value="">Select Faction</option>
+								<option value="space-marines">Space Marines</option>
+								<option value="imperial-guard">Astra Militarum</option>
+								<option value="sisters">Adepta Sororitas</option>
+								<option value="custodes">Adeptus Custodes</option>
+								<option value="chaos-marines">Chaos Space Marines</option>
+								<option value="death-guard">Death Guard</option>
+								<option value="thousand-sons">Thousand Sons</option>
+								<option value="orks">Orks</option>
+								<option value="tau">T'au Empire</option>
+								<option value="necrons">Necrons</option>
+								<option value="eldar">Aeldari</option>
+								<option value="drukhari">Drukhari</option>
+								<option value="tyranids">Tyranids</option>
+								<option value="genestealer">Genestealer Cults</option>
+							</select>
+						</div>
+					</div>
+				</div>
+				<div class="setup-buttons" style="text-align: center">
+					<button class="btn" onclick="startBattle()">
+						⚡ Begin Battle ⚡
+					</button>
+				</div>
+			</div>
+		</div>
+
+		<!-- Unit Selection Modal -->
+		<div id="unitModal" class="modal">
+			<div class="modal-content">
+				<h2 id="modalTitle">Select Units</h2>
+				<div id="unitSelectionGrid" class="unit-selection-grid"></div>
+				<div style="text-align: center; margin-top: 2rem">
+					<button class="btn btn-secondary" onclick="closeUnitModal()">
+						Cancel
+					</button>
+					<button class="btn" onclick="confirmUnitSelection()">
+						Confirm Selection
+					</button>
+				</div>
+			</div>
+		</div>
+
+		<!-- Weapon Selection Modal -->
+		<div id="weaponModal" class="modal">
+			<div class="modal-content">
+				<h2 id="weaponModalTitle">Assign Weapons</h2>
+				<div id="weaponSelectionContent"></div>
+				<div style="text-align: center; margin-top: 2rem">
+					<button class="btn btn-secondary" onclick="closeWeaponModal()">
+						Cancel
+					</button>
+					<button class="btn" onclick="confirmWeaponSelection()">
+						Confirm Weapons
+					</button>
+				</div>
+			</div>
+		</div>
+
+		<!-- Shooting Phase Modal -->
+		<div id="shootingModal" class="modal">
+			<div class="modal-content shooting-modal">
+				<h2>🎯 Shooting Attack</h2>
+				<div id="shootingContent">
+					<!-- Dynamic content will be inserted here -->
+				</div>
+			</div>
+		</div>
+
+		<!-- Battle-shock Test Modal -->
+		<div id="moraleModal" class="modal">
+			<div class="modal-content morale-test-modal">
+				<h2>⚠️ Battle-shock Test</h2>
+				<div id="moraleTestContent">
+					<!-- Dynamic content will be inserted here -->
+				</div>
+			</div>
+		</div>
+
+		<!-- Charge Phase Modal -->
+		<div id="chargeModal" class="modal">
+			<div class="modal-content charge-modal">
+				<h2>⚡ Charge Declaration ⚡</h2>
+				<div id="chargeContent">
+					<!-- Dynamic content will be inserted here -->
+				</div>
+			</div>
+		</div>
+
+		<!-- Main Game Screen -->
+		<div id="gameScreen" class="game-container">
+			<div class="main-game">
+				<!-- Phase Info Box -->
+				<div
+					id="phaseInfoBox"
+					style="
+						background: rgba(0, 0, 0, 0.7);
+						color: #ffd700;
+						padding: 0.5rem 1rem;
+						border-radius: 8px;
+						margin-bottom: 1rem;
+						font-size: 1rem;
+					"
+				>
+					<!-- Phase info will be injected here -->
+				</div>
+
+				<!-- Phase Tracker -->
+				<div class="phase-tracker">
+					<div class="phase-bar">
+						<div class="phase active" data-phase="command">Command</div>
+						<div class="phase" data-phase="movement">Movement</div>
+						<div class="phase" data-phase="shooting">Shooting</div>
+						<div class="phase" data-phase="charge">Charge</div>
+						<div class="phase" data-phase="fight">Fight</div>
+						<div class="phase" data-phase="morale">Morale</div>
+					</div>
+					<div class="turn-info">
+						<div>
+							<span style="font-size: 1.1rem"
+								>⚔️ Battle Round: <strong id="currentTurn">1</strong></span
+							>
+							<span style="margin-left: 1rem"
+								>👑 Active: <strong id="activePlayer">-</strong></span
+							>
+						</div>
+						<div>
+							<button class="btn btn-small" onclick="nextPhase()">
+								Next Phase →
+							</button>
+							<button class="btn btn-secondary btn-small" onclick="endTurn()">
+								End Turn
+							</button>
+							<button class="btn btn-secondary btn-small" onclick="resetGame()">
+								Reset
+							</button>
+						</div>
+					</div>
+				</div>
+
+				<!-- Players Area -->
+				<div class="players-area">
+					<!-- Player 1 Panel -->
+					<div class="player-panel" id="player1Panel">
+						<div class="player-header">
+							<div class="player-avatar">P1</div>
+							<div class="player-stats">
+								<div class="stat-row">
+									<span
+										style="font-size: 1.1rem; font-weight: bold"
+										id="player1NameDisplay"
+										>Player 1</span
+									>
+								</div>
+								<div class="stat-row">
+									<span class="stat-badge"
+										>⚡ CP: <span id="player1CP">0</span></span
+									>
+									<span class="stat-badge"
+										>🎯 VP: <span id="player1VP">0</span></span
+									>
+								</div>
+							</div>
+						</div>
+
+						<div class="units-section"></div>
+							<h4>🛡️ Battle Forces</h4>
+							<div id="player1Units"></div>
+						</div>
+
+						<div class="actions-section"></div>
+							<h4 style="color: #ffd700; margin-bottom: 0.5rem">
+								⚔️ Battle Commands
+							</h4>
+							<div class="action-input">
+								<input
+									type="text"
+									id="player1Input"
+									placeholder="e.g., 'Space Marine shoots Ork Boy', 'use Transhuman'"
+								/>
+								<button class="btn btn-small" onclick="processAction(1)">
+									Execute
+								</button>
+							</div>
+							<div class="quick-actions">
+								<button
+									class="btn btn-secondary btn-small"
+									onclick="quickAction(1, 'spend-cp')"
+								>
+									Use CP
+								</button>
+								<button
+									class="btn btn-secondary btn-small"
+									onclick="quickAction(1, 'gain-vp')"
+								>
+									Score VP
+								</button>
+								<button
+									class="btn btn-secondary btn-small"
+									onclick="rollDiceFor(1)"
+								>
+									Roll Dice
+								</button>
+								<button
+									class="btn btn-secondary btn-small"
+									onclick="selectUnitsForPlayer(1)"
+								>
+									Add Units
+								</button>
+							</div>
+						</div>
+					</div>
+
+					<!-- Player 2 Panel --></div>
+					<div class="player-panel" id="player2Panel">
+						<div class="player-header">
+							<div class="player-avatar">P2</div>
+							<div class="player-stats">
+								<div class="stat-row">
+									<span
+										style="font-size: 1.1rem; font-weight: bold"
+										id="player2NameDisplay"
+										>Player 2</span
+									>
+								</div>
+								<div class="stat-row">
+									<span class="stat-badge"
+										>⚡ CP: <span id="player2CP">0</span></span
+									>
+									<span class="stat-badge"
+										>🎯 VP: <span id="player2VP">0</span></span
+									>
+								</div>
+							</div>
+						</div>
+
+						<div class="units-section">
+							<h4>🛡️ Battle Forces</h4>
+							<div id="player2Units"></div>
+						</div>
+
+						<div class="actions-section"></div>
+							<h4 style="color: #ffd700; margin-bottom: 0.5rem">
+								⚔️ Battle Commands
+							</h4>
+							<div class="action-input">
+								<input
+									type="text"
+									id="player2Input"
+									placeholder="e.g., 'Ork Boy shoots Space Marine', 'WAAAGH!'"
+								/>
+								<button class="btn btn-small" onclick="processAction(2)">
+									Execute
+								</button>
+							</div>
+							<div class="quick-actions">
+								<button
+									class="btn btn-secondary btn-small"
+									onclick="quickAction(2, 'spend-cp')"
+								>
+									Use CP
+								</button>
+								<button
+									class="btn btn-secondary btn-small"
+									onclick="quickAction(2, 'gain-vp')"
+								>
+									Score VP
+								</button>
+								<button
+									class="btn btn-secondary btn-small"
+									onclick="rollDiceFor(2)"
+								>
+									Roll Dice
+								</button>
+								<button
+									class="btn btn-secondary btn-small"
+									onclick="selectUnitsForPlayer(2)"
+								>
+									Add Units
+								</button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- Sidebar -->
+			<div class="sidebar">
+				<!-- Dice Section -->
+				<div class="dice-section">
+					<h3>🎲 Dice Engine</h3>
+					<div class="dice-controls">
+						<input
+							type="text"
+							class="dice-input"
+							id="diceInput"
+							placeholder="e.g., '6d6', '2d6+1', 'roll 5'"
+						/>
+						<button class="btn btn-small" onclick="rollDice()">Roll!</button>
+					</div>
+					<div class="dice-results" id="diceResults">
+						<div style="text-align: center; color: #888">Ready to roll...</div>
+					</div>
+				</div>
+
+				<!-- Objectives Panel -->
+				<div class="objectives-section">
+					<h3 style="color: #ffd700">🎯 Objectives</h3>
+					<div id="objectivesList"></div>
+					<button class="btn btn-small" onclick="addObjective()">
+						Add Objective
+					</button>
+				</div>
+
+				<!-- Game Log -->
+				<div class="log-section">
+					<h3>📜 Battle Chronicle</h3>
+					<div class="log-content" id="gameLog"></div>
+					<div style="margin-top: 0.5rem; display: flex; gap: 0.5rem">
+						<button class="btn btn-secondary btn-small" onclick="clearLog()">
+							Clear
+						</button>
+						<button class="btn btn-secondary btn-small" onclick="exportLog()">
+							Export
+						</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Unit Actions Modal -->
+		<div id="unitActionsModal" class="modal">
+			<div class="modal-content">
+				<h2 id="unitActionTitle">Unit Actions</h2>
+				<div id="unitActionsList"></div>
+				<div style="text-align: center; margin-top: 1rem">
+					<button class="btn btn-secondary" onclick="closeUnitActionsModal()">
+						Close
+					</button>
+				</div>
+			</div>
+		</div>
+		<script src="data.js"></script>
+		<script>
+			// Action explanations for contextual info tooltips
+			const actionExplanations = {
+				move: "Move this unit up to its Movement (M) value in inches.",
+				advance:
+					"Advance: Roll a D6 and add to this unit's Movement. Cannot shoot non-Assault weapons after advancing.",
+				shoot:
+					"Make ranged attacks with eligible weapons in the Shooting phase.",
+				charge: "Declare a charge against eligible enemies within range.",
+				fight: "Make melee attacks in the Fight phase.",
+				"battle-shock":
+					"If a unit is below half-strength or otherwise required, it must take a Battle-shock test in the Morale phase.",
+				stratagem:
+					"Use an eligible Stratagem. Consumes CP and grants a special effect.",
+				recover: "Attempt to recover from Battle-shock during Morale phase.",
+			};
+			function showActionInfo(action) {
+				alert(
+					actionExplanations[action] || "No info available for this action."
+				);
+			}
+			const factionCommands = {
+				"space-marines": [
+					{
+						name: "Oath of Moment",
+						description:
+							"Select one enemy unit. This turn, reroll all failed hit rolls against that unit. If the unit is a CHARACTER, gain 1 CP.",
+						phase: "shooting",
+						cost: 1,
+						frequency: "once",
+						target: "enemy",
+						type: "strategic",
+					},
+					{
+						name: "Transhuman Physiology",
+						description:
+							"Select one friendly unit. Until the end of the turn, that unit can only be wounded on a roll of 4+.",
+						phase: "fight",
+						cost: 1,
+						frequency: "once",
+						target: "friendly",
+						type: "strategic",
+					},
+				],
+				"imperial-guard": [
+					{
+						name: "Take Cover",
+						description:
+							"Select one friendly unit. Until the start of your next turn, that unit gains +1 to their saving throws.",
+						phase: "shooting",
+						cost: 1,
+						frequency: "once",
+						target: "friendly",
+						type: "strategic",
+					},
+					{
+						name: "For the Emperor",
+						description:
+							"Select one friendly unit. Until the end of the turn, that unit can reroll all failed hit rolls.",
+						phase: "fight",
+						cost: 1,
+						frequency: "once",
+						target: "friendly",
+						type: "strategic",
+					},
+				],
+				orks: [
+					{
+						name: "WAAAGH!",
+						description:
+							"All Ork units in range can reroll charge rolls and gain +1 to their Strength this turn.",
+						phase: "charge",
+						cost: 1,
+						frequency: "once",
+						target: "friendly",
+						type: "strategic",
+					},
+					{
+						name: "Furious Charge",
+						description:
+							"Select one Ork unit. Until the end of the turn, that unit adds 1 to their damage rolls in the first round of combat.",
+						phase: "fight",
+						cost: 1,
+						frequency: "once",
+						target: "friendly",
+						type: "strategic",
+					},
+				],
+				necrons: [
+					{
+						name: "My Will Be Done",
+						description:
+							"Select one friendly Necron unit. Until the end of the turn, that unit can reroll all failed hit rolls and wound rolls.",
+						phase: "shooting",
+						cost: 1,
+						frequency: "once",
+						target: "friendly",
+						type: "strategic",
+					},
+					{
+						name: "Phase Shifter",
+						description:
+							"Select one friendly Necron unit. Until the start of your next turn, that unit has a 4+ invulnerable save.",
+						phase: "fight",
+						cost: 1,
+						frequency: "once",
+						target: "friendly",
+						type: "strategic",
+					},
+				],
+				tau: [
+					{
+						name: "Supporting Fire",
+						description:
+							"Use when an enemy unit declares a charge. Your units can fire Overwatch even if they are not eligible to shoot this turn.",
+						phase: "charge",
+						cost: 1,
+						frequency: "once",
+						target: "friendly",
+						type: "strategic",
+					},
+					{
+						name: "Tactical Withdrawal",
+						description:
+							"Select one friendly unit. Until the start of your next turn, that unit can move through enemy units and cannot be charged.",
+						phase: "movement",
+						cost: 1,
+						frequency: "once",
+						target: "friendly",
+						type: "strategic",
+					},
+				],
+				tyranids: [
+					{
+						name: "Synaptic Imperative",
+						description:
+							"Select one friendly Tyranid unit. Until the end of the turn, that unit gains +1 to their Strength and Toughness.",
+						phase: "command",
+						cost: 1,
+						frequency: "once",
+						target: "friendly",
+						type: "strategic",
+					},
+					{
+						name: "Adrenaline Surge",
+						description:
+							"Use at the start of the Fight phase. One Tyranid unit can reroll all failed hit rolls in close combat this phase.",
+						phase: "fight",
+						cost: 1,
+						frequency: "once",
+						target: "friendly",
+						type: "strategic",
+					},
+				],
+			};
+
+			// Game State Management
+			let gameState = {
+				currentTurn: 1,
+				currentPhase: "command",
+				activePlayer: 1,
+				phases: [
+					"command",
+					"movement",
+					"shooting",
+					"charge",
+					"fight",
+					"morale",
+				],
+				players: {
+					1: {
+						name: "Player 1",
+						faction: "",
+						cp: 0,
+						vp: 0,
+						units: [],
+						stratagems: [],
+						objectives: [],
+						activeCommandEffects: [],
+					},
+					2: {
+						name: "Player 2",
+						faction: "",
+						cp: 0,
+						vp: 0,
+						units: [],
+						stratagems: [],
+						objectives: [],
+						activeCommandEffects: [],
+					},
+				},
+				log: [],
+				objectives: [],
+				secondaryObjectives: [],
+				currentUnitSelection: null,
+				selectedUnits: [],
+				currentShootingAttack: null,
+			};
+
+			// Initialize objectives if not present
+			if (!gameState.objectives || gameState.objectives.length === 0) {
+				gameState.objectives = [
+					{
+						id: 1,
+						name: "Objective 1",
+						controlledBy: null,
+						terrain: "",
+						notes: "",
+						vp: 0,
+					},
+					{
+						id: 2,
+						name: "Objective 2",
+						controlledBy: null,
+						terrain: "",
+						notes: "",
+						vp: 0,
+					},
+					{
+						id: 3,
+						name: "Objective 3",
+						controlledBy: null,
+						terrain: "",
+						notes: "",
+						vp: 0,
+					},
+					{
+						id: 4,
+						name: "Objective 4",
+						controlledBy: null,
+						terrain: "",
+						notes: "",
+						vp: 0,
+					},
+				];
+			}
+
+			// Charge Phase State Management
+			let currentChargeAttempt = null;
+			let chargeQueue = [];
+
+			// Process morale tests sequentially
+			let moraleTestQueue = [];
+			let currentMoraleTest = null;
+
+			// Unit selection variables
+			let pendingUnitsToAssign = [];
+			let pendingPlayerNum = null;
+			let selectedWeaponsConfig = {};
+
+			// Initialize
+			function init() {
+				logEntry(
+					"Welcome to Warhammer 40,000 10th Edition Battle Assistant!",
+					"system"
+				);
+				renderObjectivesList();
+				loadGameState();
+			}
+
+			// Start Battle
+			function startBattle() {
+				const p1Name =
+					document.getElementById("player1Name").value || "Player 1";
+				const p2Name =
+					document.getElementById("player2Name").value || "Player 2";
+				const p1Faction = document.getElementById("player1Faction").value;
+				const p2Faction = document.getElementById("player2Faction").value;
+
+				if (!p1Faction || !p2Faction) {
+					alert("Please select factions for both players!");
+					return;
+				}
+
+				gameState.players[1].name = p1Name;
+				gameState.players[2].name = p2Name;
+				gameState.players[1].faction = p1Faction;
+				gameState.players[2].faction = p2Faction;
+
+				document.getElementById("player1NameDisplay").textContent = p1Name;
+				document.getElementById("player2NameDisplay").textContent = p2Name;
+
+				// Initial CP allocation (3 CP at game start)
+				gameState.players[1].cp = 3;
+				gameState.players[2].cp = 3;
+
+				document.getElementById("setupScreen").style.display = "none";
+				document.getElementById("gameScreen").style.display = "grid";
+
+				updateDisplay();
+				logEntry(
+					`BATTLE COMMENCES! ${p1Name} (${p1Faction}) vs ${p2Name} (${p2Faction})`,
+					"system"
+				);
+
+				// Prompt for unit selection
+				setTimeout(() => {
+					selectUnitsForPlayer(1);
+				}, 500);
+			}
+
+			// Unit Selection
+			function selectUnitsForPlayer(playerNum) {
+				gameState.currentUnitSelection = playerNum;
+				gameState.selectedUnits = [];
+
+				const modal = document.getElementById("unitModal");
+				const modalTitle = document.getElementById("modalTitle");
+				const grid = document.getElementById("unitSelectionGrid");
+
+				modalTitle.textContent = `Select Units for ${gameState.players[playerNum].name}`;
+
+				const faction = gameState.players[playerNum].faction;
+				const availableUnits = unitDatabase[faction] || [];
+
+				grid.innerHTML = "";
+
+				availableUnits.forEach((unit, index) => {
+					const card = document.createElement("div");
+					card.className = "unit-select-card";
+					card.dataset.unitIndex = index;
+
+					const weaponsList = unit.weapons
+						? unit.weapons.map((w) => weaponProfiles[w]?.name || w).join(", ")
+						: "None";
+
+					card.innerHTML = `
+															<h4 style="color: #FFD700; margin-bottom: 0.5rem;">${unit.name}</h4>
+															<div style="font-size: 0.85rem; line-height: 1.5;">
+																<div>Role: ${unit.role}</div>
+																<div>Models: ${unit.models} | Wounds: ${unit.wounds}</div>
+																<div>M: ${unit.movement}" | T: ${unit.toughness} | Sv: ${unit.save}+ | Ld: ${unit.leadership}+</div>
+																<div>OC: ${unit.oc}</div>
+																<div style="margin-top: 0.5rem; color: #ffa500;">Weapons: ${weaponsList}</div>
+															</div>
+														`;
+
+					card.onclick = () => toggleUnitSelection(card, unit);
+					grid.appendChild(card);
+				});
+
+				modal.style.display = "block";
+			}
+
+			function toggleUnitSelection(card, unit) {
+				card.classList.toggle("selected");
+
+				if (card.classList.contains("selected")) {
+					gameState.selectedUnits.push(unit);
+				} else {
+					const index = gameState.selectedUnits.findIndex(
+						(u) => u.name === unit.name
+					);
+					if (index > -1) {
+						gameState.selectedUnits.splice(index, 1);
+					}
+				}
+			}
+
+			function closeUnitModal() {
+				document.getElementById("unitModal").style.display = "none";
+				gameState.currentUnitSelection = null;
+				gameState.selectedUnits = [];
+			}
+
+			function confirmUnitSelection() {
+				const playerNum = gameState.currentUnitSelection;
+				if (gameState.selectedUnits.length === 0) {
+					alert("Please select at least one unit!");
+					return;
+				}
+				// Save selections for weapon configuration
+				pendingUnitsToAssign = [...gameState.selectedUnits];
+				pendingPlayerNum = playerNum;
+				gameState.selectedUnits = [];
+				closeUnitModal();
+				showWeaponModal();
+			}
+
+			function showWeaponModal() {
+				if (pendingUnitsToAssign.length === 0) {
+					// All done, add units to player army!
+					updateUnitsDisplay(pendingPlayerNum);
+					logEntry(
+						`${gameState.players[pendingPlayerNum].name} has deployed units!`,
+						"system"
+					);
+					// If player 1 just finished, prompt for player 2
+					if (
+						pendingPlayerNum === 1 &&
+						gameState.players[2].units.length === 0
+					) {
+						setTimeout(() => selectUnitsForPlayer(2), 500);
+					}
+					pendingUnitsToAssign = [];
+					pendingPlayerNum = null;
+					selectedWeaponsConfig = {};
+					saveGameState();
+					return;
+				}
+				// Pick the first unit to configure
+				const unit = pendingUnitsToAssign[0];
+				selectedWeaponsConfig = {};
+				const modal = document.getElementById("weaponModal");
+				const content = document.getElementById("weaponSelectionContent");
+				document.getElementById(
+					"weaponModalTitle"
+				).textContent = `Assign Weapons for ${unit.name} (${unit.models} models)`;
+				// Build weapon selection UI
+				let html = `<form id="weaponForm"><div style="margin-bottom:1rem;">Assign how many models carry each weapon (total must be ${unit.models}):</div>`;
+				unit.weapons.forEach((weaponKey) => {
+					const weapon = weaponProfiles[weaponKey];
+					if (!weapon) return;
+					html += `
+											  <div style="margin-bottom:8px;">
+												<label>
+												  <strong>${weapon.name}</strong>
+												  (<span style="font-size:0.9em">${weapon.range}", S${weapon.strength}, AP-${weapon.ap}, D${weapon.damage}</span>)
+												</label>
+												<input
+												  type="number"
+												  min="0"
+												  max="${unit.models}"
+												  value="0"
+												  id="weaponCount_${weaponKey}"
+												  style="width:60px; margin-left:12px"
+												  onchange="checkWeaponTotal('${unit.name}', ${unit.models})"
+												>
+											  </div>
+											`;
+				});
+				html += `<div id="weaponTotalNotice" style="color:#ffd700;margin-top:8px;"></div></form>`;
+				content.innerHTML = html;
+				modal.style.display = "block";
+				checkWeaponTotal(unit.name, unit.models);
+			}
+
+			function checkWeaponTotal(unitName, maxModels) {
+				let total = 0;
+				const unit = pendingUnitsToAssign[0];
+				
+				// Only count weapons that have valid input elements
+				if (unit && unit.weapons) {
+					unit.weapons.forEach((weaponKey) => {
+						const input = document.getElementById(`weaponCount_${weaponKey}`);
+						if (input) {
+							const val = parseInt(input.value) || 0;
+							total += val;
+						}
+					});
+				}
+
+				const notice = document.getElementById("multiWeaponCountNotice");
+				if (notice) {
+					if (total < maxModels) {
+						notice.textContent = `You have assigned ${total}/${maxModels} models.`;
+					} else if (total > maxModels) {
+						notice.textContent = `Too many assigned! (${total}/${maxModels})`;
+					} else {
+						notice.textContent = `✅ Assignment complete!`;
+					}
+				}
+			}
+
+			function confirmWeaponSelection() {
+				const unit = pendingUnitsToAssign[0];
+				// Gather selections
+				let total = 0;
+				let config = {};
+				unit.weapons.forEach((weaponKey) => {
+					const count =
+						parseInt(
+							document.getElementById(`weaponCount_${weaponKey}`).value
+						) || 0;
+					config[weaponKey] = count;
+					total += count;
+				});
+				if (total !== unit.models) {
+					alert(`Please assign exactly ${unit.models} models to weapons.`);
+					return;
+				}
+				// Build unit with battleshock properties
+				const newUnit = {
+					...unit,
+					id: Date.now() + Math.random(),
+					currentWounds: unit.wounds * unit.models,
+					maxWounds: unit.wounds * unit.models,
+					currentModels: unit.models,
+					startingStrength: unit.models,
+					battleshocked: false,
+					battleshockModifier: 0,
+					engagedWith: [],
+					hasCharged: false,
+					madeChargeThisTurn: false,
+					chargedOnTurn: null,
+					status: "active",
+					buffs: [],
+					damageTaken: 0,
+					hasShot: false,
+					hasFought: false,
+					weaponConfig: config,
+				};
+				gameState.players[pendingPlayerNum].units.push(newUnit);
+				pendingUnitsToAssign.shift(); // Done with this unit, next!
+				closeWeaponModal();
+				showWeaponModal();
+			}
+
+			function closeWeaponModal() {
+				document.getElementById("weaponModal").style.display = "none";
+			}
+
+			// Display Updates
+			function updateDisplay() {
+				// Update phase display
+				document.querySelectorAll(".phase").forEach((phase) => {
+					phase.classList.remove("active");
+					if (phase.dataset.phase === gameState.currentPhase) {
+						phase.classList.add("active");
+					}
+				});
+
+				// Update turn and active player
+				document.getElementById("currentTurn").textContent =
+					gameState.currentTurn;
+				document.getElementById("activePlayer").textContent =
+					gameState.players[gameState.activePlayer].name;
+
+				// Update player panels
+				document
+					.querySelectorAll(".player-panel")
+					.forEach((panel) => panel.classList.remove("active"));
+				document
+					.getElementById(`player${gameState.activePlayer}Panel`)
+					.classList.add("active");
+
+				// Update CP and VP
+				document.getElementById("player1CP").textContent =
+					gameState.players[1].cp;
+				document.getElementById("player1VP").textContent =
+					gameState.players[1].vp;
+				document.getElementById("player2CP").textContent =
+					gameState.players[2].cp;
+				document.getElementById("player2VP").textContent =
+					gameState.players[2].vp;
+
+				// Update units
+				updateUnitsDisplay(1);
+				updateUnitsDisplay(2);
+			}
+
+			// --- Action legality helpers ---
+			function canUnitMove(unit, phase) {
+				return (
+					phase === "movement" && !unit.hasMoved && unit.status !== "destroyed"
+				);
+			}
+			function canUnitAdvance(unit, phase) {
+				return (
+					phase === "movement" && !unit.hasMoved && unit.status !== "destroyed"
+				);
+			}
+			function canUnitShoot(unit, phase) {
+				return (
+					phase === "shooting" &&
+					!unit.hasShot &&
+					!unit.battleshocked &&
+					unit.status !== "destroyed"
+				);
+			}
+			function canUnitCharge(unit, phase) {
+				return (
+					phase === "charge" &&
+					!unit.hasCharged &&
+					!unit.battleshocked &&
+					unit.status !== "destroyed"
+				);
+			}
+			function canUnitFight(unit, phase) {
+				return (
+					phase === "fight" &&
+					!unit.hasFought &&
+					!unit.battleshocked &&
+					unit.status !== "destroyed"
+				);
+			}
+			function canUnitBattleShock(unit, phase) {
+				return (
+					phase === "morale" &&
+					!unit.battleshocked &&
+					unit.status !== "destroyed" &&
+					unit.currentModels <= unit.models / 2
+				);
+			}
+			function canUnitRecover(unit, phase) {
+				return (
+					phase === "morale" &&
+					unit.battleshocked &&
+					unit.status !== "destroyed"
+				);
+			}
+			function canUnitStratagem(unit, phase, playerNum) {
+				// Show stratagem button if at least one is available for this phase
+				const availableStrats = getAvailableStratagems(
+					gameState.players[playerNum].faction,
+					phase,
+					gameState.players[playerNum].cp,
+					unit
+				);
+				return availableStrats.length > 0 && unit.status !== "destroyed";
+			}
+
+			function updateUnitsDisplay(playerNum) {
+				const container = document.getElementById(`player${playerNum}Units`);
+				if (!container) return;
+
+				container.innerHTML = "";
+
+				gameState.players[playerNum].units.forEach((unit) => {
+					const unitDiv = document.createElement("div");
+					unitDiv.className = "unit-card";
+					// Create wound display
+					let woundPips = "";
+					const maxPipsToShow = Math.min(unit.maxWounds, 20);
+					for (let i = 0; i < maxPipsToShow; i++) {
+						woundPips += `<div class="wound-pip ${
+							i >= unit.currentWounds ? "lost" : ""
+						}"></div>`;
+					}
+
+					// Create weapons display with counts
+					let weaponsHtml = "";
+					if (unit.weaponConfig) {
+						weaponsHtml = '<div class="unit-weapons">';
+						Object.entries(unit.weaponConfig).forEach(([weaponKey, count]) => {
+							if (count > 0) {
+								const weapon = weaponProfiles[weaponKey];
+								weaponsHtml += `<div class="weapon-profile">• ${weapon.name} x${count} (${weapon.range}", S${weapon.strength}, AP-${weapon.ap})</div>`;
+							}
+						});
+						weaponsHtml += "</div>";
+					} else if (unit.weapons && unit.weapons.length > 0) {
+						weaponsHtml = '<div class="unit-weapons">';
+						unit.weapons.forEach((weaponKey) => {
+							const weapon = weaponProfiles[weaponKey];
+							if (weapon) {
+								weaponsHtml += `<div class="weapon-profile">• ${weapon.name} (${weapon.range}", S${weapon.strength}, AP-${weapon.ap})</div>`;
+							}
+						});
+						weaponsHtml += "</div>";
+					}
+
+					// Create buffs display
+					let buffsHtml = "";
+					if (unit.buffs && unit.buffs.length > 0) {
+						buffsHtml = '<div class="unit-buffs">';
+						unit.buffs.forEach((buff) => {
+							let durLabel = buff.duration === "phase" ? "🕒 phase" : "🕒 turn";
+							buffsHtml += `<span class="buff-tag">${buff.name} <span style="opacity:0.7;">(${durLabel})</span></span>`;
+						});
+						buffsHtml += "</div>";
+					}
+
+					// --- Contextual action buttons per phase ---
+					let actionsHtml =
+						'<div class="unit-actions" style="margin-top: 0.5rem;">';
+					const phase = gameState.currentPhase;
+					const isActivePlayer = playerNum === gameState.activePlayer;
+					if (isActivePlayer && unit.status !== "destroyed") {
+						// Move/Advance phase
+						if (canUnitMove(unit, phase)) {
+							actionsHtml += `<button class="btn btn-small" onclick="unitMoveAction('${unit.id}', ${playerNum})">Move</button>
+								<button class="btn-info btn-small" onclick="showActionInfo('move')">?</button>`;
+						}
+						if (canUnitAdvance(unit, phase)) {
+							actionsHtml += `<button class="btn btn-secondary btn-small" onclick="unitAdvanceAction('${unit.id}', ${playerNum})">Advance</button>
+								<button class="btn-info btn-small" onclick="showActionInfo('advance')">?</button>`;
+						}
+						// Shooting phase
+						if (canUnitShoot(unit, phase)) {
+							actionsHtml += `<button class="btn btn-small" onclick="unitShootAction('${unit.id}', ${playerNum})">Shoot</button>
+								<button class="btn-info btn-small" onclick="showActionInfo('shoot')">?</button>`;
+						}
+						// Charge phase
+						if (canUnitCharge(unit, phase)) {
+							actionsHtml += `<button class="btn btn-small" onclick="unitChargeAction('${unit.id}', ${playerNum})">Charge</button>
+								<button class="btn-info btn-small" onclick="showActionInfo('charge')">?</button>`;
+						}
+						// Fight phase
+						if (canUnitFight(unit, phase)) {
+							actionsHtml += `<button class="btn btn-small" onclick="unitFightAction('${unit.id}', ${playerNum})">Fight</button>
+								<button class="btn-info btn-small" onclick="showActionInfo('fight')">?</button>`;
+						}
+						// Morale phase
+						if (canUnitRecover(unit, phase)) {
+							actionsHtml += `<button class="btn btn-small" onclick="unitRecoverAction('${unit.id}', ${playerNum})">Recover</button>
+								<button class="btn-info btn-small" onclick="showActionInfo('recover')">?</button>`;
+						} else if (canUnitBattleShock(unit, phase)) {
+							actionsHtml += `<button class="btn btn-small" onclick="unitBattleShockAction('${unit.id}', ${playerNum})">Battle-shock Test</button>
+								<button class="btn-info btn-small" onclick="showActionInfo('battle-shock')">?</button>`;
+						}
+						// Stratagems (phase smart)
+						if (canUnitStratagem(unit, phase, playerNum)) {
+							actionsHtml += `<button class="btn btn-small" onclick="unitStratagemAction('${unit.id}', ${playerNum})">Use Stratagem</button>
+								<button class="btn-info btn-small" onclick="showActionInfo('stratagem')">?</button>`;
+						}
+					}
+					actionsHtml += "</div>";
+
+					// Action status and engagement
+					let statusIcons = "";
+					if (gameState.currentPhase === "shooting" && unit.hasShot) {
+						statusIcons += " 🎯";
+					}
+					if (gameState.currentPhase === "fight" && unit.hasFought) {
+						statusIcons += " ⚔️";
+					}
+					if (unit.hasCharged && gameState.currentTurn === unit.chargedOnTurn) {
+						statusIcons += " ⚡";
+					}
+
+					// Engagement display
+					let engagementHtml = "";
+					if (unit.engagedWith && unit.engagedWith.length > 0) {
+						const engagedNames = unit.engagedWith
+							.map((id) => {
+								const engagedUnit = findUnitById(id);
+								return engagedUnit ? engagedUnit.name : "Unknown";
+							})
+							.join(", ");
+						engagementHtml = `<div style="color: #ff6666; font-size: 0.8rem; margin-top: 0.25rem;">⚔️ Engaged with: ${engagedNames}</div>`;
+					}
+
+					unitDiv.innerHTML = `
+						<div class="unit-header">
+							<span class="unit-name">${unit.name}${
+						unit.battleshocked
+							? '<span class="battleshock-badge">BATTLE-SHOCKED</span>'
+							: ""
+					}${statusIcons}</span>
+							<span>${unit.currentModels}/${unit.models} models</span>
+						</div>
+						<div class="unit-stats-row">
+							M: ${unit.movement}" | T: ${unit.toughness} | Sv: ${unit.save}+${
+						unit.invulnSave ? `/${unit.invulnSave}++` : ""
+					} | W: ${unit.wounds} | Ld: ${unit.leadership}+ | OC: ${unit.oc}
+						</div>
+						<div class="unit-wounds">${woundPips}</div>
+						<div style="font-size: 0.8rem; margin-top: 0.5rem; color: #ccc;">
+							Wounds: ${unit.currentWounds}/${unit.maxWounds} | ${unit.role}
+							${unit.battleshocked ? " | Cannot control objectives" : ""}
+						</div>
+						${engagementHtml}
+						${weaponsHtml}
+						${buffsHtml}
+						${actionsHtml}
+					`;
+
+					unitDiv.onclick = (e) => {
+						e.stopPropagation();
+						showUnitActionsModal(unit, playerNum);
+					};
+					container.appendChild(unitDiv);
+				});
+			}
+			// --- Per-unit action button placeholder functions ---
+			function unitMoveAction(unitId, playerNum) {
+				logEntry("Move action for unit: " + unitId, "system");
+				// TODO: Implement move logic/modal
+			}
+			function unitAdvanceAction(unitId, playerNum) {
+				logEntry("Advance action for unit: " + unitId, "system");
+				// TODO: Implement advance logic/modal
+			}
+			function unitShootAction(unitId, playerNum) {
+				logEntry("Shoot action for unit: " + unitId, "system");
+				// Could call existing shooting sequence/modal with this unit
+			}
+			function unitChargeAction(unitId, playerNum) {
+				logEntry("Charge action for unit: " + unitId, "system");
+				// TODO: Implement charge logic/modal
+			}
+			function unitFightAction(unitId, playerNum) {
+				logEntry("Fight action for unit: " + unitId, "system");
+				// TODO: Implement fight logic/modal
+			}
+			function unitBattleShockAction(unitId, playerNum) {
+				logEntry("Battle-shock test for unit: " + unitId, "system");
+				// TODO: Implement test logic/modal
+			}
+			function unitRecoverAction(unitId, playerNum) {
+				logEntry("Recover action for unit: " + unitId, "system");
+				// TODO: Implement recovery logic/modal
+			}
+			function unitStratagemAction(unitId, playerNum) {
+				logEntry("Use Stratagem for unit: " + unitId, "system");
+				// TODO: Show eligible stratagems for this unit
+			}
+			// (Optional) Info button CSS
+			// Add this to the style section if not present:
+			// .btn-info {
+			//   background: #ffd700;
+			//   color: #222;
+			//   border: none;
+			//   border-radius: 50%;
+			//   font-size: 1em;
+			//   width: 2em;
+			//   height: 2em;
+			//   margin-left: 0.25em;
+			//   cursor: pointer;
+			//   display: inline-block;
+			//   font-weight: bold;
+			//   vertical-align: middle;
+			//   transition: background 0.2s;
+			// }
+			// .btn-info:hover {
+			//   background: #ffa500;
+			// }
+
+			// Enhanced Natural Language Processing
+			function processAction(playerNum) {
+				const input = document
+					.getElementById(`player${playerNum}Input`)
+					.value.trim();
+				if (!input) return;
+
+				const lowerInput = input.toLowerCase();
+
+				// Check for battle-shock related commands
+				if (
+					lowerInput.includes("battle-shock") ||
+					lowerInput.includes("battleshock") ||
+					lowerInput.includes
