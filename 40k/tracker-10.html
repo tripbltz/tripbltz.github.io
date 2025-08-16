@@ -1,0 +1,2143 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Pirata+One&display=swap"
+			rel="stylesheet"
+		/>
+		<title>40K Tracker</title>
+		<style>
+			:root {
+				--bg: #0d0f12;
+				--panel: #151a20;
+				--panel-2: #1b2129;
+				--text: #e6ebf2;
+				--muted: #9fb0c3;
+				--accent: #62d3ff;
+				--accent-2: #ffd166;
+				--danger: #ff6b6b;
+				--ok: #2ecc71;
+				--border: #26303b;
+			}
+			* {
+				box-sizing: border-box;
+			}
+			html,
+			body {
+				height: 100%;
+			}
+			body {
+				margin: 0;
+				font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto,
+					Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+				background: linear-gradient(180deg, #0b0e12, #0a0d11 30%, #0b0e12);
+				color: var(--text);
+			}
+			.container {
+				max-width: 1400px;
+				margin: 0 auto;
+				padding: 16px;
+			}
+			header {
+				display: flex;
+				gap: 12px;
+				align-items: center;
+				justify-content: space-between;
+				margin-bottom: 12px;
+			}
+			.app-title {
+				font-weight: 800;
+				letter-spacing: 0.5px;
+			}
+			.pirata-one-regular {
+				font-family: "Pirata One", system-ui;
+				font-weight: 400;
+				font-style: normal;
+			}
+			.faction-name {
+				font-family: "Pirata One", system-ui;
+				font-weight: 400;
+				font-style: normal;
+				font-size: 30px;
+				color: #e6ebf2;
+			}
+			.badge {
+				padding: 2px 8px;
+				border: 1px solid var(--border);
+				border-radius: 999px;
+				background: var(--panel);
+				color: var(--muted);
+				font-size: 12px;
+			}
+			.row {
+				display: grid;
+				gap: 12px;
+			}
+			@media (min-width: 1100px) {
+				.row {
+					grid-template-columns: 1fr 1fr;
+				}
+			}
+			@media (max-width: 1099px) {
+				.row {
+					grid-template-columns: 1fr;
+				}
+			}
+
+			.panel {
+				background: linear-gradient(180deg, var(--panel), var(--panel-2));
+				border: 1px solid var(--border);
+				border-radius: 12px;
+				padding: 12px;
+			}
+			.panel h3 {
+				margin: 0 0 8px 0;
+				font-size: 16px;
+				color: var(--text);
+			}
+			.sub {
+				font-size: 12px;
+				color: var(--muted);
+			}
+
+			.controls {
+				display: flex;
+				flex-wrap: wrap;
+				gap: 8px;
+				align-items: center;
+			}
+			.controls .group {
+				display: flex;
+				gap: 6px;
+				align-items: center;
+			}
+			input[type="text"],
+			input[type="number"],
+			select,
+			textarea {
+				background: #0f141a;
+				border: 1px solid var(--border);
+				color: var(--text);
+				padding: 8px 10px;
+				border-radius: 8px;
+				outline: none;
+				min-width: 0;
+			}
+			textarea {
+				width: 100%;
+				min-height: 80px;
+			}
+			button {
+				background: var(--panel-2);
+				color: var(--text);
+				border: 1px solid var(--border);
+				padding: 8px 10px;
+				border-radius: 8px;
+				cursor: pointer;
+			}
+			button:hover {
+				border-color: #3a495b;
+			}
+			button.primary {
+				background: linear-gradient(180deg, #0c2730, #0a3b4b);
+				border-color: #294a5a;
+				color: #dff6ff;
+			}
+			button.danger {
+				background: linear-gradient(180deg, #361414, #2c0e0e);
+				border-color: #623434;
+				color: #ffd0d0;
+			}
+			button.ghost {
+				background: transparent;
+			}
+
+			/* Sleek select and custom file uploader */
+			.input-row {
+				display: flex;
+				gap: 10px;
+				align-items: stretch;
+				flex-wrap: wrap;
+				margin-top: 6px;
+			}
+			.select-wrap {
+				position: relative;
+				flex: 0 0 180px;
+			}
+			.select-wrap select.custom-select {
+				appearance: none;
+				-webkit-appearance: none;
+				-moz-appearance: none;
+				width: 100%;
+				height: 38px;
+				background: #0f141a;
+				border: 1px solid var(--border);
+				color: var(--text);
+				padding: 8px 36px 8px 10px;
+				border-radius: 8px;
+				outline: none;
+				cursor: pointer;
+			}
+			.select-wrap::after {
+				content: "▾";
+				position: absolute;
+				right: 10px;
+				top: 50%;
+				transform: translateY(-50%);
+				pointer-events: none;
+				color: var(--muted);
+				font-size: 14px;
+			}
+			.file-uploader {
+				display: inline-flex;
+				align-items: center;
+				gap: 8px;
+				flex: 1 1 auto;
+			}
+			.file-uploader .filename-pill {
+				display: inline-flex;
+				align-items: center;
+				max-width: 100%;
+				padding: 6px 10px;
+				border: 1px dashed var(--border);
+				color: var(--muted);
+				border-radius: 8px;
+				min-height: 38px;
+				overflow: hidden;
+				text-overflow: ellipsis;
+				white-space: nowrap;
+			}
+			.file-uploader .btn-choose {
+				height: 38px;
+			}
+			.visually-hidden {
+				position: absolute !important;
+				width: 1px;
+				height: 1px;
+				padding: 0;
+				margin: -1px;
+				overflow: hidden;
+				clip: rect(0 0 0 0);
+				white-space: nowrap;
+				border: 0;
+			}
+
+			.grid-2 {
+				display: grid;
+				gap: 10px;
+				grid-template-columns: 1fr 1fr;
+			}
+			.grid-3 {
+				display: grid;
+				gap: 10px;
+				grid-template-columns: repeat(3, 1fr);
+			}
+
+			.unit-card {
+				border: 1px solid var(--border);
+				border-radius: 10px;
+				padding: 10px;
+				background: #12171d;
+				display: flex;
+				gap: 10px;
+				align-items: flex-start;
+				align-self: start;
+				/* Prevent splitting; enable masonry flow */
+				break-inside: avoid;
+				-webkit-column-break-inside: avoid;
+				page-break-inside: avoid;
+
+				/* Make card flow within multi-column container */
+				display: inline-block;
+				width: 100%;
+			}
+			.unit-name {
+				cursor: pointer;
+			}
+			.unit-details {
+				/* smoother sliding reveal using inline max-height */
+				max-height: 0;
+				overflow: hidden;
+				opacity: 0;
+				transform: translateY(-6px);
+				padding-top: 0; /* start collapsed */
+				will-change: max-height, opacity, transform, padding-top;
+				transition: max-height 600ms cubic-bezier(0.22, 1, 0.36, 1),
+					opacity 420ms ease, transform 420ms ease, padding-top 420ms ease;
+				margin-top: 8px;
+				border-top: 1px solid var(--border);
+			}
+			.unit-details.active {
+				/* max-height is set inline by JS to the element's scrollHeight */
+				opacity: 1;
+				transform: translateY(0);
+				padding-top: 8px; /* restore spacing when open */
+			}
+
+			/* Respect users who prefer reduced motion */
+			@media (prefers-reduced-motion: reduce) {
+				.unit-details,
+				.unit-details.active {
+					transition: none !important;
+					max-height: none !important;
+					opacity: 1 !important;
+					transform: none !important;
+					padding-top: 8px !important;
+				}
+			}
+			.statline {
+				display: flex;
+				gap: 8px;
+				flex-wrap: wrap;
+				margin: 6px 0;
+			}
+			.statline .tag {
+				background: #0f141a;
+			}
+			.composition {
+				font-size: 12px;
+				color: var(--muted);
+			}
+			.unit-meta {
+				flex: 1;
+				min-width: 0;
+			}
+			.unit-name {
+				font-weight: 700;
+			}
+			.kw {
+				font-size: 11px;
+				color: var(--muted);
+				border: 1px solid var(--border);
+				padding: 2px 6px;
+				border-radius: 999px;
+				margin-right: 4px;
+			}
+			.wounds {
+				display: flex;
+				align-items: center;
+				gap: 8px;
+				margin-top: 6px;
+			}
+			.bar {
+				position: relative;
+				flex: 1;
+				height: 10px;
+				background: red;
+				border: 1px solid var(--border);
+				border-radius: 6px;
+				overflow: hidden;
+			}
+			.bar > span {
+				position: absolute;
+				left: 0;
+				top: 0;
+				bottom: 0;
+				background: linear-gradient(90deg, #1f815a, #1b9d74, #1ea77c);
+			}
+			.cnt {
+				font-variant-numeric: tabular-nums;
+			}
+
+			/* Phase Help specific tweaks */
+			#phaseModal .modal-dialog {
+				width: 520px;
+				max-width: 90vw;
+			}
+			#phaseHelpBody p {
+				margin: 8px 0;
+			}
+			#phaseHelpBody ul {
+				margin: 8px 0 0 18px;
+			}
+
+			.effect-chip {
+				display: inline-flex;
+				gap: 6px;
+				align-items: center;
+				border: 1px solid var(--border);
+				background: #121820;
+				padding: 4px 8px;
+				border-radius: 999px;
+				font-size: 12px;
+				color: #cfe4ff;
+				margin: 4px 6px 0 0;
+			}
+			.effect-chip small {
+				color: #9fc4ff;
+			}
+			.effect-chip button {
+				border: none;
+				background: transparent;
+				color: #ffd0d0;
+				cursor: pointer;
+			}
+
+			.section-title {
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				margin: 6px 0;
+			}
+
+			.phase {
+				display: flex;
+				gap: 6px;
+				flex-wrap: wrap;
+			}
+			.phase .pill {
+				padding: 6px 10px;
+				border-radius: 999px;
+				border: 1px solid var(--border);
+				background: #121820;
+				color: var(--muted);
+				font-size: 12px;
+			}
+			.phase .pill.active {
+				background: linear-gradient(180deg, #172330, #0f1a24);
+				color: #eaf6ff;
+				border-color: #2d3b4b;
+			}
+
+			/* Masonry-like columns for unit cards */
+			.players {
+				column-gap: 12px; /* space between columns */
+			}
+			@media (min-width: 700px) {
+				.players {
+					column-count: 2;
+				}
+			}
+			@media (max-width: 699px) {
+				.players {
+					column-count: 1;
+				}
+			}
+
+			.card-title {
+				display: flex;
+				gap: 8px;
+				align-items: center;
+				justify-content: space-between;
+			}
+			.faction-row {
+				display: flex;
+				align-items: center;
+				gap: 10px;
+				margin: 6px 0 12px 0;
+			}
+			.faction-row img {
+				max-width: 200px;
+				height: auto;
+				border-radius: 8px;
+				border: 1px solid var(--border);
+				background: #0f141a;
+			}
+			.counter {
+				display: inline-flex;
+				gap: 6px;
+				align-items: center;
+			}
+			.counter input {
+				width: 70px;
+				text-align: center;
+			}
+			.counter button {
+				width: 34px;
+			}
+
+			.footer {
+				margin-top: 16px;
+				color: var(--muted);
+				font-size: 12px;
+				text-align: center;
+			}
+
+			.log {
+				max-height: 220px;
+				overflow: auto;
+				border: 1px dashed var(--border);
+				padding: 8px;
+				border-radius: 8px;
+				background: #0e1419;
+			}
+			.log .item {
+				font-size: 12px;
+				color: #c8d6e5;
+				padding: 4px 0;
+				border-bottom: 1px dashed #213042;
+			}
+			.log .item:last-child {
+				border-bottom: none;
+			}
+
+			.tag {
+				font-size: 11px;
+				border: 1px solid var(--border);
+				padding: 2px 6px;
+				border-radius: 999px;
+				color: #cfd8e3;
+			}
+			.muted {
+				color: var(--muted);
+			}
+			.divider {
+				height: 1px;
+				background: var(--border);
+				margin: 8px 0;
+			}
+
+			.hidden {
+				display: none !important;
+			}
+
+			/* Modal */
+			.modal-backdrop {
+				position: fixed;
+				inset: 0;
+				background: rgba(0, 0, 0, 0.6);
+				display: none;
+				align-items: center;
+				justify-content: center;
+				z-index: 1000;
+			}
+			.modal-backdrop.active {
+				display: flex;
+			}
+			.modal-dialog {
+				width: 50vw; /* ~50% of page width */
+				max-width: 900px;
+				min-width: 320px;
+				max-height: 85vh;
+				overflow: auto;
+				border-radius: 12px;
+				background: linear-gradient(180deg, var(--panel), var(--panel-2));
+				border: 1px solid var(--border);
+				box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+			}
+			.modal-header {
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				padding: 10px 12px;
+				border-bottom: 1px solid var(--border);
+			}
+			.modal-body {
+				padding: 12px;
+			}
+			.modal-close {
+				background: transparent;
+				border: none;
+				color: var(--muted);
+				font-size: 20px;
+				cursor: pointer;
+			}
+			.btn-x {
+				background: transparent;
+				color: var(--danger);
+				border: 1px solid var(--border);
+				width: 28px;
+				height: 28px;
+				padding: 0;
+				border-radius: 6px;
+				font-size: 16px;
+				line-height: 1;
+				cursor: pointer;
+			}
+			.btn-x:hover {
+				background: #2c0e0e;
+				border-color: #623434;
+				color: #ffd0d0;
+			}
+		</style>
+		<!-- Prevent local favicon warning -->
+		<link rel="icon" href="data:," />
+
+		<!-- PDF.js for client-side PDF text extraction (no SRI to avoid hash mismatch across CDNs) -->
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+		<script>
+			(function () {
+				const lib = window.pdfjsLib || window["pdfjs-dist/build/pdf"];
+				if (lib && lib.GlobalWorkerOptions) {
+					lib.GlobalWorkerOptions.workerSrc =
+						"https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+					window.__pdfjs = lib;
+				}
+			})();
+		</script>
+		<script src="data.js"></script>
+	</head>
+	<body>
+		<div class="container">
+			<header>
+				<div style="display: flex; align-items: center; gap: 10px">
+					<div class="app-title pirata-one-regular">
+						⚙️ 40K TRACKER <br /><span class="badge">10th Edition</span>
+					</div>
+					<span class="badge" id="roundBadge">Round 1</span>
+					<span class="badge" id="turnBadge"
+						>Turn: <strong id="turnPlayerBadge">Player 1</strong></span
+					>
+				</div>
+				<div class="controls">
+					<div class="group">
+						<label class="sub">Phase</label>
+						<div class="phase" id="phasePills"></div>
+					</div>
+					<div class="group">
+						<button class="primary" id="btnNextPhase">Next Phase ➜</button>
+						<button class="ghost" id="btnPrevPhase">◀︎ Prev</button>
+					</div>
+				</div>
+				<div class="group">
+					<button id="btnDice" class="ghost" title="Open dice roller">
+						🎲
+					</button>
+					<button id="btnSetup" class="primary" title="Open setup & tools">
+						Setup
+					</button>
+					<button id="btnNewGame" class="danger" title="Start a new battle">
+						New Game
+					</button>
+				</div>
+			</header>
+
+			<!-- Setup & Tools Modal -->
+			<div id="setupModal" class="modal-backdrop">
+				<div class="modal-dialog">
+					<div class="modal-header">
+						<strong class="faction-name">Setup & Tools</strong>
+						<button id="setupClose" class="modal-close" aria-label="Close">
+							✕
+						</button>
+					</div>
+					<div class="modal-body">
+						<section class="panel" id="importPanel">
+							<div class="grid-2">
+								<div>
+									<div class="card-title"><strong>Player Names</strong></div>
+									<div class="grid-2" style="margin-top: 6px">
+										<input id="p1Name" type="text" value="Player 1" />
+										<input id="p2Name" type="text" value="Player 2" />
+									</div>
+								</div>
+								<div>
+									<div class="card-title"><strong>CP / VP</strong></div>
+									<div class="grid-2" style="margin-top: 6px">
+										<div class="counter">
+											<span class="tag">P1 CP</span
+											><button data-cp="p1" data-delta="-1">−</button
+											><input id="p1CP" type="number" value="0" /><button
+												data-cp="p1"
+												data-delta="1"
+											>
+												＋
+											</button>
+										</div>
+										<div class="counter">
+											<span class="tag">P1 VP</span
+											><button data-vp="p1" data-delta="-1">−</button
+											><input id="p1VP" type="number" value="0" /><button
+												data-vp="p1"
+												data-delta="1"
+											>
+												＋
+											</button>
+										</div>
+										<div class="counter">
+											<span class="tag">P2 CP</span
+											><button data-cp="p2" data-delta="-1">−</button
+											><input id="p2CP" type="number" value="0" /><button
+												data-cp="p2"
+												data-delta="1"
+											>
+												＋
+											</button>
+										</div>
+										<div class="counter">
+											<span class="tag">P2 VP</span
+											><button data-vp="p2" data-delta="-1">−</button
+											><input id="p2VP" type="number" value="0" /><button
+												data-vp="p2"
+												data-delta="1"
+											>
+												＋
+											</button>
+										</div>
+									</div>
+								</div>
+							</div>
+
+							<div class="divider"></div>
+							<div class="card-title">
+								<strong>Game Settings</strong>
+							</div>
+							<div class="sub" style="margin-top: 6px">
+								<label
+									><input type="checkbox" id="autoCP" checked /> Auto +1 CP at
+									Command phase</label
+								>
+							</div>
+							<div class="divider"></div>
+							<div class="grid-2">
+								<div>
+									<div class="card-title" style="padding-bottom: 5px">
+										<strong>Import Army List</strong>
+									</div>
+									<div class="sub">
+										Upload a Battlescribe-style PDF army list
+									</div>
+									<div class="input-row">
+										<div class="select-wrap">
+											<select id="importTarget" class="custom-select">
+												<option value="p1">Player 1</option>
+												<option value="p2">Player 2</option>
+											</select>
+										</div>
+										<div
+											class="file-uploader"
+											role="group"
+											aria-label="Import Army List"
+										>
+											<button
+												id="btnChooseFile"
+												type="button"
+												class="primary btn-choose"
+											>
+												Choose PDF…
+											</button>
+											<span id="armyFileName" class="filename-pill"
+												>No file chosen</span
+											>
+											<input
+												type="file"
+												id="armyFile"
+												accept=".pdf,application/pdf"
+												class="visually-hidden"
+												aria-hidden="true"
+											/>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="divider"></div>
+							<div>
+								<div class="card-title">
+									<strong>Activity Log</strong>
+									<button id="btnClearLog" class="ghost">Clear</button>
+								</div>
+								<div id="log" class="log"></div>
+							</div>
+							<div class="divider"></div>
+							<div class="card-title"><strong>Saved states</strong></div>
+							<div
+								style="
+									margin-top: 8px;
+									display: flex;
+									gap: 12px;
+									flex-wrap: wrap;
+								"
+							>
+								<button id="btnSave">💾 Save</button>
+								<button id="btnLoad">📂 Load</button>
+								<input
+									id="loadState"
+									type="file"
+									accept="application/json"
+									style="display: none"
+								/>
+							</div>
+						</section>
+					</div>
+				</div>
+			</div>
+
+			<div class="row">
+				<!-- Players only: two columns -->
+				<section class="panel">
+					<div class="card-title">
+						<h3 id="p1Header">Player 1 Army</h3>
+					</div>
+					<div class="faction-row">
+						<img id="p1FactionImg" alt="Faction" class="hidden" />
+						<div id="p1Faction" class="faction-name"></div>
+					</div>
+					<div id="p1Units" class="players"></div>
+				</section>
+				<section class="panel">
+					<div class="card-title">
+						<h3 id="p2Header">Player 2 Army</h3>
+					</div>
+					<div class="faction-row">
+						<img id="p2FactionImg" alt="Faction" class="hidden" />
+						<div id="p2Faction" class="faction-name"></div>
+					</div>
+					<div id="p2Units" class="players"></div>
+				</section>
+			</div>
+
+			<div class="footer">
+				State is auto-saved locally. You can export/import to continue later.
+			</div>
+		</div>
+
+		<template id="unitTemplate">
+			<div class="unit-card" data-unit-id>
+				<div class="unit-meta">
+					<div class="unit-name"></div>
+					<div class="sub keywords"></div>
+					<div class="wounds">
+						<div class="bar"><span></span></div>
+						<div class="cnt" data-wounds></div>
+						<button data-dmg="1">−</button>
+						<button data-dmg="-1">＋</button>
+					</div>
+					<div class="sub" data-models></div>
+					<div class="section-title">
+						<strong>Effects</strong> <button data-add-effect>＋ Add</button>
+					</div>
+					<div class="effects" data-effects></div>
+					<div class="unit-details" data-details>
+						<div class="section-title"><strong>Unit Details</strong></div>
+						<div class="statline" data-statline></div>
+						<div class="composition" data-composition></div>
+					</div>
+				</div>
+				<div>
+					<button class="btn-x" data-remove aria-label="Remove">✕</button>
+				</div>
+			</div>
+		</template>
+
+		<!-- Phase Help Modal -->
+		<div id="phaseModal" class="modal-backdrop">
+			<div class="modal-dialog">
+				<div class="modal-header">
+					<strong id="phaseHelpTitle">Phase Help</strong>
+					<button id="phaseHelpClose" class="modal-close" aria-label="Close">
+						✕
+					</button>
+				</div>
+				<div id="phaseHelpBody" class="modal-body"></div>
+			</div>
+		</div>
+
+		<!-- Dice Roller Modal -->
+		<div id="diceModal" class="modal-backdrop">
+			<div class="modal-dialog">
+				<div class="modal-header">
+					<strong class="faction-name">Dice Roller</strong>
+					<button id="diceClose" class="modal-close" aria-label="Close">
+						✕
+					</button>
+				</div>
+				<div class="modal-body">
+					<div
+						style="
+							display: flex;
+							gap: 8px;
+							align-items: center;
+							flex-wrap: wrap;
+						"
+					>
+						<input id="diceExpr" type="text" placeholder="e.g. 6d6+2" />
+						<input
+							id="diceTN"
+							type="number"
+							placeholder="Target (e.g. 4 for 4+)"
+						/>
+						<button id="btnRoll">Roll</button>
+					</div>
+					<div id="diceOut" class="sub" style="margin-top: 10px"></div>
+				</div>
+			</div>
+		</div>
+
+		<script>
+			const PHASE_HELP = {
+				Command: `
+					<p><strong>Command phase:</strong> Gain 1CP, resolve any "start of your Command phase" abilities and effects, select targets for army rules/stratagems as appropriate, and take any required Battle-shock tests as instructed by rules (many 10th edition rules check for below Half-strength here).</p>
+				`,
+				Movement: `
+					<p><strong>Movement phase:</strong> Select units to move. Each unit can Normal Move, Advance (add D6 to Move and cannot shoot certain weapons or charge), or Fall Back (cannot shoot or charge unless a rule allows). Aircraft and other special moves follow their datasheet rules.</p>
+				`,
+				Shooting: `
+					<p><strong>Shooting phase:</strong> Choose eligible units to shoot, select targets in range and line of sight, resolve attacks weapon-by-weapon (Hit → Wound → Saves → Damage), and apply abilities like Rapid Fire, Blast, etc.</p>
+				`,
+				Charge: `
+					<p><strong>Charge phase:</strong> Declare targets with units eligible to charge (not Advanced or Fell Back unless a rule allows), resolve Overwatch/defensive rules as applicable, roll charge distances, and make charge moves into Engagement Range.</p>
+				`,
+				Fight: `
+					<p><strong>Fight phase:</strong> Units in Engagement Range fight in alternating order. Pile-In → Make Attacks → Remove Casualties → Consolidate. Apply abilities such as Fights First/Last and modifiers from stratagems.</p>
+				`,
+				Battleshock: `
+					<p><strong>Battle-shock step:</strong> Resolve any end-of-turn checks or effects tied to Battle-shock and mission rules. In 10th edition, many Battle-shock tests are taken at the start of the Command phase when a unit is below Half-strength; use this step to track ongoing Battle-shock effects and clean up end-of-turn abilities.</p>
+				`,
+			};
+
+			function openPhaseModal(title, html) {
+				const m = document.getElementById("phaseModal");
+				const t = document.getElementById("phaseHelpTitle");
+				const b = document.getElementById("phaseHelpBody");
+				if (t) t.textContent = title || "Phase Help";
+				if (b) b.innerHTML = html || "";
+				if (m) m.classList.add("active");
+			}
+			function closePhaseModal() {
+				const m = document.getElementById("phaseModal");
+				if (m) m.classList.remove("active");
+			}
+			// ------------------------------
+			// Data Models
+			// ------------------------------
+			/** @typedef {{name:string, models?:number, woundsPerModel?:number, keywords?:string[], abilities?:string[]}} ImportedUnit */
+
+			const PHASES = [
+				"Command",
+				"Movement",
+				"Shooting",
+				"Charge",
+				"Fight",
+				"Battleshock",
+			];
+
+			const defaultArmy = () => ({ faction: "", units: [] });
+
+			function deepClone(o) {
+				return JSON.parse(JSON.stringify(o));
+			}
+
+			function makeId() {
+				return Math.random().toString(36).slice(2, 9);
+			}
+
+			function nowISO() {
+				return new Date().toISOString();
+			}
+
+			function log(msg) {
+				const el = document.getElementById("log");
+				const div = document.createElement("div");
+				div.className = "item";
+				div.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`;
+				el.prepend(div);
+				// keep last 200 lines
+				while (el.children.length > 200) el.removeChild(el.lastChild);
+			}
+
+			// Modal helpers
+			function openSetupModal() {
+				const m = document.getElementById("setupModal");
+				if (m) m.classList.add("active");
+			}
+			function closeSetupModal() {
+				const m = document.getElementById("setupModal");
+				if (m) m.classList.remove("active");
+			}
+			function resetStateForNewGame() {
+				State.round = 1;
+				State.currentPlayer = 0;
+				State.phaseIndex = 0;
+				State.autoGainCP = true;
+				State.players = [
+					{ name: "Player 1", cp: 0, vp: 0, army: defaultArmy(), units: [] },
+					{ name: "Player 2", cp: 0, vp: 0, army: defaultArmy(), units: [] },
+				];
+				localStorage.removeItem("wh40k_tracker_state_v1");
+				log("New game started.");
+			}
+
+			/** Game state */
+			const State = {
+				round: 1,
+				currentPlayer: 0, // 0 = p1, 1 = p2
+				phaseIndex: 0,
+				autoGainCP: true,
+				players: [
+					{ name: "Player 1", cp: 0, vp: 0, army: defaultArmy(), units: [] },
+					{ name: "Player 2", cp: 0, vp: 0, army: defaultArmy(), units: [] },
+				],
+				// A flat, serialisable unit model stored per player
+				/** @returns {{round:number, player:number}} */
+				turnId() {
+					return { round: this.round, player: this.currentPlayer };
+				},
+			};
+
+			function saveLocal() {
+				localStorage.setItem("wh40k_tracker_state_v1", JSON.stringify(State));
+			}
+			function loadLocal() {
+				const raw = localStorage.getItem("wh40k_tracker_state_v1");
+				if (!raw) return;
+				try {
+					const data = JSON.parse(raw);
+					// Basic migration guard
+					if (!Array.isArray(data.players) || data.players.length !== 2) return;
+					Object.assign(State, data);
+				} catch (e) {
+					console.warn("Failed to load local state", e);
+				}
+			}
+
+			// ------------------------------
+			// External data lookups (unitDatabase from data.js)
+			// ------------------------------
+			function canonicaliseFactionName(f) {
+				if (!f || typeof f !== "string") return "";
+				const s = f
+					.toLowerCase()
+					.replace(/[^a-z0-9\s\-']/g, "")
+					.trim();
+				// try exact keys as-is
+				if (window.unitDatabase && window.unitDatabase[s]) return s;
+				// normalise spaces -> dashes, drop apostrophes
+				const k = s.replace(/\s+/g, "-").replace(/'+/g, "");
+				if (window.unitDatabase && window.unitDatabase[k]) return k;
+				// fuzzy: find any key that appears inside the text (e.g., "astra militarum" -> "imperial-guard" via alias keys created in data.js)
+				if (window.unitDatabase) {
+					const keys = Object.keys(window.unitDatabase);
+					for (const key of keys) {
+						if (s.includes(key)) return key;
+					}
+				}
+				return k; // best effort
+			}
+
+			function findUnitProfileByName(name, factionHint) {
+				if (!window.unitDatabase) return null;
+				const n = (name || "").toLowerCase().trim();
+				const fKey = canonicaliseFactionName(factionHint || "");
+
+				const tryMatch = (arr) => {
+					if (!Array.isArray(arr)) return null;
+					// exact name first
+					let prof = arr.find((u) => (u.name || "").toLowerCase() === n);
+					if (prof) return prof;
+					// loose contains (e.g., handle punctuation/case differences)
+					prof = arr.find((u) => n.includes((u.name || "").toLowerCase()));
+					return prof || null;
+				};
+
+				// 1) search within hinted faction (including aliases added in data.js)
+				if (fKey && window.unitDatabase[fKey]) {
+					const p = tryMatch(window.unitDatabase[fKey]);
+					if (p) return p;
+				}
+				// 2) search across all factions as fallback
+				for (const key of Object.keys(window.unitDatabase)) {
+					const p = tryMatch(window.unitDatabase[key]);
+					if (p) return p;
+				}
+				return null;
+			}
+			function renderCompositionHTML(lines) {
+				if (!Array.isArray(lines) || !lines.length) {
+					return '<span class="sub">No composition detected from PDF.</span>';
+				}
+
+				// Build HTML with proper nesting:
+				// • Top level bullet opens a <li> (kept open until we see what's next)
+				// ◦ Sub-bullets are nested inside a <ul> under the last <li>
+				const out = [];
+				out.push('<ul style="margin:6px 0 6px 18px">');
+
+				let liOpen = false;
+				let subOpen = false;
+
+				const BULLET_TOP = /^[•●*\-]\s*/; // solid bullets & dashes
+				const BULLET_SUB = /^(?:◦|○|°|∙|·|∘|o)\s*/i; // hollow/small bullets & 'o'
+
+				const isTop = (s) => BULLET_TOP.test(s);
+				const isSub = (s) => BULLET_SUB.test(s);
+
+				for (const raw of lines) {
+					const s = String(raw).trim();
+					if (!s) continue;
+
+					if (isTop(s)) {
+						// Close previous sublist and li if needed
+						if (subOpen) {
+							out.push("</ul>");
+							subOpen = false;
+						}
+						if (liOpen) {
+							out.push("</li>");
+							liOpen = false;
+						}
+						// Open new top-level li
+						const text = s.replace(BULLET_TOP, "");
+						out.push("<li>" + text);
+						liOpen = true;
+					} else if (isSub(s)) {
+						// Ensure we have a parent <li>
+						if (!liOpen) {
+							out.push("<li>");
+							liOpen = true;
+						}
+						// Open a nested <ul> if not already open
+						if (!subOpen) {
+							out.push('<ul style="margin:4px 0 4px 18px">');
+							subOpen = true;
+						}
+						const text = s.replace(BULLET_SUB, "");
+						out.push("<li>" + text + "</li>");
+					}
+				}
+
+				// Close any open tags
+				if (subOpen) out.push("</ul>");
+				if (liOpen) out.push("</li>");
+				out.push("</ul>");
+
+				return out.join("");
+			}
+			// ------------------------------
+			// Helper for smooth expand/collapse of unit details
+			function smoothToggle(el) {
+				if (!el) return;
+
+				const isOpening = !el.classList.contains("active");
+
+				if (isOpening) {
+					// Prepare: set to current height (0), then measure and animate to scrollHeight
+					el.classList.add("active");
+					el.style.maxHeight = "0px"; // ensure we start collapsed
+					// Next frame to allow transition
+					requestAnimationFrame(() => {
+						const target = el.scrollHeight;
+						el.style.maxHeight = target + "px";
+					});
+
+					const onEnd = (e) => {
+						if (e.propertyName === "max-height") {
+							// Allow content growth while open
+							el.style.maxHeight = "none";
+							el.removeEventListener("transitionend", onEnd);
+						}
+					};
+					el.addEventListener("transitionend", onEnd);
+				} else {
+					// Closing: set a fixed height first, then animate to 0
+					const current = el.scrollHeight;
+					el.style.maxHeight = current + "px";
+					// force reflow to apply the fixed height before collapsing
+					void el.offsetHeight; // reflow
+					el.classList.remove("active");
+					requestAnimationFrame(() => {
+						el.style.maxHeight = "0px";
+					});
+
+					const onEnd = (e) => {
+						if (e.propertyName === "max-height") {
+							// Cleanup inline style when fully collapsed
+							el.style.maxHeight = "";
+							el.removeEventListener("transitionend", onEnd);
+						}
+					};
+					el.addEventListener("transitionend", onEnd);
+				}
+			}
+			// Units / Effects helpers
+			// ------------------------------
+			/** Create a tracked unit from an imported unit */
+			function createUnit(u) {
+				// pull wounds per model from data.js (unitDatabase) when available
+				const factionHint =
+					u.__faction || (State && State._importFactionHint) || "";
+				const models = Number(u.models || 1);
+
+				const profile = findUnitProfileByName(u.name || "Unit", factionHint);
+				const wpmFromProfile = profile && Number(profile.wounds);
+
+				const wpm = Number.isFinite(wpmFromProfile)
+					? wpmFromProfile
+					: Number(u.woundsPerModel || 1);
+
+				const totalW = models * wpm;
+				return {
+					id: makeId(),
+					name: u.name || "Unit",
+					models,
+					woundsPerModel: wpm,
+					totalWounds: totalW,
+					remainingWounds: totalW,
+					keywords: Array.isArray(u.keywords)
+						? u.keywords
+						: typeof u.keywords === "string"
+						? u.keywords
+								.split(/[,;]+/)
+								.map((s) => s.trim())
+								.filter(Boolean)
+						: profile && profile.role
+						? [profile.role]
+						: [],
+					abilities: Array.isArray(u.abilities)
+						? u.abilities
+						: typeof u.abilities === "string"
+						? u.abilities
+								.split(/[,;]+/)
+								.map((s) => s.trim())
+								.filter(Boolean)
+						: [],
+					effects: [],
+					composition: Array.isArray(u.composition) ? u.composition : [],
+					stats: profile
+						? {
+								M: profile.movement,
+								T: profile.toughness,
+								Sv: profile.save,
+								W: Number(profile.wounds),
+								Ld: profile.leadership,
+								OC: profile.oc,
+						  }
+						: null,
+				};
+			}
+
+			function applyDamage(unit, delta) {
+				const before = unit.remainingWounds;
+				unit.remainingWounds = Math.max(
+					0,
+					Math.min(unit.totalWounds, unit.remainingWounds - delta)
+				);
+				const after = unit.remainingWounds;
+				const change = after - before;
+				if (change !== 0) {
+					log(
+						`${unit.name}: ${
+							change < 0 ? `took ${-change}` : `healed ${change}`
+						} wound(s). ${after}/${unit.totalWounds} remain.`
+					);
+				}
+			}
+
+			function currentPhase() {
+				return PHASES[State.phaseIndex];
+			}
+
+			function nextPhase() {
+				const oldPhase = State.phaseIndex;
+				const oldTurn = { round: State.round, player: State.currentPlayer };
+				// advance
+				if (State.phaseIndex < PHASES.length - 1) {
+					State.phaseIndex++;
+					expireEffects({
+						phaseAdvanced: true,
+						turnChanged: false,
+						oldTurn,
+						oldPhase,
+					});
+					onPhaseStart();
+				} else {
+					// Leaving Battleshock -> next player's Command
+					State.phaseIndex = 0;
+					State.currentPlayer = State.currentPlayer === 0 ? 1 : 0;
+					if (State.currentPlayer === 0) State.round++;
+					expireEffects({
+						phaseAdvanced: true,
+						turnChanged: true,
+						oldTurn,
+						oldPhase,
+					});
+					onPhaseStart();
+				}
+				render();
+				saveLocal();
+			}
+
+			function prevPhase() {
+				if (State.phaseIndex > 0) {
+					State.phaseIndex--;
+					render();
+					saveLocal();
+					return;
+				}
+				// going back from Command -> previous player's Battleshock
+				if (State.round === 1 && State.currentPlayer === 0) return; // at start
+				State.phaseIndex = PHASES.length - 1;
+				State.currentPlayer = State.currentPlayer === 0 ? 1 : 0;
+				if (State.currentPlayer === 1)
+					State.round = Math.max(1, State.round - 1);
+				render();
+				saveLocal();
+			}
+
+			function onPhaseStart() {
+				if (State.phaseIndex === 0 && State.autoGainCP) {
+					const p = State.players[State.currentPlayer];
+					p.cp += 1;
+					log(`${p.name} gains +1 CP (Command phase).`);
+				}
+			}
+
+			function expireEffects(ctx) {
+				// ctx: {phaseAdvanced:boolean, turnChanged:boolean, oldTurn:{round,player}, oldPhase:number}
+				for (const player of State.players) {
+					for (const unit of player.units) {
+						const keep = [];
+						for (const ef of unit.effects || []) {
+							let remove = false;
+							if (ef.expiry === "phase" && ctx.phaseAdvanced) {
+								// Remove on any phase advance after creation phase within the same turn
+								if (
+									ef.createdAt.round === ctx.oldTurn.round &&
+									ef.createdAt.player === ctx.oldTurn.player
+								) {
+									remove = true;
+								}
+							} else if (ef.expiry === "turn" && ctx.turnChanged) {
+								if (
+									ef.createdAt.round === ctx.oldTurn.round &&
+									ef.createdAt.player === ctx.oldTurn.player
+								) {
+									remove = true;
+								}
+							} else if (ef.expiry === "opponentTurn" && ctx.turnChanged) {
+								// Opponent's turn just ended if new current player equals ef.createdAt.player
+								const newPlayer = ctx.oldTurn.player === 0 ? 1 : 0;
+								if (newPlayer === ef.createdAt.player) {
+									remove = true;
+								}
+							} else if (ef.expiry === "rounds") {
+								if (State.round >= ef.createdAt.round + (ef.rounds || 1))
+									remove = true;
+							}
+							if (remove) {
+								log(`${unit.name}: Effect ended — ${ef.name}`);
+							}
+							if (!remove) keep.push(ef);
+						}
+						unit.effects = keep;
+					}
+				}
+			}
+
+			// ------------------------------
+			// PDF Import Helpers (Battlescribe/Wahapedia style lists)
+			// ------------------------------
+			async function readPdfText(file) {
+				const pdfjs =
+					window.__pdfjs || window.pdfjsLib || window["pdfjs-dist/build/pdf"];
+				if (!pdfjs) throw new Error("PDF.js not loaded");
+				const buf = await file.arrayBuffer();
+				const doc = await pdfjs.getDocument({ data: buf }).promise;
+				let text = "";
+				for (let p = 1; p <= doc.numPages; p++) {
+					const page = await doc.getPage(p);
+					const content = await page.getTextContent();
+
+					// Reconstruct lines using hasEOL so bullets and their text stay together.
+					let line = "";
+					const pageLines = [];
+					for (const it of content.items) {
+						const s = "str" in it ? it.str : it?.unicode || "";
+						line += s;
+						if (it.hasEOL) {
+							pageLines.push(line.trim());
+							line = "";
+						} else {
+							line += " ";
+						}
+					}
+					if (line.trim()) pageLines.push(line.trim());
+
+					text += pageLines.join("\n") + "\n";
+				}
+				return text;
+			}
+
+			function parseArmyPdfText(raw) {
+				// Normalize whitespace and split lines
+				const text = raw
+					.replace(/\u00A0/g, " ")
+					.replace(/[\r\t]+/g, " ")
+					.replace(/ +/g, " ")
+					.trim();
+				const lines = text
+					.split(/\n+/)
+					.map((s) => s.trim())
+					.filter(Boolean);
+
+				const SECTION_HEADERS = new Set([
+					"CHARACTERS",
+					"BATTLELINE",
+					"DEDICATED TRANSPORTS",
+					"OTHER DATASHEETS",
+					"ALLIED UNITS",
+					"LORD OF WAR",
+					"ELITES",
+					"FAST ATTACK",
+					"HEAVY SUPPORT",
+					"FLYER",
+				]);
+
+				// Try to infer faction and army name from the first 20 lines
+				let faction = "";
+				let army_name = "";
+				for (let i = 0; i < Math.min(20, lines.length); i++) {
+					const L = lines[i];
+					if (!army_name && /Points\)/i.test(L))
+						army_name = L.replace(/\s*\(.*$/, "").trim();
+					if (
+						!faction &&
+						/(Astra Militarum|Space Marines|Chaos|Tyranids|Adept[a]? Sororitas|Orks|Adeptus Mechanicus|Necrons|T'au|Eldar|Leagues of Votann|Genestealer Cults)/i.test(
+							L
+						)
+					)
+						faction = L;
+				}
+
+				// --- Helper: model line detection and tokens ---
+				const WEAPON_TOKENS = [
+					"lasgun",
+					"lascannon",
+					"plasma",
+					"melta",
+					"flamer",
+					"grenade",
+					"missile",
+					"launcher",
+					"bolter",
+					"bolt",
+					"pistol",
+					"rifle",
+					"cannon",
+					"stubber",
+					"mortar",
+					"autocannon",
+					"autogun",
+					"sword",
+					"chainsword",
+					"knife",
+					"power",
+					"gauntlet",
+					"spitter",
+					"devourer",
+					"claw",
+					"talon",
+					"talons",
+					"bonesword",
+					"barbed",
+					"hammer",
+					"maul",
+					"blade",
+					"carbine",
+					"shotgun",
+					"volley",
+					"hot-shot",
+					"hot‑shot",
+					"hot–shot",
+					"vox",
+					"vox-caster",
+					"voxcaster",
+					"weapon",
+				];
+				function isProbablyModelLine(s) {
+					const line = s.trim();
+					// Ignore sub-bullets (wargear) like "◦  9x Close combat weapon"
+					if (line.startsWith("◦")) return false;
+					// Only count top-level bullets that start with •, -, or *
+					const m = line.match(/^[•\-*]\s*(\d+)x\s+([A-Za-z][A-Za-z\-\s'’]+)/);
+					if (!m) return false;
+					const text = m[2].toLowerCase();
+					// Filter typical wargear/weapon words
+					if (text.includes("weapon")) return false;
+					if (WEAPON_TOKENS.some((tok) => text.includes(tok))) return false;
+					return true;
+				}
+
+				// Identify unit headers like "Kasrkin (110 Points)" or "Hormagaunts (65 Points)"
+				const unitHeader = /^(.*)\((\d+) Points\)$/i;
+				let seenSectionHeader = false;
+				const units = [];
+				for (let i = 0; i < lines.length; i++) {
+					const L = lines[i];
+					if (SECTION_HEADERS.has(L.toUpperCase())) {
+						seenSectionHeader = true;
+						continue;
+					}
+					// Only consider unit headers after we have seen at least one section header
+					const m = seenSectionHeader ? L.match(unitHeader) : null;
+					if (m) {
+						const name = m[1].trim();
+						// Collect following lines until next header or section
+						const block = [];
+						let j = i + 1;
+						for (; j < lines.length; j++) {
+							const nL = lines[j];
+							if (SECTION_HEADERS.has(nL.toUpperCase()) || unitHeader.test(nL))
+								break;
+							block.push(nL);
+						}
+						i = j - 1;
+						// Merge bullet-only lines with the next NON-empty text line.
+						// Some PDFs render bullets (• / ◦) on their own line, then the content on a later line.
+						// We also skip over empty spacer lines before merging.
+						const merged = [];
+						const isTopBulletOnly = (s) => /^[•●*\-]\s*$/.test(s);
+						const isSubBulletOnly = (s) => /^(?:◦|○|°|∙|·|∘|o)\s*$/i.test(s);
+						const isBulletOnly = (s) =>
+							isTopBulletOnly(s) || isSubBulletOnly(s);
+						const hasBulletWithText = (s) =>
+							/^(?:[•●*\-]|[◦○°∙·∘o])\s+/.test(s);
+
+						for (let k = 0; k < block.length; k++) {
+							const a = (block[k] || "").trim();
+
+							if (isBulletOnly(a)) {
+								// Seek forward to the next non-empty line
+								let m = k + 1;
+								while (m < block.length && !(block[m] || "").trim()) m++;
+								if (m < block.length) {
+									const next = (block[m] || "").trim();
+									if (hasBulletWithText(next)) {
+										// The next line already has a bullet + text; just use that instead of the lone bullet
+										merged.push(next);
+									} else {
+										// Append the text to the bullet symbol we saw on its own
+										merged.push(a + " " + next);
+									}
+									k = m; // skip the consumed line(s)
+								} else {
+									// Nothing to merge with; keep the bullet so it is visible
+									merged.push(a);
+								}
+								continue;
+							}
+
+							// Normal line
+							merged.push(a);
+						}
+
+						// Capture composition bullets from the merged block
+						const comp = [];
+						for (const tRaw of merged) {
+							const t = (tRaw || "").trim();
+							if (/^(?:[•●*\-]|[◦○°∙·∘o])\s*/i.test(t)) comp.push(t);
+						}
+						// Count models like "10x Hormagaunt", "1x Sergeant", etc., but only likely model lines
+						let models = 0;
+						for (const b of block) {
+							if (!isProbablyModelLine(b)) continue;
+							const mx = b.match(/(\d+)x\s+/i);
+							if (mx) models += parseInt(mx[1], 10);
+						}
+						if (!models) models = 1; // Vehicles/solitary models default to 1
+						units.push({
+							name,
+							models,
+							woundsPerModel: 1,
+							keywords: [],
+							abilities: [],
+							composition: comp,
+						});
+					}
+				}
+
+				return { faction, army_name: army_name || "Imported PDF", units };
+			}
+
+			// ------------------------------
+			// Dice Roller
+			// ------------------------------
+			function parseDiceExpr(expr) {
+				// Supports: NdM+K / NdM-K / d6 / 6 / 6d6
+				expr = (expr || "").toString().trim();
+				if (!expr) return null;
+				const m =
+					expr.match(/^(\d+)?d(\d+)([+-]\d+)?$/i) || expr.match(/^(\d+)$/);
+				if (!m) return null;
+				if (m[0].includes("d")) {
+					const num = parseInt(m[1] || "1", 10);
+					const sides = parseInt(m[2], 10);
+					const mod = m[3] ? parseInt(m[3], 10) : 0;
+					return { num, sides, mod };
+				} else {
+					const num = parseInt(m[1], 10);
+					return { num, sides: 6, mod: 0 };
+				}
+			}
+
+			function rollDice(num, sides) {
+				const out = [];
+				for (let i = 0; i < num; i++)
+					out.push(1 + Math.floor(Math.random() * sides));
+				return out;
+			}
+
+			function doRoll(expr, tn) {
+				const spec = parseDiceExpr(expr);
+				if (!spec) return { err: "Bad expression" };
+				const rolls = rollDice(spec.num, spec.sides);
+				const total = rolls.reduce((a, b) => a + b, 0) + spec.mod;
+				let successes = null;
+				if (tn && Number.isFinite(tn))
+					successes = rolls.filter((v) => v >= tn).length;
+				return { spec, rolls, total, successes };
+			}
+
+			// ------------------------------
+			// Faction helpers
+			// ------------------------------
+			function getFactionImage(factionText) {
+				const key = canonicaliseFactionName(factionText || "");
+				// Map using canonical keys (lowercase, hyphenated) + common raw labels as fallbacks
+				const map = {
+					// Astra Militarum / Imperial Guard
+					"imperial-guard": "Imperial-Guard.jpg",
+					"astra-militarum": "Imperial-Guard.jpg",
+					"astra militarum": "Imperial-Guard.jpg",
+
+					// Chaos Space Marines
+					"chaos-marines": "chaos-marine.jpg",
+					"chaos space marines": "chaos-marine.jpg",
+
+					// Adepta Sororitas
+					sisters: "sisters-of-battle.jpg",
+					"adepta-sororitas": "sisters-of-battle.jpg",
+
+					// Space Marines
+					"space-marines": "space-marines.jpg",
+					"space marines": "space-marines.jpg",
+
+					// Tyranids
+					tyranids: "tyranids.jpeg",
+				};
+
+				// Try canonical key first, then a lowercase raw fallback
+				const rawLower = (factionText || "").toLowerCase().trim();
+				return map[key] || map[rawLower] || null;
+			}
+			function getFactionLabel(factionText) {
+				// Prefer the text from the import if present; otherwise map common keys to display names
+				if (factionText && factionText.trim()) return factionText.trim();
+				return "";
+			}
+			// ------------------------------
+			// Rendering
+			// ------------------------------
+			function render() {
+				document.getElementById("p1Name").value = State.players[0].name;
+				document.getElementById("p2Name").value = State.players[1].name;
+				document.getElementById("p1CP").value = State.players[0].cp;
+				document.getElementById("p2CP").value = State.players[1].cp;
+				document.getElementById("p1VP").value = State.players[0].vp;
+				document.getElementById("p2VP").value = State.players[1].vp;
+
+				document.getElementById(
+					"roundBadge"
+				).textContent = `Round ${State.round}`;
+				document.getElementById("turnPlayerBadge").textContent =
+					State.players[State.currentPlayer].name;
+
+				// Phases
+				const pills = document.getElementById("phasePills");
+				pills.innerHTML = "";
+				PHASES.forEach((p, idx) => {
+					const span = document.createElement("span");
+					span.className = "pill" + (idx === State.phaseIndex ? " active" : "");
+					span.textContent = p;
+					span.style.cursor = "help";
+					span.title = "Click for phase help";
+					span.addEventListener("click", () => {
+						const html = PHASE_HELP[p] || "<p>No help available.</p>";
+						openPhaseModal(p, html);
+					});
+					pills.appendChild(span);
+				});
+
+				// Headers
+				document.getElementById(
+					"p1Header"
+				).textContent = `${State.players[0].name}`;
+				document.getElementById(
+					"p2Header"
+				).textContent = `${State.players[1].name}`;
+
+				// Faction meta (name + image)
+				[0, 1].forEach((idx) => {
+					const factionText =
+						(State.players[idx].army && State.players[idx].army.faction) || "";
+					const label = getFactionLabel(factionText);
+					const imgFile = getFactionImage(factionText);
+					const nameEl = document.getElementById(
+						idx === 0 ? "p1Faction" : "p2Faction"
+					);
+					const imgEl = document.getElementById(
+						idx === 0 ? "p1FactionImg" : "p2FactionImg"
+					);
+					if (nameEl) nameEl.textContent = label;
+					if (imgEl) {
+						if (imgFile) {
+							imgEl.src = imgFile;
+							imgEl.classList.remove("hidden");
+							imgEl.alt = label || "Faction";
+						} else {
+							imgEl.removeAttribute("src");
+							imgEl.classList.add("hidden");
+						}
+					}
+				});
+
+				// Units
+				const mount = (playerIdx, rootId) => {
+					const root = document.getElementById(rootId);
+					root.innerHTML = "";
+					for (const unit of State.players[playerIdx].units) {
+						const tpl = document.getElementById("unitTemplate");
+						const node = tpl.content.cloneNode(true);
+						const wrap = node.querySelector("[data-unit-id]");
+						wrap.dataset.unitId = unit.id;
+						wrap.querySelector(".unit-name").textContent = unit.name;
+						const nameEl = wrap.querySelector(".unit-name");
+						const detailsEl = wrap.querySelector("[data-details]");
+						if (nameEl && detailsEl) {
+							nameEl.setAttribute("role", "button");
+							nameEl.setAttribute("tabindex", "0");
+							nameEl.setAttribute("aria-expanded", "false");
+
+							const doToggle = () => {
+								const willOpen = !detailsEl.classList.contains("active");
+								smoothToggle(detailsEl);
+								nameEl.setAttribute(
+									"aria-expanded",
+									willOpen ? "true" : "false"
+								);
+							};
+
+							nameEl.addEventListener("click", doToggle);
+							nameEl.addEventListener("keydown", (ev) => {
+								if (ev.key === "Enter" || ev.key === " ") {
+									ev.preventDefault();
+									doToggle();
+								}
+							});
+						}
+						const kw =
+							unit.keywords && unit.keywords.length
+								? unit.keywords.join(" • ")
+								: "";
+						wrap.querySelector(".keywords").textContent = kw;
+						wrap.querySelector("[data-models]").textContent =
+							unit.models && unit.woundsPerModel
+								? `${unit.models} model(s) • ${unit.woundsPerModel}W each`
+								: "";
+						// wounds
+						const pct =
+							unit.totalWounds === 0
+								? 0
+								: Math.max(
+										0,
+										Math.min(
+											100,
+											Math.round(
+												(100 * unit.remainingWounds) / unit.totalWounds
+											)
+										)
+								  );
+						wrap.querySelector(".bar > span").style.width = pct + "%";
+						wrap.querySelector(
+							"[data-wounds]"
+						).textContent = `${unit.remainingWounds}/${unit.totalWounds}`;
+						// buttons
+						wrap.querySelectorAll("[data-dmg]").forEach((btn) => {
+							btn.addEventListener("click", () => {
+								const d = Number(btn.getAttribute("data-dmg"));
+								applyDamage(unit, d);
+								saveLocal();
+								render();
+							});
+						});
+						// Remove unit
+						wrap
+							.querySelector("[data-remove]")
+							.addEventListener("click", () => {
+								if (confirm(`Remove ${unit.name}?`)) {
+									const arr = State.players[playerIdx].units;
+									const idx = arr.findIndex((x) => x.id === unit.id);
+									if (idx > -1) {
+										arr.splice(idx, 1);
+										saveLocal();
+										render();
+									}
+								}
+							});
+						// Effects list
+						const efRoot = wrap.querySelector("[data-effects]");
+						efRoot.innerHTML = "";
+						(unit.effects || []).forEach((ef) => {
+							const chip = document.createElement("span");
+							chip.className = "effect-chip";
+							const exp =
+								ef.expiry === "persistent"
+									? "∞"
+									: ef.expiry === "phase"
+									? "end of phase"
+									: ef.expiry === "turn"
+									? "end of turn"
+									: ef.expiry === "opponentTurn"
+									? "end of opponent's turn"
+									: `+${ef.rounds || 1} round(s)`;
+							chip.innerHTML = `${ef.name} <small>(${exp})</small> <button title="Remove">✕</button>`;
+							chip.querySelector("button").addEventListener("click", () => {
+								unit.effects = (unit.effects || []).filter(
+									(x) => x.id !== ef.id
+								);
+								log(`${unit.name}: Removed effect — ${ef.name}`);
+								saveLocal();
+								render();
+							});
+							efRoot.appendChild(chip);
+						});
+						// Add effect
+						wrap
+							.querySelector("[data-add-effect]")
+							.addEventListener("click", () => {
+								promptAddEffect(unit);
+							});
+						const statRoot = wrap.querySelector("[data-statline]");
+						if (statRoot) {
+							statRoot.innerHTML = "";
+							const s = unit.stats;
+							if (s) {
+								const mk = (label, val) => {
+									const sp = document.createElement("span");
+									sp.className = "tag";
+									sp.textContent = `${label}: ${val ?? "-"}`;
+									return sp;
+								};
+								statRoot.appendChild(mk("M", s.M));
+								statRoot.appendChild(mk("T", s.T));
+								statRoot.appendChild(mk("Sv", s.Sv != null ? s.Sv + "+" : "-"));
+								statRoot.appendChild(mk("W", s.W));
+								statRoot.appendChild(mk("Ld", s.Ld != null ? s.Ld + "+" : "-"));
+								statRoot.appendChild(mk("OC", s.OC));
+							} else {
+								statRoot.innerHTML =
+									'<span class="sub">No stats found in data.js for this unit.</span>';
+							}
+						}
+						const compRoot = wrap.querySelector("[data-composition]");
+						if (compRoot)
+							compRoot.innerHTML = renderCompositionHTML(unit.composition);
+						root.appendChild(node);
+					}
+				};
+				mount(0, "p1Units");
+				mount(1, "p2Units");
+			}
+
+			function promptAddEffect(unit) {
+				const name = prompt(
+					"Effect name (e.g., Transhuman, Cover, Battle-shock):"
+				);
+				if (!name) return;
+				const opts = prompt(
+					"Expiry: phase | turn | opponentTurn | rounds | persistent",
+					"turn"
+				);
+				if (!opts) return;
+				let expiry = opts.trim();
+				let rounds = 1;
+				if (expiry === "rounds") {
+					const r = Number(prompt("How many rounds?", "1"));
+					if (Number.isFinite(r) && r > 0) rounds = r;
+					else rounds = 1;
+				}
+				const ef = {
+					id: makeId(),
+					name: name.trim(),
+					expiry,
+					rounds,
+					createdAt: {
+						round: State.round,
+						player: State.currentPlayer,
+						phaseIndex: State.phaseIndex,
+						iso: nowISO(),
+					},
+				};
+				if (!unit.effects) unit.effects = [];
+				unit.effects.push(ef);
+				log(
+					`${unit.name}: Added effect — ${ef.name} (${
+						expiry === "persistent" ? "∞" : expiry
+					})`
+				);
+				saveLocal();
+				render();
+			}
+
+			// ------------------------------
+			// Bootstrap / Events
+			// ------------------------------
+			function bind() {
+				// Names
+				document.getElementById("p1Name").addEventListener("input", (e) => {
+					State.players[0].name = e.target.value;
+					render();
+					saveLocal();
+				});
+				document.getElementById("p2Name").addEventListener("input", (e) => {
+					State.players[1].name = e.target.value;
+					render();
+					saveLocal();
+				});
+
+				// CP / VP buttons
+				document.querySelectorAll("[data-cp]").forEach((btn) => {
+					btn.addEventListener("click", () => {
+						const who = btn.getAttribute("data-cp") === "p1" ? 0 : 1;
+						const delta = Number(btn.getAttribute("data-delta"));
+						State.players[who].cp = Math.max(
+							0,
+							Number(State.players[who].cp) + delta
+						);
+						saveLocal();
+						render();
+					});
+				});
+				document.querySelectorAll("[data-vp]").forEach((btn) => {
+					btn.addEventListener("click", () => {
+						const who = btn.getAttribute("data-vp") === "p1" ? 0 : 1;
+						const delta = Number(btn.getAttribute("data-delta"));
+						State.players[who].vp = Math.max(
+							0,
+							Number(State.players[who].vp) + delta
+						);
+						saveLocal();
+						render();
+					});
+				});
+				document.getElementById("p1CP").addEventListener("input", (e) => {
+					State.players[0].cp = Number(e.target.value || 0);
+					saveLocal();
+				});
+				document.getElementById("p2CP").addEventListener("input", (e) => {
+					State.players[1].cp = Number(e.target.value || 0);
+					saveLocal();
+				});
+				document.getElementById("p1VP").addEventListener("input", (e) => {
+					State.players[0].vp = Number(e.target.value || 0);
+					saveLocal();
+				});
+				document.getElementById("p2VP").addEventListener("input", (e) => {
+					State.players[1].vp = Number(e.target.value || 0);
+					saveLocal();
+				});
+
+				// Phase controls
+				document
+					.getElementById("btnNextPhase")
+					.addEventListener("click", nextPhase);
+				document
+					.getElementById("btnPrevPhase")
+					.addEventListener("click", prevPhase);
+				document.getElementById("autoCP").addEventListener("change", (e) => {
+					State.autoGainCP = !!e.target.checked;
+					saveLocal();
+				});
+
+				// Save / Load
+				document.getElementById("btnSave").addEventListener("click", () => {
+					const blob = new Blob([JSON.stringify(State, null, 2)], {
+						type: "application/json",
+					});
+					const a = document.createElement("a");
+					a.href = URL.createObjectURL(blob);
+					const d = new Date();
+					a.download = `40k_tracker_round${State.round}_${d
+						.toISOString()
+						.slice(0, 10)}.json`;
+					document.body.appendChild(a);
+					a.click();
+					a.remove();
+				});
+				document.getElementById("btnLoad").addEventListener("click", () => {
+					document.getElementById("loadState").click();
+				});
+				document
+					.getElementById("loadState")
+					.addEventListener("change", async (e) => {
+						const f = e.target.files && e.target.files[0];
+						if (!f) return;
+						const text = await f.text();
+						try {
+							const data = JSON.parse(text);
+							Object.assign(State, data);
+							log("Loaded saved game state.");
+							render();
+							saveLocal();
+						} catch (err) {
+							alert("Bad state file.");
+						}
+					});
+
+				// Setup modal toggles
+				const btnSetup = document.getElementById("btnSetup");
+				if (btnSetup) btnSetup.addEventListener("click", openSetupModal);
+				const setupClose = document.getElementById("setupClose");
+				if (setupClose) setupClose.addEventListener("click", closeSetupModal);
+				// Close when clicking backdrop (outside dialog)
+				const setupModal = document.getElementById("setupModal");
+				if (setupModal) {
+					setupModal.addEventListener("click", (e) => {
+						if (e.target === setupModal) closeSetupModal();
+					});
+				}
+				// Phase Help modal toggles
+				const phaseHelpClose = document.getElementById("phaseHelpClose");
+				if (phaseHelpClose)
+					phaseHelpClose.addEventListener("click", closePhaseModal);
+				const phaseModal = document.getElementById("phaseModal");
+				if (phaseModal) {
+					phaseModal.addEventListener("click", (e) => {
+						if (e.target === phaseModal) closePhaseModal();
+					});
+				}
+				// Dice modal toggles
+				const btnDice = document.getElementById("btnDice");
+				if (btnDice)
+					btnDice.addEventListener("click", () => {
+						const m = document.getElementById("diceModal");
+						if (m) m.classList.add("active");
+					});
+				const diceClose = document.getElementById("diceClose");
+				if (diceClose)
+					diceClose.addEventListener("click", () => {
+						const m = document.getElementById("diceModal");
+						if (m) m.classList.remove("active");
+					});
+				const diceModal = document.getElementById("diceModal");
+				if (diceModal) {
+					diceModal.addEventListener("click", (e) => {
+						if (e.target === diceModal) diceModal.classList.remove("active");
+					});
+				}
+				// New Game
+				const btnNewGame = document.getElementById("btnNewGame");
+				if (btnNewGame)
+					btnNewGame.addEventListener("click", () => {
+						if (
+							!confirm("Start a new battle? This will wipe all current data.")
+						)
+							return;
+						resetStateForNewGame();
+						render();
+						saveLocal();
+						openSetupModal();
+					});
+
+				// Importers
+				const chooseBtn = document.getElementById("btnChooseFile");
+				if (chooseBtn) {
+					chooseBtn.addEventListener("click", () => {
+						const input = document.getElementById("armyFile");
+						if (input) input.click();
+					});
+				}
+				const fileNameEl = document.getElementById("armyFileName");
+				document
+					.getElementById("armyFile")
+					.addEventListener("change", async (e) => {
+						const f = e.target.files && e.target.files[0];
+						if (fileNameEl)
+							fileNameEl.textContent = f ? f.name : "No file chosen";
+						if (!f) return;
+						const target =
+							document.getElementById("importTarget").value === "p1" ? 0 : 1;
+
+						try {
+							if (!(f.type === "application/pdf" || /\.pdf$/i.test(f.name))) {
+								alert("Please upload a PDF army list.");
+								e.target.value = "";
+								return;
+							}
+							const raw = await readPdfText(f);
+							const army = parseArmyPdfText(raw);
+
+							State.players[target].army = {
+								faction: army.faction || "",
+								army_name: army.army_name || "",
+								units: [],
+							};
+							State._importFactionHint = army.faction || "";
+							const _factionHint = army.faction || "";
+
+							State.players[target].units = (army.units || []).map((u) =>
+								createUnit({ ...u, __faction: _factionHint })
+							);
+
+							log(
+								`${State.players[target].name}: Imported ${army.units.length} unit(s) from PDF.`
+							);
+							render();
+							saveLocal();
+						} catch (err) {
+							console.error(err);
+							alert("Import failed: " + (err.message || err));
+						}
+
+						e.target.value = ""; // reset input
+					});
+
+				// Dice
+				document.getElementById("btnRoll").addEventListener("click", () => {
+					const expr = document.getElementById("diceExpr").value;
+					const tn = Number(document.getElementById("diceTN").value);
+					const tnValid = Number.isFinite(tn) && tn > 0;
+					const res = doRoll(expr, tnValid ? tn : null);
+					if (res.err) {
+						document.getElementById("diceOut").textContent =
+							"Invalid expression";
+						return;
+					}
+					const parts = [
+						`${res.spec.num}d${res.spec.sides}${
+							res.spec.mod
+								? res.spec.mod > 0
+									? "+" + res.spec.mod
+									: res.spec.mod
+								: ""
+						}`,
+						`Rolls: [${res.rolls.join(", ")}]`,
+						`Total: ${res.total}`,
+					];
+					if (res.successes != null)
+						parts.push(`Successes (≥${tn}): ${res.successes}`);
+					const txt = parts.join(" • ");
+					document.getElementById("diceOut").textContent = txt;
+					log(`🎲 ${txt}`);
+				});
+
+				// Log
+				document.getElementById("btnClearLog").addEventListener("click", () => {
+					document.getElementById("log").innerHTML = "";
+				});
+			}
+
+			// ------------------------------
+			// Init
+			// ------------------------------
+			loadLocal();
+			bind();
+			render();
+			onPhaseStart();
+			// If no saved state (or no units), prompt setup
+			try {
+				const saved = localStorage.getItem("wh40k_tracker_state_v1");
+				const noUnits =
+					!State.players[0].units.length && !State.players[1].units.length;
+				if (!saved || noUnits) {
+					openSetupModal();
+				}
+			} catch (e) {
+				/* ignore */
+			}
+		</script>
+	</body>
+</html>
