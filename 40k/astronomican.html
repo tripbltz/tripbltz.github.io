@@ -9,7 +9,7 @@
 			href="https://fonts.googleapis.com/css2?family=Pirata+One&display=swap"
 			rel="stylesheet"
 		/>
-		<title>Astronomican</title>
+		<title>Astronomican 1.5</title>
 		<style>
 			:root {
 				--bg: #0d0f12;
@@ -58,6 +58,48 @@
 				font-family: "Pirata One", system-ui;
 				font-weight: 400;
 				font-style: normal;
+			}
+			/* Stratagems */
+			.strat-card {
+				border: 1px solid var(--border);
+				background: #121820;
+				border-radius: 10px;
+				padding: 10px;
+				margin: 8px 0;
+			}
+			.strat-head {
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				gap: 8px;
+				margin-bottom: 4px;
+			}
+			.cp-badge {
+				font-size: 12px;
+				padding: 2px 8px;
+				border-radius: 999px;
+				border: 1px solid var(--border);
+				background: #14222c;
+				color: #bfe9ff;
+			}
+			.chips {
+				display: flex;
+				gap: 6px;
+				flex-wrap: wrap;
+				margin-top: 6px;
+			}
+			.chip {
+				font-size: 11px;
+				border: 1px solid var(--border);
+				border-radius: 999px;
+				padding: 2px 6px;
+				color: var(--muted);
+				background: #0f141a;
+			}
+			.strat-section-title {
+				margin: 10px 0 4px 0;
+				font-size: 13px;
+				color: #d9e6f7;
 			}
 			.faction-name {
 				font-family: "Pirata One", system-ui;
@@ -432,8 +474,8 @@
 				margin: 6px 0 12px 0;
 			}
 			.faction-row img {
-				max-width: 200px;
-				height: auto;
+				max-height: 150px;
+				width: auto;
 				border-radius: 8px;
 				border: 1px solid var(--border);
 				background: #0f141a;
@@ -530,6 +572,19 @@
 			.modal-body {
 				padding: 12px;
 			}
+			.modal-footer {
+				display: flex;
+				align-items: center;
+				justify-content: flex-end;
+				padding: 10px 12px;
+				border-top: 1px solid var(--border);
+				gap: 8px;
+			}
+			.modal-footer .hint {
+				margin-right: auto;
+				font-size: 12px;
+				color: var(--muted);
+			}
 			.modal-close {
 				background: transparent;
 				border: none;
@@ -556,20 +611,21 @@
 			}
 			.dice-anim {
 				display: flex;
-				gap: 6px;
+				gap: 10px; /* give bigger dice some breathing room */
 				flex-wrap: wrap;
 				align-items: center;
 			}
 			.die {
-				width: 28px;
-				height: 28px;
-				border-radius: 6px;
+				width: 112px; /* 4x bigger */
+				height: 112px; /* 4x bigger */
+				border-radius: 24px; /* keep the same rounded proportion */
 				border: 1px solid var(--border);
 				background: #0f141a;
 				display: flex;
 				align-items: center;
 				justify-content: center;
 				font-weight: 700;
+				font-size: 48px; /* scale the face value so it’s readable */
 			}
 			.die.spin {
 				animation: dice-spin 300ms linear infinite;
@@ -591,6 +647,40 @@
 				border: 1px dashed var(--border);
 				border-radius: 999px;
 				padding: 2px 6px;
+			}
+			/* Missions */
+			.mission-grid {
+				display: grid;
+				grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+				gap: 10px;
+			}
+			.mission-card {
+				border: 1px solid var(--border);
+				border-radius: 10px;
+				background: #121820;
+				padding: 10px;
+				cursor: pointer;
+			}
+			.mission-card:hover {
+				border-color: #2d3b4b;
+				background: #101720;
+			}
+			.mission-card.selected {
+				outline: 2px solid var(--accent);
+			}
+			.mission-meta {
+				display: flex;
+				gap: 6px;
+				flex-wrap: wrap;
+				margin-top: 6px;
+			}
+			.mission-meta .chip {
+				font-size: 11px;
+				border: 1px solid var(--border);
+				border-radius: 999px;
+				padding: 2px 6px;
+				color: var(--muted);
+				background: #0f141a;
 			}
 		</style>
 		<!-- Prevent local favicon warning -->
@@ -640,6 +730,7 @@
 					<button id="btnDice" class="ghost" title="Open dice roller">
 						🎲
 					</button>
+					<button id="btnHelp" class="ghost" title="Open help">Help</button>
 					<button id="btnSetup" class="primary" title="Open setup & tools">
 						Setup
 					</button>
@@ -648,6 +739,148 @@
 					</button>
 				</div>
 			</header>
+
+			<!-- Start Game Modal -->
+			<div id="startModal" class="modal-backdrop">
+				<div class="modal-dialog">
+					<div class="modal-header">
+						<strong class="faction-name">Start Game</strong>
+						<button
+							id="startClose"
+							class="modal-close"
+							aria-label="Close"
+							style="display: none"
+						>
+							✕
+						</button>
+					</div>
+					<div class="modal-body">
+						<section class="panel" id="startPanel">
+							<div class="grid-2">
+								<!-- Player Names + CP/VP -->
+								<div>
+									<div class="card-title"><strong>Player Names</strong></div>
+									<div class="grid-2" style="margin-top: 6px">
+										<input id="p1Name" type="text" value="Player 1" />
+										<input id="p2Name" type="text" value="Player 2" />
+									</div>
+								</div>
+
+								<!-- Import Army List -->
+								<div>
+									<div class="card-title" style="padding-bottom: 5px">
+										<strong>Import Army List</strong>
+									</div>
+									<div class="sub">
+										Upload a Battlescribe-style PDF army list
+									</div>
+									<div class="input-row">
+										<div class="select-wrap">
+											<select id="importTarget" class="custom-select">
+												<option value="p1">Player 1</option>
+												<option value="p2">Player 2</option>
+											</select>
+										</div>
+										<div
+											class="file-uploader"
+											role="group"
+											aria-label="Import Army List"
+										>
+											<button
+												id="btnChooseFile"
+												type="button"
+												class="primary btn-choose"
+											>
+												Choose PDF…
+											</button>
+											<span id="armyFileName" class="filename-pill"
+												>No file chosen</span
+											>
+											<input
+												type="file"
+												id="armyFile"
+												accept=".pdf,application/pdf"
+												class="visually-hidden"
+												aria-hidden="true"
+											/>
+										</div>
+									</div>
+								</div>
+							</div>
+
+							<div class="divider"></div>
+
+							<!-- Mission Setup -->
+							<div class="card-title"><strong>Mission Setup</strong></div>
+							<div class="sub" style="margin-top: 6px">
+								Choose a mission pack at random or pick one.
+							</div>
+
+							<div class="grid-2" style="margin-top: 8px">
+								<div>
+									<div
+										style="
+											margin-top: 8px;
+											display: flex;
+											gap: 8px;
+											flex-wrap: wrap;
+										"
+									>
+										<button id="btnMissionRandom">🎴 Draw Random</button>
+										<button id="btnMissionChoose">📜 Choose Mission</button>
+									</div>
+								</div>
+								<div>
+									<div class="sub"><strong>Selected Mission</strong></div>
+									<div id="missionSelected" class="sub" style="margin-top: 6px">
+										None selected.
+									</div>
+								</div>
+							</div>
+
+							<div id="missionChooser" class="hidden" style="margin-top: 10px">
+								<div class="card-title">
+									<strong>Choose a Mission</strong>
+									<button id="btnMissionChooserClose" class="ghost">
+										Close
+									</button>
+								</div>
+								<div id="missionGrid" class="mission-grid"></div>
+							</div>
+
+							<div class="divider"></div>
+
+							<!-- Saved states (Load ONLY) -->
+							<div class="card-title"><strong>Saved states</strong></div>
+							<div
+								style="
+									margin-top: 8px;
+									display: flex;
+									gap: 12px;
+									flex-wrap: wrap;
+								"
+							>
+								<button id="btnLoad">📂 Load</button>
+								<input
+									id="loadState"
+									type="file"
+									accept="application/json"
+									style="display: none"
+								/>
+							</div>
+						</section>
+					</div>
+					<!-- closes .modal-body -->
+					<div class="modal-footer">
+						<span class="hint"
+							>Upload both army lists and select a mission to begin.</span
+						>
+						<button id="btnStartBattle" class="btn btn-primary">
+							Start battle!
+						</button>
+					</div>
+				</div>
+			</div>
 
 			<!-- Setup & Tools Modal -->
 			<div id="setupModal" class="modal-backdrop">
@@ -661,13 +894,6 @@
 					<div class="modal-body">
 						<section class="panel" id="importPanel">
 							<div class="grid-2">
-								<div>
-									<div class="card-title"><strong>Player Names</strong></div>
-									<div class="grid-2" style="margin-top: 6px">
-										<input id="p1Name" type="text" value="Player 1" />
-										<input id="p2Name" type="text" value="Player 2" />
-									</div>
-								</div>
 								<div>
 									<div class="card-title"><strong>CP / VP</strong></div>
 									<div class="grid-2" style="margin-top: 6px">
@@ -726,56 +952,6 @@
 								>
 							</div>
 							<div class="divider"></div>
-							<div class="grid-2">
-								<div>
-									<div class="card-title" style="padding-bottom: 5px">
-										<strong>Import Army List</strong>
-									</div>
-									<div class="sub">
-										Upload a Battlescribe-style PDF army list
-									</div>
-									<div class="input-row">
-										<div class="select-wrap">
-											<select id="importTarget" class="custom-select">
-												<option value="p1">Player 1</option>
-												<option value="p2">Player 2</option>
-											</select>
-										</div>
-										<div
-											class="file-uploader"
-											role="group"
-											aria-label="Import Army List"
-										>
-											<button
-												id="btnChooseFile"
-												type="button"
-												class="primary btn-choose"
-											>
-												Choose PDF…
-											</button>
-											<span id="armyFileName" class="filename-pill"
-												>No file chosen</span
-											>
-											<input
-												type="file"
-												id="armyFile"
-												accept=".pdf,application/pdf"
-												class="visually-hidden"
-												aria-hidden="true"
-											/>
-										</div>
-									</div>
-								</div>
-							</div>
-							<div class="divider"></div>
-							<div>
-								<div class="card-title">
-									<strong>Activity Log</strong>
-									<button id="btnClearLog" class="ghost">Clear</button>
-								</div>
-								<div id="log" class="log"></div>
-							</div>
-							<div class="divider"></div>
 							<div class="card-title"><strong>Saved states</strong></div>
 							<div
 								style="
@@ -786,13 +962,6 @@
 								"
 							>
 								<button id="btnSave">💾 Save</button>
-								<button id="btnLoad">📂 Load</button>
-								<input
-									id="loadState"
-									type="file"
-									accept="application/json"
-									style="display: none"
-								/>
 							</div>
 						</section>
 					</div>
@@ -808,6 +977,8 @@
 					<div class="faction-row">
 						<img id="p1FactionImg" alt="Faction" class="hidden" />
 						<div id="p1Faction" class="faction-name"></div>
+						<button id="p1Strats">Stratagems</button>
+						<button id="p1Mission">Mission</button>
 					</div>
 					<div id="p1Units" class="players"></div>
 				</section>
@@ -818,6 +989,8 @@
 					<div class="faction-row">
 						<img id="p2FactionImg" alt="Faction" class="hidden" />
 						<div id="p2Faction" class="faction-name"></div>
+						<button id="p2Strats">Stratagems</button>
+						<button id="p2Mission">Mission</button>
 					</div>
 					<div id="p2Units" class="players"></div>
 				</section>
@@ -904,7 +1077,110 @@
 						style="margin-top: 10px"
 					></div>
 					<div id="diceOut" class="sub" style="margin-top: 10px"></div>
-					<div id="diceOut" class="sub" style="margin-top: 10px"></div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Help Modal -->
+		<div id="helpModal" class="modal-backdrop">
+			<div class="modal-dialog">
+				<div class="modal-header">
+					<strong class="faction-name">Help</strong>
+					<button id="helpClose" class="modal-close" aria-label="Close">
+						✕
+					</button>
+				</div>
+				<div class="modal-body">
+					<section class="panel">
+						<div class="card-title"><strong>Getting Started</strong></div>
+						<div class="sub">
+							<p>
+								Import your army list as a PDF, then click unit names to expand
+								details. Use the phase pills at the top to step through your
+								turn.
+							</p>
+						</div>
+					</section>
+					<section class="panel" style="margin-top: 10px">
+						<div class="card-title"><strong>Common Actions</strong></div>
+						<div class="sub">
+							<ul style="margin: 6px 0 0 18px">
+								<li>
+									Click a unit name to view its M/T/Sv/W/Ld/OC and composition.
+								</li>
+								<li>
+									Use the − / ＋ buttons on a unit to apply damage or healing.
+								</li>
+								<li>
+									Use the ✕ button to remove a unit (or confirm when it reaches
+									0W).
+								</li>
+								<li>
+									Open <em>Setup</em> to rename players, import armies, and
+									manage saves.
+								</li>
+							</ul>
+						</div>
+					</section>
+					<section class="panel" style="margin-top: 10px">
+						<div class="card-title"><strong>Dice Notation</strong></div>
+						<div class="sub">
+							<ul style="margin: 6px 0 0 18px">
+								<li><code>d6</code> – roll one six-sided die.</li>
+								<li><code>6d6+2</code> – roll six D6 and add 2.</li>
+								<li><code>3d10-1</code> – roll three D10 and subtract 1.</li>
+							</ul>
+						</div>
+					</section>
+					<section class="panel" style="margin-top: 10px">
+						<div class="card-title">
+							<strong>Terrain (10th Edition)</strong>
+						</div>
+						<div class="sub">
+							<ul style="margin: 6px 0 0 18px">
+								<li>
+									<strong>Light Cover</strong> – models wholly on/within gain
+									the <em>Benefit of Cover</em> against ranged attacks.
+								</li>
+								<li>
+									<strong>Heavy Cover</strong> – as Light Cover; in addition, if
+									Charged through Heavy Cover, charging units do not receive the
+									charge bonus to melee Attacks (where applicable).
+								</li>
+								<li>
+									<strong>Difficult Ground</strong> – subtract 2" from Move,
+									Advance and Charge moves made through it.
+								</li>
+								<li>
+									<strong>Obscuring</strong> – blocks line of sight through it
+									for non-AIRCRAFT outside and targets behind (with usual
+									exceptions like models on/within or towering).
+								</li>
+								<li>
+									<strong>Benefit of Cover</strong> – add 1 to Saving Throws
+									(not Invulnerable saves) against ranged attacks; does not
+									apply while the target is within Engagement Range of any enemy
+									models.
+								</li>
+							</ul>
+						</div>
+					</section>
+				</div>
+			</div>
+		</div>
+
+		<!-- Stratagems Modal -->
+		<div id="stratModal" class="modal-backdrop">
+			<div class="modal-dialog">
+				<div class="modal-header">
+					<strong id="stratTitle" class="faction-name">Stratagems</strong>
+					<button id="stratClose" class="modal-close" aria-label="Close">
+						✕
+					</button>
+				</div>
+				<div id="stratBody" class="modal-body">
+					<div class="sub" id="stratContext"></div>
+					<div id="stratList"></div>
 				</div>
 			</div>
 		</div>
@@ -934,6 +1210,19 @@
 						Helping dyslexics play 40k since 2025
 					</div>
 				</div>
+			</div>
+		</div>
+
+		<!-- Mission Modal -->
+		<div id="missionModal" class="modal-backdrop">
+			<div class="modal-dialog">
+				<div class="modal-header">
+					<strong id="missionTitle" class="faction-name">Mission</strong>
+					<button id="missionClose" class="modal-close" aria-label="Close">
+						✕
+					</button>
+				</div>
+				<div id="missionBody" class="modal-body"></div>
 			</div>
 		</div>
 
@@ -1001,12 +1290,29 @@
 
 			function log(msg) {
 				const el = document.getElementById("log");
+				if (!el) return; // no log panel present; skip
 				const div = document.createElement("div");
 				div.className = "item";
 				div.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`;
 				el.prepend(div);
-				// keep last 200 lines
 				while (el.children.length > 200) el.removeChild(el.lastChild);
+			}
+
+			function findUnitOwner(unitId) {
+				for (let pi = 0; pi < State.players.length; pi++) {
+					const arr = State.players[pi].units || [];
+					const idx = arr.findIndex((u) => u.id === unitId);
+					if (idx > -1) return { playerIdx: pi, index: idx, arr };
+				}
+				return null;
+			}
+			function removeUnitById(unitId) {
+				const owner = findUnitOwner(unitId);
+				if (!owner) return false;
+				const unit = owner.arr[owner.index];
+				owner.arr.splice(owner.index, 1);
+				log(`Removed ${unit.name} from the battlefield.`);
+				return true;
 			}
 
 			// Modal helpers
@@ -1017,6 +1323,41 @@
 			function closeSetupModal() {
 				const m = document.getElementById("setupModal");
 				if (m) m.classList.remove("active");
+			}
+			function openStartModal() {
+				const m = document.getElementById("startModal");
+				if (m) m.classList.add("active");
+			}
+			function closeStartModal() {
+				const m = document.getElementById("startModal");
+				if (m) m.classList.remove("active");
+			}
+			function isStartReady() {
+				const p1Ready = !!(
+					State.players[0] &&
+					Array.isArray(State.players[0].units) &&
+					State.players[0].units.length > 0
+				);
+				const p2Ready = !!(
+					State.players[1] &&
+					Array.isArray(State.players[1].units) &&
+					State.players[1].units.length > 0
+				);
+				const missionReady = !!State.mission;
+				return p1Ready && p2Ready && missionReady;
+			}
+			function updateStartBattleButton() {
+				const btn = document.getElementById("btnStartBattle");
+				const hint = document.querySelector("#startModal .modal-footer .hint");
+				if (!btn) return;
+				const ready = isStartReady();
+				btn.disabled = !ready;
+				btn.classList.toggle("primary", ready);
+				if (hint) {
+					hint.textContent = ready
+						? "All set. Begin the battle!"
+						: "Upload both army lists and select a mission to begin.";
+				}
 			}
 			function resetStateForNewGame() {
 				State.round = 1;
@@ -1037,6 +1378,7 @@
 				currentPlayer: 0, // 0 = p1, 1 = p2
 				phaseIndex: 0,
 				autoGainCP: true,
+				mission: null, // shared mission for this battle
 				players: [
 					{ name: "Player 1", cp: 0, vp: 0, army: defaultArmy(), units: [] },
 					{ name: "Player 2", cp: 0, vp: 0, army: defaultArmy(), units: [] },
@@ -1287,12 +1629,28 @@
 				);
 				const after = unit.remainingWounds;
 				const change = after - before;
+
 				if (change !== 0) {
 					log(
 						`${unit.name}: ${
 							change < 0 ? `took ${-change}` : `healed ${change}`
-						} wound(s). ${after}/${unit.totalWounds} remain.`
+						} wound(s). ${Math.max(after, 0)}/${unit.totalWounds} remain.`
 					);
+				}
+
+				// When a unit reaches 0 wounds, offer to remove it. If cancelled, keep it at 1W.
+				if (after === 0) {
+					const ok = confirm(
+						`${unit.name} has 0 wounds remaining.\nRemove it from the battlefield?`
+					);
+					if (ok) {
+						// remove from state
+						removeUnitById(unit.id);
+					} else {
+						// restore to 1W in case the reduction was a mistake
+						unit.remainingWounds = 1;
+						log(`${unit.name}: kept on the table at 1 wound.`);
+					}
 				}
 			}
 
@@ -1328,6 +1686,11 @@
 				}
 				render();
 				saveLocal();
+				// If stratagems modal is open, refresh its contents for the new context
+				if (__openStratForPlayer !== null) {
+					const listEl = document.getElementById("stratList");
+					if (listEl) renderStratListInto(listEl, __openStratForPlayer);
+				}
 			}
 
 			function prevPhase() {
@@ -1345,6 +1708,11 @@
 					State.round = Math.max(1, State.round - 1);
 				render();
 				saveLocal();
+				// If stratagems modal is open, refresh its contents for the new context
+				if (__openStratForPlayer !== null) {
+					const listEl = document.getElementById("stratList");
+					if (listEl) renderStratListInto(listEl, __openStratForPlayer);
+				}
 			}
 
 			function onPhaseStart() {
@@ -1711,7 +2079,246 @@
 					requestAnimationFrame(raf);
 				});
 			}
+			// ------------------------------
+			// Stratagems UI (Core + Faction)
+			// Expects: window.getStratagemsForContext(faction, phase, whoseTurn)
+			// and (optionally) window.coreStratagems for tagging.
+			// ------------------------------
+			let __openStratForPlayer = null; // remember which player's list is open
 
+			function stratagemTurnLabel(playerIdx) {
+				return State.currentPlayer === playerIdx
+					? "your turn"
+					: "opponent's turn";
+			}
+			function humanPhaseLabel() {
+				return PHASES[State.phaseIndex] || "";
+			}
+			function renderStratListInto(container, playerIdx) {
+				if (!container) return;
+
+				const faction =
+					(State.players[playerIdx].army &&
+						State.players[playerIdx].army.faction) ||
+					"";
+				const whose =
+					State.currentPlayer === playerIdx ? "current" : "opponent";
+				const phase = humanPhaseLabel();
+
+				let list = [];
+				if (typeof window.getStratagemsForContext === "function") {
+					try {
+						list = window.getStratagemsForContext(faction, phase, whose) || [];
+					} catch (e) {
+						console.warn("getStratagemsForContext failed:", e);
+					}
+				}
+
+				const coreSet = new Set(
+					(window.coreStratagems || []).map((s) =>
+						(s.key || s.name || "").toLowerCase()
+					)
+				);
+				const groups = { faction: [], core: [] };
+
+				for (const s of list) {
+					const key = (s.key || s.name || "").toLowerCase();
+					if (s.source === "core" || coreSet.has(key)) groups.core.push(s);
+					else groups.faction.push(s);
+				}
+
+				const mkCard = (s) => {
+					const phases = Array.isArray(s.phases)
+						? s.phases.join(", ")
+						: s.phase || s.phases || "any";
+					const timing = s.timing ? `<div class="muted">${s.timing}</div>` : "";
+					const type = s.type ? `<span class="chip">${s.type}</span>` : "";
+					const turn = s.turn ? `<span class="chip">${s.turn}</span>` : "";
+					const phaseChip = phases
+						? `<span class="chip">Phase: ${phases}</span>`
+						: "";
+					const target = s.target
+						? `<span class="chip">Target: ${s.target}</span>`
+						: "";
+					const cost = s.cost != null ? s.cost : 1;
+					return `
+      <div class="strat-card">
+        <div class="strat-head">
+          <strong>${s.name || s.key}</strong>
+          <span class="cp-badge">${cost} CP</span>
+        </div>
+        ${timing}
+        <div class="sub" style="margin-top:4px">${s.description || ""}</div>
+        <div class="chips">
+          ${phaseChip}
+          ${type}
+          ${turn}
+          ${target}
+        </div>
+      </div>
+    `;
+				};
+
+				const ctxText = `Showing stratagems for ${phase} • ${stratagemTurnLabel(
+					playerIdx
+				)} • ${faction || "Faction"}`;
+				const ctxEl = document.getElementById("stratContext");
+				if (ctxEl) ctxEl.textContent = ctxText;
+
+				const parts = [];
+				if (groups.faction.length) {
+					parts.push(
+						`<div class="strat-section-title">Faction Stratagems</div>`
+					);
+					parts.push(groups.faction.map(mkCard).join(""));
+				}
+				if (groups.core.length) {
+					parts.push(`<div class="strat-section-title">Core Stratagems</div>`);
+					parts.push(groups.core.map(mkCard).join(""));
+				}
+				if (!parts.length) {
+					parts.push(
+						'<div class="sub">No stratagems found for this context. (Make sure data.js defines coreStratagems and getStratagemsForContext.)</div>'
+					);
+				}
+				container.innerHTML = parts.join("");
+			}
+
+			function openStratModalFor(playerIdx) {
+				__openStratForPlayer = playerIdx;
+				const m = document.getElementById("stratModal");
+				const t = document.getElementById("stratTitle");
+				if (t) {
+					const pname =
+						State.players[playerIdx].name || `Player ${playerIdx + 1}`;
+					t.textContent = `Stratagems — ${pname}`;
+				}
+				const listEl = document.getElementById("stratList");
+				renderStratListInto(listEl, playerIdx);
+				if (m) m.classList.add("active");
+			}
+			function closeStratModal() {
+				__openStratForPlayer = null;
+				const m = document.getElementById("stratModal");
+				if (m) m.classList.remove("active");
+			}
+			// ------------------------------
+			// Missions (10th Edition) — placeholder until data.js is updated
+			// Expects window.missions = [{key,name,pack,type,summary,primary,deployment,notes}]
+			// ------------------------------
+			function getAvailableMissions() {
+				if (Array.isArray(window.missions) && window.missions.length)
+					return window.missions;
+				// Temporary placeholders (we’ll replace with real data from data.js)
+				return [
+					{
+						key: "scorched-earth",
+						name: "Scorched Earth",
+						pack: "Leviathan",
+						type: "Eternal War",
+						summary: "Primary: hold objectives; burn in opponent territory.",
+						deployment: "Dawn of War",
+					},
+					{
+						key: "take-and-hold",
+						name: "Take and Hold",
+						pack: "Leviathan",
+						type: "Eternal War",
+						summary: "Primary: hold more at the end of each round.",
+						deployment: "Hammer and Anvil",
+					},
+					{
+						key: "supply-drop",
+						name: "Supply Drop",
+						pack: "Leviathan",
+						type: "Eternal War",
+						summary: "Late-game shifting objectives with endgame scoring.",
+						deployment: "Search and Destroy",
+					},
+				];
+			}
+			function pickRandomMission() {
+				const list = getAvailableMissions();
+				if (!list.length) return null;
+				return list[Math.floor(Math.random() * list.length)];
+			}
+			function missionDisplayName(m) {
+				return m ? m.name || m.key || "Mission" : "None";
+			}
+			function renderMissionSelected() {
+				const el = document.getElementById("missionSelected");
+				if (!el) return;
+				if (!State.mission) {
+					el.textContent = "None selected.";
+					return;
+				}
+				const m = State.mission;
+				el.innerHTML = `<strong>${missionDisplayName(
+					m
+				)}</strong><br><span class="sub">${m.pack || ""}${
+					m.type ? " • " + m.type : ""
+				}</span>`;
+			}
+			function renderMissionCardsInto(container) {
+				const list = getAvailableMissions();
+				container.innerHTML = "";
+				list.forEach((m) => {
+					const card = document.createElement("div");
+					card.className =
+						"mission-card" +
+						(State.mission && State.mission.key === m.key ? " selected" : "");
+					card.innerHTML = `
+      <div><strong>${m.name || m.key}</strong></div>
+      <div class="mission-meta">
+        ${m.pack ? `<span class="chip">${m.pack}</span>` : ""}
+        ${m.type ? `<span class="chip">${m.type}</span>` : ""}
+        ${m.deployment ? `<span class="chip">${m.deployment}</span>` : ""}
+      </div>
+      <div class="sub" style="margin-top:6px">${m.summary || ""}</div>
+    `;
+					card.addEventListener("click", () => {
+						State.mission = m;
+						log(`Mission selected: ${missionDisplayName(m)}`);
+						saveLocal();
+						renderMissionSelected();
+						updateStartBattleButton();
+						renderMissionCardsInto(container); // refresh highlight
+					});
+					container.appendChild(card);
+				});
+			}
+			function openMissionModal() {
+				const m = document.getElementById("missionModal");
+				if (!m) return;
+				const body = document.getElementById("missionBody");
+				const title = document.getElementById("missionTitle");
+				const mis = State.mission;
+				if (!mis) {
+					title.textContent = "Mission";
+					body.innerHTML =
+						'<div class="sub">No mission selected. Open <em>Setup</em> → Mission Setup to draw or choose one.</div>';
+				} else {
+					title.textContent = mis.name || mis.key || "Mission";
+					body.innerHTML = `
+      <div class="panel">
+        <div class="card-title">
+          <strong>${mis.name || mis.key}</strong>
+          ${mis.pack ? `<span class="badge">${mis.pack}</span>` : ""}
+        </div>
+        <div class="sub">
+          ${mis.type ? `<strong>Type:</strong> ${mis.type}<br>` : ""}
+          ${
+						mis.deployment
+							? `<strong>Deployment:</strong> ${mis.deployment}<br>`
+							: ""
+					}
+          ${mis.summary ? `<strong>Summary:</strong> ${mis.summary}` : ""}
+        </div>
+      </div>
+    `;
+				}
+				m.classList.add("active");
+			}
 			// ------------------------------
 			// Faction helpers
 			// ------------------------------
@@ -1959,8 +2566,11 @@
 						root.appendChild(node);
 					}
 				};
+				// Update selected mission preview in Setup
+				renderMissionSelected();
 				mount(0, "p1Units");
 				mount(1, "p2Units");
+				updateStartBattleButton();
 			}
 
 			function promptAddEffect(unit) {
@@ -2011,6 +2621,7 @@
 				document.getElementById("p1Name").addEventListener("input", (e) => {
 					State.players[0].name = e.target.value;
 					render();
+					updateStartBattleButton();
 					saveLocal();
 				});
 				document.getElementById("p2Name").addEventListener("input", (e) => {
@@ -2120,7 +2731,115 @@
 						if (e.target === setupModal) closeSetupModal();
 					});
 				}
-				// Phase Help modal toggles
+
+				// Mission setup controls
+				const btnMissionChoose = document.getElementById("btnMissionChoose");
+				const missionChooser = document.getElementById("missionChooser");
+				const missionGrid = document.getElementById("missionGrid");
+				const btnMissionChooserClose = document.getElementById(
+					"btnMissionChooserClose"
+				);
+
+				const btnMissionRandom = document.getElementById("btnMissionRandom");
+				const modeRandom = document.getElementById("missionModeRandom");
+				const modeChoose = document.getElementById("missionModeChoose");
+
+				if (btnMissionRandom) {
+					btnMissionRandom.addEventListener("click", () => {
+						if (modeRandom) modeRandom.checked = true;
+						const m = pickRandomMission();
+						if (m) {
+							State.mission = m;
+							renderMissionSelected();
+							updateStartBattleButton();
+							saveLocal();
+							log(`Random mission drawn: ${missionDisplayName(m)}`);
+							if (missionChooser) missionChooser.classList.add("hidden");
+						} else {
+							alert(
+								"No missions available yet. Add them to data.js as window.missions."
+							);
+						}
+					});
+				}
+
+				if (btnMissionChoose) {
+					btnMissionChoose.addEventListener("click", () => {
+						if (modeChoose) modeChoose.checked = true;
+						if (missionChooser) missionChooser.classList.remove("hidden");
+						if (missionGrid) renderMissionCardsInto(missionGrid);
+					});
+				}
+
+				if (btnMissionChooserClose) {
+					btnMissionChooserClose.addEventListener("click", () => {
+						if (missionChooser) missionChooser.classList.add("hidden");
+					});
+				}
+				// Stratagems buttons (null-safe)
+				const p1StratsBtn = document.getElementById("p1Strats");
+				const p2StratsBtn = document.getElementById("p2Strats");
+				if (p1StratsBtn)
+					p1StratsBtn.addEventListener("click", () => openStratModalFor(0));
+				if (p2StratsBtn)
+					p2StratsBtn.addEventListener("click", () => openStratModalFor(1));
+
+				// Stratagems modal close & backdrop (null-safe)
+				const stratModal = document.getElementById("stratModal");
+				const stratClose = document.getElementById("stratClose");
+				if (stratClose) stratClose.addEventListener("click", closeStratModal);
+				if (stratModal) {
+					stratModal.addEventListener("click", (e) => {
+						if (e.target === stratModal) closeStratModal();
+					});
+				}
+
+				// Mission buttons (view; shared mission) — null-safe
+				const p1MissionBtn = document.getElementById("p1Mission");
+				const p2MissionBtn = document.getElementById("p2Mission");
+				if (p1MissionBtn)
+					p1MissionBtn.addEventListener("click", openMissionModal);
+				if (p2MissionBtn)
+					p2MissionBtn.addEventListener("click", openMissionModal);
+
+				// Mission modal close & backdrop — null-safe
+				const missionModal = document.getElementById("missionModal");
+				const missionClose = document.getElementById("missionClose");
+				if (missionClose) {
+					missionClose.addEventListener("click", () => {
+						if (missionModal) missionModal.classList.remove("active");
+					});
+				}
+				if (missionModal) {
+					missionModal.addEventListener("click", (e) => {
+						if (e.target === missionModal)
+							missionModal.classList.remove("active");
+					});
+				}
+
+				// Start Game modal toggles
+				const startModal = document.getElementById("startModal");
+				const btnStartBattle = document.getElementById("btnStartBattle");
+				// Keep the header close button hidden/disabled
+				const startClose = document.getElementById("startClose");
+				if (startClose) {
+					startClose.style.display = "none";
+					startClose.onclick = null;
+				}
+				if (btnStartBattle) {
+					btnStartBattle.addEventListener("click", () => {
+						if (!isStartReady()) return; // double-guard
+						closeStartModal();
+					});
+				}
+				if (startModal) {
+					// Only allow backdrop-click close if setup is complete
+					startModal.addEventListener("click", (e) => {
+						if (e.target === startModal && isStartReady()) {
+							closeStartModal();
+						}
+					});
+				} // Phase Help modal toggles
 				const phaseHelpClose = document.getElementById("phaseHelpClose");
 				if (phaseHelpClose)
 					phaseHelpClose.addEventListener("click", closePhaseModal);
@@ -2138,7 +2857,7 @@
 						if (m) m.classList.add("active");
 						// Focus the dice expression input when opening the modal
 						const diceExpr = document.getElementById("diceExpr");
-						if (diceExpr) diceExpr.focus();
+						if (diceExpr) setTimeout(() => diceExpr.focus(), 0);
 					});
 				const diceClose = document.getElementById("diceClose");
 				if (diceClose)
@@ -2150,6 +2869,26 @@
 				if (diceModal) {
 					diceModal.addEventListener("click", (e) => {
 						if (e.target === diceModal) diceModal.classList.remove("active");
+					});
+				}
+
+				// Help modal toggles
+				const btnHelp = document.getElementById("btnHelp");
+				if (btnHelp)
+					btnHelp.addEventListener("click", () => {
+						const m = document.getElementById("helpModal");
+						if (m) m.classList.add("active");
+					});
+				const helpClose = document.getElementById("helpClose");
+				if (helpClose)
+					helpClose.addEventListener("click", () => {
+						const m = document.getElementById("helpModal");
+						if (m) m.classList.remove("active");
+					});
+				const helpModal = document.getElementById("helpModal");
+				if (helpModal) {
+					helpModal.addEventListener("click", (e) => {
+						if (e.target === helpModal) helpModal.classList.remove("active");
 					});
 				}
 
@@ -2176,18 +2915,18 @@
 				}
 				// New Game
 				const btnNewGame = document.getElementById("btnNewGame");
-				if (btnNewGame)
+				if (btnNewGame) {
 					btnNewGame.addEventListener("click", () => {
 						if (
-							!confirm("Start a new battle? This will wipe all current data.")
-						)
-							return;
-						resetStateForNewGame();
-						render();
-						saveLocal();
-						openSetupModal();
+							confirm("Start a new battle? This will wipe the current state.")
+						) {
+							resetStateForNewGame();
+							render();
+							saveLocal();
+							openStartModal();
+						}
 					});
-
+				}
 				// Importers
 				const chooseBtn = document.getElementById("btnChooseFile");
 				if (chooseBtn) {
@@ -2227,7 +2966,7 @@
 							State.players[target].units = (army.units || []).map((u) =>
 								createUnit({ ...u, __faction: _factionHint })
 							);
-
+							updateStartBattleButton();
 							log(
 								`${State.players[target].name}: Imported ${army.units.length} unit(s) from PDF.`
 							);
@@ -2271,24 +3010,50 @@
 						document.getElementById("diceOut").textContent = txt;
 						log(`🎲 ${txt}`);
 					});
-				// Add Enter key handler for diceExpr input
-				document.getElementById("diceExpr").addEventListener("keydown", (e) => {
-					if (e.key === "Enter") {
-						e.preventDefault();
-						document.getElementById("btnRoll").click();
+				// Add Enter key handler for diceExpr input (null-safe)
+				(function () {
+					const diceExprEl = document.getElementById("diceExpr");
+					const rollBtn = document.getElementById("btnRoll");
+					if (diceExprEl && rollBtn) {
+						diceExprEl.addEventListener("keydown", (e) => {
+							if (e.key === "Enter") {
+								e.preventDefault();
+								rollBtn.click();
+							}
+						});
 					}
-				});
-				// Log
-				document.getElementById("btnClearLog").addEventListener("click", () => {
-					document.getElementById("log").innerHTML = "";
-				});
+				})();
+				// Log (null-safe)
+				const clearLogBtn = document.getElementById("btnClearLog");
+				if (clearLogBtn) {
+					clearLogBtn.addEventListener("click", () => {
+						const logEl = document.getElementById("log");
+						if (logEl) logEl.innerHTML = "";
+					});
+				}
 
 				// Global Escape key closes any open modal (backdrops use the `active` class)
 				document.addEventListener("keydown", (e) => {
 					if (e.key === "Escape") {
-						document
-							.querySelectorAll(".modal-backdrop.active")
-							.forEach((backdrop) => backdrop.classList.remove("active"));
+						const sm = document.getElementById("startModal");
+						if (sm && sm.classList.contains("active") && !isStartReady()) {
+							// Block closing the Start Game modal until requirements are met
+							return;
+						}
+						[
+							"setupModal",
+							"diceModal",
+							"helpModal",
+							"phaseModal",
+							"aboutModal",
+							"stratModal",
+							"missionModal",
+							"startModal",
+						].forEach((id) => {
+							const m = document.getElementById(id);
+							if (m && m.classList.contains("active"))
+								m.classList.remove("active");
+						});
 					}
 				});
 			}
@@ -2299,13 +3064,23 @@
 			loadLocal();
 			bind();
 			render();
+			// Open Start Game on first load (no saved state yet)
+			try {
+				const raw = localStorage.getItem("wh40k_tracker_state_v1");
+				if (!raw) openStartModal();
+			} catch (_) {
+				openStartModal();
+			}
 			onPhaseStart();
-			// If no saved state (or no units), prompt setup
+			// If no saved state (or no units), prompt setup — but never over the blocking Start Game modal
 			try {
 				const saved = localStorage.getItem("wh40k_tracker_state_v1");
 				const noUnits =
 					!State.players[0].units.length && !State.players[1].units.length;
-				if (!saved || noUnits) {
+				const sm = document.getElementById("startModal");
+				const startBlocking =
+					sm && sm.classList.contains("active") && !isStartReady();
+				if (!startBlocking && (!saved || noUnits)) {
 					openSetupModal();
 				}
 			} catch (e) {
