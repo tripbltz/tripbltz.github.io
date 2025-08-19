@@ -9,7 +9,7 @@
 			href="https://fonts.googleapis.com/css2?family=Pirata+One&display=swap"
 			rel="stylesheet"
 		/>
-		<title>Astronomican 1.5</title>
+		<title>Astronomican 1.9</title>
 		<style>
 			:root {
 				--bg: #0d0f12;
@@ -293,10 +293,19 @@
 				break-inside: avoid;
 				-webkit-column-break-inside: avoid;
 				page-break-inside: avoid;
+				margin: 0;
+				min-width: 0;
 
-				/* Make card flow within multi-column container */
-				display: inline-block;
+				/* Grid-friendly: cards are grid items, no inline-block needed */
 				width: 100%;
+				transition: background 300ms ease, border-color 300ms ease,
+					box-shadow 300ms ease;
+			}
+
+			.unit-card.expanded {
+				background: linear-gradient(180deg, #151d25, #1a2530);
+				border-color: #2d3b4b;
+				box-shadow: inset 0 0 0 1px rgba(45, 59, 75, 0.35);
 			}
 			.unit-name {
 				cursor: pointer;
@@ -344,6 +353,61 @@
 			.composition {
 				font-size: 12px;
 				color: var(--muted);
+			}
+			.weapon-grid {
+				display: flex;
+				gap: 6px;
+				flex-wrap: wrap;
+				margin-top: 6px;
+			}
+			.weapon-link {
+				display: inline-flex;
+				align-items: center;
+				gap: 6px;
+				padding: 4px 8px;
+				border-radius: 999px;
+				border: 1px solid var(--border);
+				background: #121820;
+				color: #cfe4ff;
+				font-size: 12px;
+				cursor: pointer;
+			}
+			.weapon-link:hover {
+				border-color: #2d3b4b;
+				background: #101720;
+			}
+			.weapon-panel {
+				margin-top: 8px;
+				border-top: 1px solid var(--border);
+				padding-top: 8px;
+				contain: layout;
+			}
+			.weapon-panel.hidden {
+				display: none;
+			}
+			.weapon-table {
+				width: 100%;
+				border-collapse: collapse;
+				font-size: 12px;
+				table-layout: fixed;
+			}
+			.weapon-table th,
+			.weapon-table td {
+				border: 1px solid var(--border);
+				padding: 6px 8px;
+				text-align: left;
+				background: #0f141a;
+				overflow: hidden;
+				text-overflow: ellipsis;
+				white-space: nowrap;
+			}
+			.weapon-table th {
+				background: #121820;
+				color: #eaf6ff;
+			}
+			.weapon-table .abilities-row td {
+				white-space: normal; /* allow wrapping for long ability text */
+				overflow: visible; /* show full content */
 			}
 			.unit-meta {
 				flex: 1;
@@ -446,21 +510,24 @@
 				border-color: #2d3b4b;
 			}
 
-			/* Masonry-like columns for unit cards */
+			/* Two fixed columns; each column manages its own vertical flow */
 			.players {
-				column-gap: 12px; /* space between columns */
+				display: grid;
+				gap: 12px;
+				align-items: start; /* no stretching */
+				grid-template-columns: 1fr; /* 1 col on small screens */
 			}
 			@media (min-width: 700px) {
 				.players {
-					column-count: 2;
+					grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
 				}
 			}
-			@media (max-width: 699px) {
-				.players {
-					column-count: 1;
-				}
+			.player-col {
+				display: grid; /* simple vertical stack */
+				gap: 12px; /* space between unit cards in the same column */
+				align-content: start;
+				min-width: 0;
 			}
-
 			.card-title {
 				display: flex;
 				gap: 8px;
@@ -718,12 +785,12 @@
 				</div>
 				<div class="controls">
 					<div class="group">
-						<label class="sub">Phase</label>
 						<div class="phase" id="phasePills"></div>
 					</div>
 					<div class="group">
-						<button class="primary" id="btnNextPhase">Next Phase ➜</button>
-						<button class="ghost" id="btnPrevPhase">◀︎ Prev</button>
+						<button class="primary" id="btnNextPhase" style="margin-left: 10px">
+							Next Phase ➜
+						</button>
 					</div>
 				</div>
 				<div class="group">
@@ -951,6 +1018,24 @@
 									Command phase</label
 								>
 							</div>
+
+							<!-- Tools section -->
+							<div class="divider"></div>
+							<div class="card-title"><strong>Tools</strong></div>
+							<div class="sub" style="margin-top: 6px">
+								If phase moved forward by mistake
+							</div>
+							<div
+								style="
+									margin-top: 8px;
+									display: flex;
+									gap: 8px;
+									flex-wrap: wrap;
+								"
+							>
+								<button class="ghost" id="btnPrevPhase">◀︎ Prev Phase</button>
+							</div>
+
 							<div class="divider"></div>
 							<div class="card-title"><strong>Saved states</strong></div>
 							<div
@@ -975,24 +1060,30 @@
 						<h3 id="p1Header">Player 1 Army</h3>
 					</div>
 					<div class="faction-row">
-						<img id="p1FactionImg" alt="Faction" class="hidden" />
 						<div id="p1Faction" class="faction-name"></div>
 						<button id="p1Strats">Stratagems</button>
 						<button id="p1Mission">Mission</button>
+						<img id="p1FactionImg" alt="Faction" class="hidden" />
 					</div>
-					<div id="p1Units" class="players"></div>
+					<div id="p1Units" class="players">
+						<div class="player-col" id="p1UnitsCol1"></div>
+						<div class="player-col" id="p1UnitsCol2"></div>
+					</div>
 				</section>
 				<section class="panel">
 					<div class="card-title">
 						<h3 id="p2Header">Player 2 Army</h3>
 					</div>
 					<div class="faction-row">
-						<img id="p2FactionImg" alt="Faction" class="hidden" />
 						<div id="p2Faction" class="faction-name"></div>
 						<button id="p2Strats">Stratagems</button>
 						<button id="p2Mission">Mission</button>
+						<img id="p2FactionImg" alt="Faction" class="hidden" />
 					</div>
-					<div id="p2Units" class="players"></div>
+					<div id="p2Units" class="players">
+						<div class="player-col" id="p2UnitsCol1"></div>
+						<div class="player-col" id="p2UnitsCol2"></div>
+					</div>
 				</section>
 			</div>
 
@@ -1021,6 +1112,11 @@
 						<div class="section-title"><strong>Unit Details</strong></div>
 						<div class="statline" data-statline></div>
 						<div class="composition" data-composition></div>
+						<div class="section-title" style="margin-top: 8px">
+							<strong>Weapons</strong>
+						</div>
+						<div class="weapon-grid" data-weapons></div>
+						<div class="weapon-panel hidden" data-weapon-panel></div>
 					</div>
 				</div>
 				<div>
@@ -1260,6 +1356,121 @@
 				const m = document.getElementById("phaseModal");
 				if (m) m.classList.remove("active");
 			}
+			// ------------------------------
+			// Weapon helpers (uses window.weaponProfiles defined in data.js)
+			// ------------------------------
+			function getWeaponProfilesMap() {
+				const db = window.weaponProfiles || {};
+				// build a map by lowercase name for fuzzy matching from composition text
+				const byName = new Map();
+				for (const [key, prof] of Object.entries(db)) {
+					const name =
+						prof && prof.name
+							? String(prof.name).toLowerCase().trim()
+							: String(key).toLowerCase().trim();
+					byName.set(name, { key, prof });
+				}
+				return { byName, byKey: db };
+			}
+
+			function extractWeaponsFromComposition(lines) {
+				if (!Array.isArray(lines) || !lines.length) return [];
+				const { byName } = getWeaponProfilesMap();
+				const foundKeys = new Set();
+				for (const raw of lines) {
+					const s = String(raw).toLowerCase();
+					// try to match by weapon display name appearing in the bullet text
+					for (const [nm, { key }] of byName.entries()) {
+						if (nm.length < 3) continue; // ignore very short names
+						if (s.includes(nm)) foundKeys.add(key);
+					}
+				}
+				return Array.from(foundKeys);
+			}
+
+			function renderWeaponProfileHTML(key) {
+				const db = window.weaponProfiles || {};
+				const p = db[key];
+				if (!p) return '<div class="sub">No profile found.</div>';
+				const isMelee = String(p.range).toLowerCase() === "melee";
+				const accLabel = isMelee ? "WS" : "BS";
+				const acc = isMelee ? p.ws ?? "-" : p.bs ?? "-";
+				const abil =
+					Array.isArray(p.abilities) && p.abilities.length
+						? p.abilities.join(", ")
+						: "—";
+				return `
+  <div class="sub" style="margin-bottom:6px"><strong>${
+		p.name || key
+	}</strong></div>
+  <table class="weapon-table">
+    <thead>
+      <tr>
+        <th>Rng</th><th>A</th><th>${accLabel}</th><th>S</th><th>AP</th><th>D</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>${p.range}</td>
+        <td>${p.attacks ?? "-"}</td>
+        <td>${acc}</td>
+        <td>${p.strength ?? "-"}</td>
+        <td>${p.ap ?? 0}</td>
+        <td>${p.damage ?? "-"}</td>
+      </tr>
+      <tr class="abilities-row">
+        <td colspan="6"><span class="muted">Abilities:</span> ${abil}</td>
+      </tr>
+    </tbody>
+  </table>
+`;
+			}
+
+			function renderWeaponsForUnit(unit, listEl, panelEl) {
+				if (!listEl || !panelEl) return;
+				const keys = extractWeaponsFromComposition(unit.composition || []);
+				listEl.innerHTML = "";
+				panelEl.innerHTML = "";
+				panelEl.classList.add("hidden");
+				const grid = panelEl.closest(".players");
+				relayoutMasonry(grid);
+
+				if (!keys.length) {
+					listEl.innerHTML =
+						'<span class="sub">No weapons detected from PDF.</span>';
+					return;
+				}
+
+				// Build buttons
+				keys.forEach((key) => {
+					const p =
+						(window.weaponProfiles && window.weaponProfiles[key]) || null;
+					const btn = document.createElement("button");
+					btn.className = "weapon-link";
+					btn.type = "button";
+					btn.setAttribute("data-weapon-key", key);
+					btn.textContent = p ? p.name || key : key;
+					btn.addEventListener("click", () => {
+						const current = panelEl.getAttribute("data-open-key") || "";
+						if (current === key && !panelEl.classList.contains("hidden")) {
+							// toggle close
+							panelEl.classList.add("hidden");
+							panelEl.removeAttribute("data-open-key");
+							panelEl.innerHTML = "";
+						} else {
+							panelEl.innerHTML = renderWeaponProfileHTML(key);
+							panelEl.classList.remove("hidden");
+							panelEl.setAttribute("data-open-key", key);
+						}
+
+						// ✨ Recompute masonry span after height changes
+						const grid = panelEl.closest(".players");
+						relayoutMasonry(grid);
+					});
+					listEl.appendChild(btn);
+				});
+			}
+
 			// ------------------------------
 			// Data Models
 			// ------------------------------
@@ -1518,32 +1729,46 @@
 
 				return out.join("");
 			}
+			// Layout helpers (no-op now that each column is independent)
+			function relayoutMasonry(_) {
+				/* no-op */
+			}
+			function relayoutAllGrids() {
+				/* no-op */
+			}
+			// No resize listener needed anymore
 			// ------------------------------
 			// Helper for smooth expand/collapse of unit details
 			function smoothToggle(el) {
 				if (!el) return;
-
+				const card = el.closest(".unit-card");
 				const isOpening = !el.classList.contains("active");
 
 				if (isOpening) {
 					// Prepare: set to current height (0), then measure and animate to scrollHeight
 					el.classList.add("active");
+					if (card) card.classList.add("expanded");
 					el.style.maxHeight = "0px"; // ensure we start collapsed
 					// Next frame to allow transition
 					requestAnimationFrame(() => {
 						const target = el.scrollHeight;
 						el.style.maxHeight = target + "px";
+						const gridEarly = el.closest(".players");
+						relayoutMasonry(gridEarly);
 					});
 
 					const onEnd = (e) => {
 						if (e.propertyName === "max-height") {
 							// Allow content growth while open
 							el.style.maxHeight = "none";
+							const grid = el.closest(".players");
+							relayoutMasonry(grid);
 							el.removeEventListener("transitionend", onEnd);
 						}
 					};
 					el.addEventListener("transitionend", onEnd);
 				} else {
+					if (card) card.classList.remove("expanded");
 					// Closing: set a fixed height first, then animate to 0
 					const current = el.scrollHeight;
 					el.style.maxHeight = current + "px";
@@ -1558,6 +1783,11 @@
 						if (e.propertyName === "max-height") {
 							// Cleanup inline style when fully collapsed
 							el.style.maxHeight = "";
+
+							// ✨ Recompute the grid span now that we’re actually collapsed
+							const grid = el.closest(".players");
+							relayoutMasonry(grid);
+
 							el.removeEventListener("transitionend", onEnd);
 						}
 					};
@@ -2142,21 +2372,21 @@
 						: "";
 					const cost = s.cost != null ? s.cost : 1;
 					return `
-      <div class="strat-card">
-        <div class="strat-head">
-          <strong>${s.name || s.key}</strong>
-          <span class="cp-badge">${cost} CP</span>
-        </div>
-        ${timing}
-        <div class="sub" style="margin-top:4px">${s.description || ""}</div>
-        <div class="chips">
-          ${phaseChip}
-          ${type}
-          ${turn}
-          ${target}
-        </div>
-      </div>
-    `;
+			   <div class="strat-card">
+			     <div class="strat-head">
+			       <strong>${s.name || s.key}</strong>
+			       <span class="cp-badge">${cost} CP</span>
+			     </div>
+			     ${timing}
+			     <div class="sub" style="margin-top:4px">${s.description || ""}</div>
+			     <div class="chips">
+			       ${phaseChip}
+			       ${type}
+			       ${turn}
+			       ${target}
+			     </div>
+			   </div>
+			 `;
 				};
 
 				const ctxText = `Showing stratagems for ${phase} • ${stratagemTurnLabel(
@@ -2268,14 +2498,14 @@
 						"mission-card" +
 						(State.mission && State.mission.key === m.key ? " selected" : "");
 					card.innerHTML = `
-      <div><strong>${m.name || m.key}</strong></div>
-      <div class="mission-meta">
-        ${m.pack ? `<span class="chip">${m.pack}</span>` : ""}
-        ${m.type ? `<span class="chip">${m.type}</span>` : ""}
-        ${m.deployment ? `<span class="chip">${m.deployment}</span>` : ""}
-      </div>
-      <div class="sub" style="margin-top:6px">${m.summary || ""}</div>
-    `;
+			   <div><strong>${m.name || m.key}</strong></div>
+			   <div class="mission-meta">
+			     ${m.pack ? `<span class="chip">${m.pack}</span>` : ""}
+			     ${m.type ? `<span class="chip">${m.type}</span>` : ""}
+			     ${m.deployment ? `<span class="chip">${m.deployment}</span>` : ""}
+			   </div>
+			   <div class="sub" style="margin-top:6px">${m.summary || ""}</div>
+			 `;
 					card.addEventListener("click", () => {
 						State.mission = m;
 						log(`Mission selected: ${missionDisplayName(m)}`);
@@ -2300,22 +2530,22 @@
 				} else {
 					title.textContent = mis.name || mis.key || "Mission";
 					body.innerHTML = `
-      <div class="panel">
-        <div class="card-title">
-          <strong>${mis.name || mis.key}</strong>
-          ${mis.pack ? `<span class="badge">${mis.pack}</span>` : ""}
-        </div>
-        <div class="sub">
-          ${mis.type ? `<strong>Type:</strong> ${mis.type}<br>` : ""}
-          ${
-						mis.deployment
-							? `<strong>Deployment:</strong> ${mis.deployment}<br>`
-							: ""
-					}
-          ${mis.summary ? `<strong>Summary:</strong> ${mis.summary}` : ""}
-        </div>
-      </div>
-    `;
+			   <div class="panel">
+			     <div class="card-title">
+			       <strong>${mis.name || mis.key}</strong>
+			       ${mis.pack ? `<span class="badge">${mis.pack}</span>` : ""}
+			     </div>
+			     <div class="sub">
+			       ${mis.type ? `<strong>Type:</strong> ${mis.type}<br>` : ""}
+			       ${
+								mis.deployment
+									? `<strong>Deployment:</strong> ${mis.deployment}<br>`
+									: ""
+							}
+			       ${mis.summary ? `<strong>Summary:</strong> ${mis.summary}` : ""}
+			     </div>
+			   </div>
+			 `;
 				}
 				m.classList.add("active");
 			}
@@ -2338,6 +2568,7 @@
 					// Adepta Sororitas
 					sisters: "sisters-of-battle.jpg",
 					"adepta-sororitas": "sisters-of-battle.jpg",
+					"adepta sororitas": "sisters-of-battle.jpg",
 
 					// Space Marines
 					"space-marines": "space-marines.jpg",
@@ -2425,12 +2656,23 @@
 				// Units
 				const mount = (playerIdx, rootId) => {
 					const root = document.getElementById(rootId);
-					root.innerHTML = "";
+					const col1 = document.getElementById(rootId + "Col1");
+					const col2 = document.getElementById(rootId + "Col2");
+					if (!root || !col1 || !col2) return;
+
+					// Clear both columns and alternate cards into them
+					col1.innerHTML = "";
+					col2.innerHTML = "";
+					let colNext = 1;
+
 					for (const unit of State.players[playerIdx].units) {
 						const tpl = document.getElementById("unitTemplate");
 						const node = tpl.content.cloneNode(true);
 						const wrap = node.querySelector("[data-unit-id]");
 						wrap.dataset.unitId = unit.id;
+
+						// No data-col or grid-row spanning — columns are real, independent containers now
+
 						wrap.querySelector(".unit-name").textContent = unit.name;
 						const nameEl = wrap.querySelector(".unit-name");
 						const detailsEl = wrap.querySelector("[data-details]");
@@ -2456,6 +2698,7 @@
 								}
 							});
 						}
+
 						const kw =
 							unit.keywords && unit.keywords.length
 								? unit.keywords.join(" • ")
@@ -2465,7 +2708,7 @@
 							unit.models && unit.woundsPerModel
 								? `${unit.models} model(s) • ${unit.woundsPerModel}W each`
 								: "";
-						// wounds
+
 						const pct =
 							unit.totalWounds === 0
 								? 0
@@ -2482,7 +2725,7 @@
 						wrap.querySelector(
 							"[data-wounds]"
 						).textContent = `${unit.remainingWounds}/${unit.totalWounds}`;
-						// buttons
+
 						wrap.querySelectorAll("[data-dmg]").forEach((btn) => {
 							btn.addEventListener("click", () => {
 								const d = Number(btn.getAttribute("data-dmg"));
@@ -2491,7 +2734,7 @@
 								render();
 							});
 						});
-						// Remove unit
+
 						wrap
 							.querySelector("[data-remove]")
 							.addEventListener("click", () => {
@@ -2505,7 +2748,7 @@
 									}
 								}
 							});
-						// Effects list
+
 						const efRoot = wrap.querySelector("[data-effects]");
 						efRoot.innerHTML = "";
 						(unit.effects || []).forEach((ef) => {
@@ -2532,6 +2775,17 @@
 							});
 							efRoot.appendChild(chip);
 						});
+
+						// Weapons UI hookup
+						const listEl = wrap.querySelector("[data-weapons]");
+						const panelEl = wrap.querySelector("[data-weapon-panel]");
+						renderWeaponsForUnit(unit, listEl, panelEl);
+
+						// Append the card into the current column, alternating 1,2,1,2…
+						const targetCol = colNext === 1 ? col1 : col2;
+						colNext = colNext === 1 ? 2 : 1;
+						targetCol.appendChild(node);
+
 						// Add effect
 						wrap
 							.querySelector("[data-add-effect]")
@@ -2563,6 +2817,10 @@
 						const compRoot = wrap.querySelector("[data-composition]");
 						if (compRoot)
 							compRoot.innerHTML = renderCompositionHTML(unit.composition);
+						// Weapons list + details panel
+						const wListEl = wrap.querySelector("[data-weapons]");
+						const wPanelEl = wrap.querySelector("[data-weapon-panel]");
+						renderWeaponsForUnit(unit, wListEl, wPanelEl);
 						root.appendChild(node);
 					}
 				};
@@ -2571,6 +2829,7 @@
 				mount(0, "p1Units");
 				mount(1, "p2Units");
 				updateStartBattleButton();
+				relayoutAllGrids();
 			}
 
 			function promptAddEffect(unit) {
