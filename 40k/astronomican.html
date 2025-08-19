@@ -3,13 +3,15 @@
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<meta name="apple-mobile-web-app-capable" content="yes" />
+		<meta name="apple-touch-fullscreen" content="yes" />
 		<link rel="preconnect" href="https://fonts.googleapis.com" />
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 		<link
 			href="https://fonts.googleapis.com/css2?family=Pirata+One&display=swap"
 			rel="stylesheet"
 		/>
-		<title>Astronomican 1.9</title>
+		<title>Astronomican 2.0</title>
 		<style>
 			:root {
 				--bg: #0d0f12;
@@ -316,10 +318,10 @@
 				overflow: hidden;
 				opacity: 0;
 				transform: translateY(-6px);
-				padding-top: 0; /* start collapsed */
-				will-change: max-height, opacity, transform, padding-top;
+				/* padding handled by inner wrapper to avoid end snap */
+				will-change: max-height, opacity, transform;
 				transition: max-height 600ms cubic-bezier(0.22, 1, 0.36, 1),
-					opacity 420ms ease, transform 420ms ease, padding-top 420ms ease;
+					opacity 600ms ease, transform 600ms ease;
 				margin-top: 8px;
 				border-top: 1px solid var(--border);
 			}
@@ -327,7 +329,10 @@
 				/* max-height is set inline by JS to the element's scrollHeight */
 				opacity: 1;
 				transform: translateY(0);
-				padding-top: 8px; /* restore spacing when open */
+			}
+
+			.unit-details-inner {
+				padding: 8px 0; /* constant padding so the outer height animation doesn't "snap" at the end */
 			}
 
 			/* Respect users who prefer reduced motion */
@@ -338,7 +343,6 @@
 					max-height: none !important;
 					opacity: 1 !important;
 					transform: none !important;
-					padding-top: 8px !important;
 				}
 			}
 			.statline {
@@ -397,9 +401,10 @@
 				padding: 6px 8px;
 				text-align: left;
 				background: #0f141a;
-				overflow: hidden;
-				text-overflow: ellipsis;
-				white-space: nowrap;
+				overflow: hidden; /* keep cells from growing */
+				text-overflow: clip; /* don't ellipsis; we'll autoshrink via JS */
+				white-space: nowrap; /* keep single-line for stat cells */
+				font-variant-numeric: tabular-nums; /* nicer alignment for numbers */
 			}
 			.weapon-table th {
 				background: #121820;
@@ -1109,14 +1114,16 @@
 					</div>
 					<div class="effects" data-effects></div>
 					<div class="unit-details" data-details>
-						<div class="section-title"><strong>Unit Details</strong></div>
-						<div class="statline" data-statline></div>
-						<div class="composition" data-composition></div>
-						<div class="section-title" style="margin-top: 8px">
-							<strong>Weapons</strong>
+						<div class="unit-details-inner">
+							<div class="section-title"><strong>Unit Details</strong></div>
+							<div class="statline" data-statline></div>
+							<div class="composition" data-composition></div>
+							<div class="section-title" style="margin-top: 8px">
+								<strong>Weapons</strong>
+							</div>
+							<div class="weapon-grid" data-weapons></div>
+							<div class="weapon-panel hidden" data-weapon-panel></div>
 						</div>
-						<div class="weapon-grid" data-weapons></div>
-						<div class="weapon-panel hidden" data-weapon-panel></div>
 					</div>
 				</div>
 				<div>
@@ -1204,6 +1211,12 @@
 								<li>
 									Click a unit name to view its M/T/Sv/W/Ld/OC and composition.
 								</li>
+								<ul>
+									<li>
+										Click a weapon name to view its profile, abilities, and
+										rolls.
+									</li>
+								</ul>
 								<li>
 									Use the − / ＋ buttons on a unit to apply damage or healing.
 								</li>
@@ -1222,6 +1235,7 @@
 						<div class="card-title"><strong>Dice Notation</strong></div>
 						<div class="sub">
 							<ul style="margin: 6px 0 0 18px">
+								<li><code>8</code> – roll eight six-sided die.</li>
 								<li><code>d6</code> – roll one six-sided die.</li>
 								<li><code>6d6+2</code> – roll six D6 and add 2.</li>
 								<li><code>3d10-1</code> – roll three D10 and subtract 1.</li>
@@ -1376,15 +1390,43 @@
 			function extractWeaponsFromComposition(lines) {
 				if (!Array.isArray(lines) || !lines.length) return [];
 				const { byName } = getWeaponProfilesMap();
+
+				// Build a list of { name, key } and sort by longest name first.
+				const nameEntries = Array.from(byName.entries())
+					.map(([nm, v]) => ({ name: nm, key: v.key }))
+					.sort((a, b) => b.name.length - a.name.length);
+
 				const foundKeys = new Set();
+
+				// Escape regex helper
+				const esc = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
 				for (const raw of lines) {
-					const s = String(raw).toLowerCase();
-					// try to match by weapon display name appearing in the bullet text
-					for (const [nm, { key }] of byName.entries()) {
-						if (nm.length < 3) continue; // ignore very short names
-						if (s.includes(nm)) foundKeys.add(key);
+					let remaining = String(raw).toLowerCase();
+					if (!remaining) continue;
+
+					for (const { name, key } of nameEntries) {
+						if (name.length < 3) continue; // ignore extremely short names
+						// Whole-word match for the weapon name (case-insensitive)
+						const re = new RegExp(`\\b${esc(name)}\\b`, "i");
+						if (re.test(remaining)) {
+							foundKeys.add(key);
+							// Remove matched text from this line so shorter names contained within
+							// (e.g., "scything talons" inside "gargantuan scything talons")
+							// won't also match on the same line.
+							// Replace all occurrences (use loop because of dynamic regex without /g flag capture)
+							let m;
+							while ((m = re.exec(remaining))) {
+								const start = m.index;
+								const end = start + m[0].length;
+								remaining = `${remaining.slice(0, start)}${" ".repeat(
+									m[0].length
+								)}${remaining.slice(end)}`;
+							}
+						}
 					}
 				}
+
 				return Array.from(foundKeys);
 			}
 
@@ -1461,6 +1503,8 @@
 							panelEl.innerHTML = renderWeaponProfileHTML(key);
 							panelEl.classList.remove("hidden");
 							panelEl.setAttribute("data-open-key", key);
+							// After injecting the table, shrink any too-long values to fit
+							autoshrinkWeaponTable(panelEl);
 						}
 
 						// ✨ Recompute masonry span after height changes
@@ -1469,6 +1513,46 @@
 					});
 					listEl.appendChild(btn);
 				});
+			}
+
+			// --- Auto-shrink long values inside weapon tables so they don't ellipsis ---
+			function isOverflowing(el) {
+				return el && el.scrollWidth > el.clientWidth;
+			}
+
+			/**
+			 * Reduce font-size inside a cell until the content fits on one line,
+			 * without changing table layout. Falls back gracefully at a minimum size.
+			 */
+			function fitTextToCell(td, minPx = 9, maxPx = 12) {
+				if (!td) return;
+				// Start from computed (or cap at max)
+				const computed = parseFloat(getComputedStyle(td).fontSize) || maxPx;
+				let size = Math.min(computed, maxPx);
+
+				// Reset any previous tweaks
+				td.style.fontSize = size + "px";
+				td.style.letterSpacing = "";
+
+				// Shrink stepwise while overflowing
+				while (isOverflowing(td) && size > minPx) {
+					size -= 1;
+					td.style.fontSize = size + "px";
+					// Tighten tracking a touch when very small
+					if (size <= minPx + 1) td.style.letterSpacing = "-0.2px";
+				}
+			}
+
+			/**
+			 * Apply autoshrink to all stat cells of a freshly-rendered weapon table.
+			 * (Skips the abilities row which wraps by design.)
+			 */
+			function autoshrinkWeaponTable(root) {
+				if (!root) return;
+				const cells = root.querySelectorAll(
+					".weapon-table tbody tr:not(.abilities-row) td"
+				);
+				cells.forEach((td) => fitTextToCell(td));
 			}
 
 			// ------------------------------
@@ -2283,13 +2367,16 @@
 				});
 			}
 
-			function runDiceAnimation(spec) {
+			function runDiceAnimation(spec, finalRolls) {
 				return new Promise((resolve) => {
 					const anim = document.getElementById("diceAnim");
 					if (!anim) return resolve();
+
+					// Build spinning dice placeholders
 					renderDiceFaces(anim, spec.num, spec.sides);
+
 					const start = performance.now();
-					const duration = Math.min(1500, 400 + spec.num * 80); // up to ~1.5s
+					const duration = Math.min(1500, 400 + spec.num * 80);
 					const interval = setInterval(
 						() => tickDiceFaces(anim, spec.sides),
 						90
@@ -2297,9 +2384,13 @@
 
 					function end() {
 						clearInterval(interval);
-						anim
-							.querySelectorAll(".die")
-							.forEach((d) => d.classList.remove("spin"));
+						// Pin the visible dice to the actual rolled results
+						const diceEls = anim.querySelectorAll(".die");
+						const show = Math.min(spec.num, diceEls.length);
+						for (let i = 0; i < show; i++) {
+							diceEls[i].textContent = finalRolls[i];
+						}
+						diceEls.forEach((d) => d.classList.remove("spin"));
 						resolve();
 					}
 					function raf(t) {
@@ -3251,9 +3342,12 @@
 							return;
 						}
 
-						await runDiceAnimation(spec); // show the roll animation first
+						// Roll ONCE and reuse for both animation + summary
+						const res = doRoll(expr, null);
 
-						const res = doRoll(expr, null); // no target number anymore
+						// Animate, then lock the faces to the actual results
+						await runDiceAnimation(res.spec, res.rolls);
+
 						const parts = [
 							`${res.spec.num}d${res.spec.sides}${
 								res.spec.mod
