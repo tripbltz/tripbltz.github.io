@@ -11,7 +11,7 @@
 			href="https://fonts.googleapis.com/css2?family=Pirata+One&display=swap"
 			rel="stylesheet"
 		/>
-		<title>Astronomican 2.0</title>
+		<title>Astronomican 2.2</title>
 		<style>
 			:root {
 				--bg: #0d0f12;
@@ -258,6 +258,16 @@
 			}
 			.file-uploader .btn-choose {
 				height: 38px;
+			}
+			.player-import-row {
+				display: flex;
+				align-items: center;
+				gap: 10px;
+				flex-wrap: wrap;
+			}
+			.player-import-row input[type="text"] {
+				flex: 1 1 240px;
+				min-width: 180px;
 			}
 			.visually-hidden {
 				position: absolute !important;
@@ -513,6 +523,7 @@
 				background: linear-gradient(180deg, #172330, #0f1a24);
 				color: #eaf6ff;
 				border-color: #2d3b4b;
+				font-weight: bold;
 			}
 
 			/* Two fixed columns; each column manages its own vertical flow */
@@ -829,48 +840,48 @@
 					<div class="modal-body">
 						<section class="panel" id="startPanel">
 							<div class="grid-2">
-								<!-- Player Names + CP/VP -->
+								<!-- Player Names -->
 								<div>
-									<div class="card-title"><strong>Player Names</strong></div>
-									<div class="grid-2" style="margin-top: 6px">
-										<input id="p1Name" type="text" value="Player 1" />
-										<input id="p2Name" type="text" value="Player 2" />
-									</div>
-								</div>
-
-								<!-- Import Army List -->
-								<div>
-									<div class="card-title" style="padding-bottom: 5px">
-										<strong>Import Army List</strong>
-									</div>
-									<div class="sub">
-										Upload a Battlescribe-style PDF army list
-									</div>
-									<div class="input-row">
-										<div class="select-wrap">
-											<select id="importTarget" class="custom-select">
-												<option value="p1">Player 1</option>
-												<option value="p2">Player 2</option>
-											</select>
-										</div>
-										<div
-											class="file-uploader"
-											role="group"
-											aria-label="Import Army List"
-										>
+									<div class="card-title"><strong>Players</strong></div>
+									<div class="player-import">
+										<!-- Row: Player 1 -->
+										<div class="player-import-row" style="margin-top: 6px">
+											<input id="p1Name" type="text" value="Player 1" />
 											<button
-												id="btnChooseFile"
+												id="btnImportP1"
 												type="button"
 												class="primary btn-choose"
 											>
-												Choose PDF…
+												Import army
 											</button>
-											<span id="armyFileName" class="filename-pill"
-												>No file chosen</span
+											<span id="armyFileNameP1" class="filename-pill sub"
+												>Upload a Battleforge (40k App) PDF army list</span
 											>
 											<input
 												type="file"
-												id="armyFile"
+												id="armyFileP1"
+												accept=".pdf,application/pdf"
+												class="visually-hidden"
+												aria-hidden="true"
+											/>
+										</div>
+
+										<!-- Row: Player 2 -->
+										<div class="player-import-row" style="margin-top: 6px">
+											<input id="p2Name" type="text" value="Player 2" />
+											<button
+												id="btnImportP2"
+												type="button"
+												class="primary btn-choose"
+											>
+												Import army
+											</button>
+											<span id="armyFileNameP2" class="filename-pill sub"
+												>Upload a Battleforge (40k App) PDF army list</span
+											>
+											<input
+												type="file"
+												id="armyFileP2"
 												accept=".pdf,application/pdf"
 												class="visually-hidden"
 												aria-hidden="true"
@@ -2304,6 +2315,39 @@
 				return { faction, army_name: army_name || "Imported PDF", units };
 			}
 
+			async function processArmyFileForPlayer(f, targetIdx) {
+				try {
+					if (!(f.type === "application/pdf" || /\.pdf$/i.test(f.name))) {
+						alert("Please upload a PDF army list.");
+						return;
+					}
+					const raw = await readPdfText(f);
+					const army = parseArmyPdfText(raw);
+
+					State.players[targetIdx].army = {
+						faction: army.faction || "",
+						army_name: army.army_name || "",
+						units: [],
+					};
+					State._importFactionHint = army.faction || "";
+					const _factionHint = army.faction || "";
+
+					State.players[targetIdx].units = (army.units || []).map((u) =>
+						createUnit({ ...u, __faction: _factionHint })
+					);
+
+					updateStartBattleButton();
+					log(
+						`${State.players[targetIdx].name}: Imported ${army.units.length} unit(s) from PDF.`
+					);
+					render();
+					saveLocal();
+				} catch (err) {
+					console.error(err);
+					alert("Import failed: " + (err.message || err));
+				}
+			}
+
 			// ------------------------------
 			// Dice Roller
 			// ------------------------------
@@ -2666,7 +2710,18 @@
 					"space marines": "space-marines.jpg",
 
 					// Tyranids
-					tyranids: "tyranids.jpeg",
+					tyranids: "tyranids.jpg",
+
+					// Orks
+					orks: "orks.jpg",
+
+					// Eldar
+					eldar: "Eldar.jpeg",
+					Aeldari: "Eldar.jpeg",
+
+					// Necron
+					necron: "necron.jpg",
+					necrons: "necron.jpg",
 				};
 
 				// Try canonical key first, then a lowercase raw fallback
@@ -3277,58 +3332,37 @@
 						}
 					});
 				}
-				// Importers
-				const chooseBtn = document.getElementById("btnChooseFile");
-				if (chooseBtn) {
-					chooseBtn.addEventListener("click", () => {
-						const input = document.getElementById("armyFile");
-						if (input) input.click();
+				// Importers (per-player)
+				const btnImportP1 = document.getElementById("btnImportP1");
+				const btnImportP2 = document.getElementById("btnImportP2");
+				const fileP1 = document.getElementById("armyFileP1");
+				const fileP2 = document.getElementById("armyFileP2");
+				const fileNameP1 = document.getElementById("armyFileNameP1");
+				const fileNameP2 = document.getElementById("armyFileNameP2");
+
+				if (btnImportP1 && fileP1) {
+					btnImportP1.addEventListener("click", () => fileP1.click());
+					fileP1.addEventListener("change", async (e) => {
+						const f = e.target.files && e.target.files[0];
+						if (fileNameP1)
+							fileNameP1.textContent = f ? f.name : "No file chosen";
+						if (!f) return;
+						await processArmyFileForPlayer(f, 0); // ➜ Player 1
+						e.target.value = ""; // reset
 					});
 				}
-				const fileNameEl = document.getElementById("armyFileName");
-				document
-					.getElementById("armyFile")
-					.addEventListener("change", async (e) => {
+
+				if (btnImportP2 && fileP2) {
+					btnImportP2.addEventListener("click", () => fileP2.click());
+					fileP2.addEventListener("change", async (e) => {
 						const f = e.target.files && e.target.files[0];
-						if (fileNameEl)
-							fileNameEl.textContent = f ? f.name : "No file chosen";
+						if (fileNameP2)
+							fileNameP2.textContent = f ? f.name : "No file chosen";
 						if (!f) return;
-						const target =
-							document.getElementById("importTarget").value === "p1" ? 0 : 1;
-
-						try {
-							if (!(f.type === "application/pdf" || /\.pdf$/i.test(f.name))) {
-								alert("Please upload a PDF army list.");
-								e.target.value = "";
-								return;
-							}
-							const raw = await readPdfText(f);
-							const army = parseArmyPdfText(raw);
-
-							State.players[target].army = {
-								faction: army.faction || "",
-								army_name: army.army_name || "",
-								units: [],
-							};
-							State._importFactionHint = army.faction || "";
-							const _factionHint = army.faction || "";
-
-							State.players[target].units = (army.units || []).map((u) =>
-								createUnit({ ...u, __faction: _factionHint })
-							);
-							updateStartBattleButton();
-							log(
-								`${State.players[target].name}: Imported ${army.units.length} unit(s) from PDF.`
-							);
-							render();
-							saveLocal();
-						} catch (err) {
-							console.error(err);
-							alert("Import failed: " + (err.message || err));
-						}
-
-						e.target.value = ""; // reset input
+						await processArmyFileForPlayer(f, 1); // ➜ Player 2
+						e.target.value = ""; // reset
 					});
+				}
 
 				// Dice
 				document
