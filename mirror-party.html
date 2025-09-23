@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<meta http-equiv="refresh" content="18000" />
+		<title>Mirror</title>
+		<link
+			href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css"
+			rel="stylesheet"
+			integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD"
+			crossorigin="anonymous"
+		/>
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Tinos&display=swap"
+			rel="stylesheet"
+		/>
+		<script
+			src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"
+			integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN"
+			crossorigin="anonymous"
+		></script>
+		<script
+			src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"
+			integrity="sha384-oBqDVmMz9ATKxIep9tiCxS/Z9fNfEXiDAYTujMAeBAsjFuCZSmKbSSUnQlmh/jp3"
+			crossorigin="anonymous"
+		></script>
+	</head>
+	<style>
+		body {
+			background-color: black;
+			font-family: "Tinos", serif;
+		}
+		.display-date {
+			text-align: center;
+			font-size: 1.6rem;
+			font-weight: 600;
+			color: white;
+		}
+
+		.display-time {
+			text-align: center;
+			/*** was display:flex **/
+			font-size: 7rem;
+			font-weight: bold;
+			padding-bottom: 10px;
+			border-radius: 5px;
+			transition: ease-in-out 0.1s;
+			color: white;
+			padding-bottom: 20px;
+		}
+
+		/* Header styling */
+		.header-container {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			text-align: center;
+		}
+
+		.header-image {
+			flex: 1; /* Images take up equal space on the sides */
+			max-width: 150px;
+		}
+
+		.header-title {
+			flex: 2; /* Title takes more space than the images */
+			font-size: 2em;
+			text-align: center;
+		}
+	</style>
+
+	<body>
+		<div class="container bg-black p-4 mt-5 shadow">
+			<div class="header-container">
+				<img src="img/popper.png" alt="Left Image" class="header-image" />
+				<h1
+					class="header-title"
+					style="color: white; text-align: center; font-size: 50px"
+				>
+					Happy Birthday Penny!
+				</h1>
+				<img
+					src="img/popper.png"
+					alt="Right Image"
+					class="header-image"
+					style="-webkit-transform: scaleX(-1); transform: scaleX(-1)"
+				/>
+			</div>
+
+			<!--DISPLAY TIME AND DATE-->
+			<div class="container">
+				<div class="display-date">
+					<span id="day">day</span>,
+					<span id="daynum">00</span>
+					<span id="month">month</span>
+					<span id="year">0000</span>
+				</div>
+				<div class="display-time"></div>
+			</div>
+
+			<!--WEATHER WIDGET - IF NEEDED SWITCH THEME TO PURE-->
+			<a
+				class="weatherwidget-io"
+				href="https://forecast7.com/en/52d661d32/sprowston/"
+				data-label_1="SPROWSTON"
+				data-label_2="Ward-Smith house"
+				data-font="Helvetica"
+				data-days="5"
+				data-theme="dark"
+				>SPROWSTON Ward-Smith house</a
+			>
+			<script>
+				!(function (d, s, id) {
+					var js,
+						fjs = d.getElementsByTagName(s)[0];
+					if (!d.getElementById(id)) {
+						js = d.createElement(s);
+						js.id = id;
+						js.src = "https://weatherwidget.io/js/widget.min.js";
+						fjs.parentNode.insertBefore(js, fjs);
+					}
+				})(document, "script", "weatherwidget-io-js");
+			</script>
+			<!--IMAGE SLIDESHOW-->
+			<style>
+				/* Container for the images */
+				.slideshow-container {
+					display: flex;
+					justify-content: center;
+					align-items: center;
+					height: 100%;
+					position: relative;
+				}
+
+				/* Individual images */
+				.mySlides {
+					display: none;
+					max-width: 100%;
+					max-height: 100%;
+					padding-top: 25px;
+					padding-bottom: 25px;
+				}
+
+				/* Keyframes for fade effect */
+				@keyframes fade {
+					0%,
+					100% {
+						opacity: 0;
+					}
+					50% {
+						opacity: 1;
+					}
+				}
+			</style>
+
+			<div class="slideshow-container">
+				<img class="mySlides" src="img/party-1.jpeg" />
+				<img class="mySlides" src="img/party-2.jpeg" />
+				<img class="mySlides" src="img/party-3.jpeg" />
+				<img class="mySlides" src="img/party-4.jpeg" />
+				<img class="mySlides" src="img/party-5.jpeg" />
+				<img class="mySlides" src="img/party-6.jpeg" />
+			</div>
+			<script>
+				// JavaScript to switch images
+				let slideIndex = 0;
+				showSlides();
+
+				function showSlides() {
+					const slides = document.getElementsByClassName("mySlides");
+					for (let i = 0; i < slides.length; i++) {
+						slides[i].style.display = "none";
+					}
+					slideIndex = (slideIndex + 1) % slides.length;
+					slides[slideIndex].style.display = "block";
+					setTimeout(showSlides, 60000); // Change image every 60 seconds
+				}
+			</script>
+		</div>
+		<!---JS FOR TIME AND DATE-->
+		<script>
+			const displayTime = document.querySelector(".display-time");
+
+			function showTime() {
+				const time = new Date();
+				const formattedTime = time.toLocaleTimeString([], {
+					hour: "2-digit",
+					minute: "2-digit",
+				});
+
+				displayTime.innerText = formattedTime;
+				setTimeout(showTime, 1000);
+			}
+
+			showTime();
+
+			// Date
+			function updateDate() {
+				let today = new Date();
+
+				// return number
+				let dayName = today.getDay(),
+					dayNum = today.getDate(),
+					month = today.getMonth(),
+					year = today.getFullYear();
+
+				const months = [
+					"January",
+					"February",
+					"March",
+					"April",
+					"May",
+					"June",
+					"July",
+					"August",
+					"September",
+					"October",
+					"November",
+					"December",
+				];
+				const dayWeek = [
+					"Sunday",
+					"Monday",
+					"Tuesday",
+					"Wednesday",
+					"Thursday",
+					"Friday",
+					"Saturday",
+				];
+				// value -> ID of the html element
+				const IDCollection = ["day", "daynum", "month", "year"];
+				// return value array with number as a index
+				const val = [dayWeek[dayName], dayNum, months[month], year];
+				for (let i = 0; i < IDCollection.length; i++) {
+					document.getElementById(IDCollection[i]).firstChild.nodeValue =
+						val[i];
+				}
+			}
+
+			updateDate();
+		</script>
+	</body>
+</html>
