@@ -1,0 +1,90 @@
+[
+	{
+		"id": "core_command_reroll",
+		"name": "Command Re-roll",
+		"cp": 1,
+		"turn": "either",
+		"phase": "any",
+		"description": "Use this Stratagem after you make a hit roll, wound roll, damage roll, saving throw, Advance roll, Charge roll or Battle-shock test for a unit from your army. You can re-roll that roll or test."
+	},
+	{
+		"id": "core_counter_offensive",
+		"name": "Counter-offensive",
+		"cp": 2,
+		"turn": "either",
+		"phase": "fight",
+		"description": "Use this Stratagem after an enemy unit has fought in the Fight phase. Select one of your units that is eligible to fight: it fights next."
+	},
+	{
+		"id": "core_epic_challenge",
+		"name": "Epic Challenge",
+		"cp": 1,
+		"turn": "either",
+		"phase": "fight",
+		"description": "Use this Stratagem in the Fight phase when a CHARACTER unit from your army is selected to fight. Until the end of the phase, melee attacks made by that unit targeting an enemy CHARACTER gain +1 Damage."
+	},
+	{
+		"id": "core_insane_bravery",
+		"name": "Insane Bravery",
+		"cp": 1,
+		"turn": "your",
+		"phase": "command (battle-shock step)",
+		"description": "Use this Stratagem in your Command phase, just after you have failed a Battle-shock test for a unit from your army. You automatically pass that test. You can only use this Stratagem once per battle."
+	},
+	{
+		"id": "core_grenade",
+		"name": "Grenade",
+		"cp": 1,
+		"turn": "your",
+		"phase": "shooting",
+		"description": "Use this Stratagem in your Shooting phase, when a Grenades unit from your army is selected to shoot. Select one enemy unit within 8\" and visible to that unit. Make a single hit roll; if successful, the target suffers D3 mortal wounds."
+	},
+	{
+		"id": "core_tank_shock",
+		"name": "Tank Shock",
+		"cp": 1,
+		"turn": "your",
+		"phase": "charge",
+		"description": "Use this Stratagem in your Charge phase, after a VEHICLE or MONSTER from your army has finished a charge move. Select one melee weapon for that unit and one enemy unit in Engagement Range, then roll a number of D6 equal to that weapon's Strength. For each 5+, that enemy unit suffers 1 mortal wound (to a maximum of 6)."
+	},
+	{
+		"id": "core_fire_overwatch",
+		"name": "Fire Overwatch",
+		"cp": 1,
+		"turn": "opponent",
+		"phase": "movement or charge",
+		"description": "Use this Stratagem in your opponent's Movement or Charge phase, just after an enemy unit ends a Normal, Advance or Fall Back move, or after it is set up. One unit from your army that is not within Engagement Range of any enemy units and has not shot this phase can shoot that enemy unit as if it were your Shooting phase, but can only target that unit and attacks hit on unmodified 6s."
+	},
+	{
+		"id": "core_rapid_ingress",
+		"name": "Rapid Ingress",
+		"cp": 1,
+		"turn": "opponent",
+		"phase": "end of movement",
+		"description": "Use this Stratagem at the end of your opponent's Movement phase. Select one unit from your army that is in Reserves; it can arrive on the battlefield as if it were the Reinforcements step of your Movement phase."
+	},
+	{
+		"id": "core_smokescreen",
+		"name": "Smokescreen",
+		"cp": 1,
+		"turn": "opponent",
+		"phase": "shooting",
+		"description": "Use this Stratagem in your opponent's Shooting phase, just after an enemy unit has selected one of your SMOKE units as a target. Until the end of the phase, attacks targeting that unit are made with a -1 to Hit modifier."
+	},
+	{
+		"id": "core_go_to_ground",
+		"name": "Go to Ground",
+		"cp": 1,
+		"turn": "opponent",
+		"phase": "shooting",
+		"description": "Use this Stratagem in your opponent's Shooting phase, just after an enemy unit has selected one unit from your army as a target. Until the end of the phase, your unit has the Benefit of Cover. If it already had it, improve its Save characteristic by 1 instead."
+	},
+	{
+		"id": "core_heroic_intervention",
+		"name": "Heroic Intervention",
+		"cp": 2,
+		"turn": "opponent",
+		"phase": "charge",
+		"description": "Use this Stratagem in your opponent's Charge phase, just after an enemy unit ends a charge move. Select one unit from your army within 6\" of that enemy unit. That unit can make a Heroic Intervention move up to 6\" to engage the charging unit."
+	}
+]
