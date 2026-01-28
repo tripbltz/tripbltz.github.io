@@ -518,9 +518,10 @@
 
 			/* Respect users who prefer reduced motion */
 			@media (prefers-reduced-motion: reduce) {
-				.unit-details,
-				.unit-details.active {
+				.unit-details {
 					transition: none !important;
+				}
+				.unit-details.active {
 					max-height: none !important;
 					opacity: 1 !important;
 					transform: none !important;
@@ -1195,6 +1196,9 @@
 				border-color: #f4d35e !important;
 				color: #ffe9a0;
 				box-shadow: 0 0 0 1px rgba(244, 211, 94, 0.3);
+			}
+			.spin-field {
+				touch-action: none;
 			}
 			.dice-summary {
 				margin-top: 6px;
@@ -2071,7 +2075,13 @@
 							flex-wrap: wrap;
 						"
 					>
-						<input id="diceExpr" type="text" placeholder="e.g. 6d6+2" />
+						<input
+							id="diceExpr"
+							type="text"
+							inputmode="none"
+							class="spin-field"
+							placeholder="e.g. 6d6+2"
+						/>
 						<button id="btnRoll">Roll</button>
 
 						<input
@@ -2079,9 +2089,15 @@
 							id="diceHighlight"
 							min="0"
 							max="100"
+							inputmode="none"
+							class="spin-field"
 							placeholder="Highlight rolls ≥"
 							style="flex: 1"
 						/>
+						<label class="sub" style="display: flex; align-items: center; gap: 6px">
+							<input type="checkbox" id="diceTypingToggle" />
+							<span>Type manually</span>
+						</label>
 					</div>
 
 					<div class="sub" id="diceHelp" style="margin-top: 6px">
@@ -4454,6 +4470,7 @@
 				const min = Number.isFinite(opts.min) ? opts.min : 0;
 				const max = Number.isFinite(opts.max) ? opts.max : 100;
 				const step = Number.isFinite(opts.step) ? opts.step : 1;
+				const shouldBlock = () => window.__diceTypingMode;
 
 				const clampVal = (v) => Math.max(min, Math.min(max, v));
 				const parseVal = () => {
@@ -4464,6 +4481,7 @@
 					return null; // preserve typed expressions like "2d3"
 				};
 				const applyDelta = (delta) => {
+					if (shouldBlock()) return;
 					const current = parseVal();
 					if (current === null) return;
 					const next = clampVal(current + delta);
@@ -4474,6 +4492,7 @@
 
 				// Mouse wheel / trackpad
 				input.addEventListener("wheel", (e) => {
+					if (shouldBlock()) return;
 					e.preventDefault();
 					const delta = e.deltaY < 0 ? step : -step; // swipe/scroll up => increase
 					applyDelta(delta);
@@ -4482,10 +4501,13 @@
 				// Touch swipe (vertical)
 				let touchStartY = null;
 				input.addEventListener("touchstart", (e) => {
+					if (shouldBlock()) return;
 					if (!e.touches || !e.touches.length) return;
 					touchStartY = e.touches[0].clientY;
+					e.preventDefault();
 				});
 				input.addEventListener("touchmove", (e) => {
+					if (shouldBlock()) return;
 					if (touchStartY == null || !e.touches || !e.touches.length) return;
 					const y = e.touches[0].clientY;
 					const dy = touchStartY - y;
@@ -6456,6 +6478,29 @@
 				const diceAnim = document.getElementById("diceAnim");
 				attachSwipeSpinner(diceExpr, { min: 0, max: 100, step: 1 });
 				attachSwipeSpinner(diceHighlightInput, { min: 0, max: 100, step: 1 });
+				const diceTypingToggle = document.getElementById("diceTypingToggle");
+				window.__diceTypingMode = false;
+				function applyDiceTypingMode() {
+					const enabled = !!window.__diceTypingMode;
+					if (diceExpr) {
+						diceExpr.inputMode = enabled ? "text" : "none";
+						diceExpr.readOnly = !enabled;
+						diceExpr.classList.toggle("spin-field", !enabled);
+					}
+					if (diceHighlightInput) {
+						diceHighlightInput.inputMode = enabled ? "numeric" : "none";
+						diceHighlightInput.readOnly = !enabled;
+						diceHighlightInput.classList.toggle("spin-field", !enabled);
+					}
+				}
+				if (diceTypingToggle) {
+					diceTypingToggle.addEventListener("change", (e) => {
+						window.__diceTypingMode = !!e.target.checked;
+						applyDiceTypingMode();
+						if (window.__diceTypingMode && diceExpr) diceExpr.focus();
+					});
+				}
+				applyDiceTypingMode();
 
 				document.getElementById("btnRoll").addEventListener("click", () => {
 					const expr = diceExpr.value.trim();
