@@ -3914,6 +3914,19 @@
 			}
 			// Units / Effects helpers
 			// ------------------------------
+			const normalizeKeywords = (kw) => {
+				if (!Array.isArray(kw)) return [];
+				return kw
+					.flatMap((k) =>
+						typeof k === "string"
+							? k
+							: k && k.words
+								? k.words
+								: [],
+					)
+					.map((s) => String(s || "").trim())
+					.filter(Boolean);
+			};
 			/** Create a tracked unit from an imported unit */
 			function createUnit(u) {
 				// pull wounds per model from unitDatabase (wh40k_10th.json) when available
@@ -3939,16 +3952,19 @@
 					// Prefer weapon keys from the database when present; fallback to composition-derived later
 					weapons:
 						profile && Array.isArray(profile.weapons) ? profile.weapons : [],
-					keywords: Array.isArray(u.keywords)
-						? u.keywords
-						: typeof u.keywords === "string"
-							? u.keywords
-									.split(/[,;]+/)
-									.map((s) => s.trim())
-									.filter(Boolean)
-							: profile && profile.role
-								? [profile.role]
-								: [],
+					keywords: (() => {
+						if (Array.isArray(u.keywords))
+							return normalizeKeywords(u.keywords);
+						if (typeof u.keywords === "string")
+							return u.keywords
+								.split(/[,;]+/)
+								.map((s) => s.trim())
+								.filter(Boolean);
+						if (profile && profile.keywords)
+							return normalizeKeywords(profile.keywords);
+						if (profile && profile.role) return [profile.role];
+						return [];
+					})(),
 					abilities: Array.isArray(u.abilities)
 						? u.abilities
 						: typeof u.abilities === "string"
@@ -3985,15 +4001,30 @@
 				if (!player) return;
 				const factionLabel =
 					(player.army && player.army.faction) || player.faction || "";
+				const defaultModels =
+					Number(profile.models) && Number(profile.models) > 0
+						? Number(profile.models)
+						: 1;
+				let models = defaultModels;
+				const input = prompt(
+					`How many models in ${profile.name}?`,
+					String(defaultModels),
+				);
+				if (input !== null) {
+					const parsed = parseInt(input, 10);
+					if (Number.isFinite(parsed) && parsed > 0) models = parsed;
+				}
 				const unit = createUnit({
 					name: profile.name,
-					models: profile.models || 1,
+					models,
 					keywords: profile.keywords || [],
 					__faction: factionLabel,
 				});
 				player.units.push(unit);
 				log(
-					`${player.name}: Added ${profile.name} from faction database during battle.`,
+					`${player.name}: Added ${profile.name} (${models} model${
+						models === 1 ? "" : "s"
+					}) from faction database during battle.`,
 				);
 				saveLocal();
 				render();
