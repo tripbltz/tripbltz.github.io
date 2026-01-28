@@ -1199,40 +1199,6 @@
 			}
 			.spin-field {
 				touch-action: none;
-				min-height: 46px;
-				padding: 10px 12px;
-				border-radius: 10px;
-				border: 1px solid var(--border);
-				background: #0f141a;
-				color: var(--text);
-				font-size: 16px;
-			}
-			.spin-wrapper {
-				position: relative;
-				flex: 1;
-				min-width: 180px;
-			}
-			.spin-arrows {
-				position: absolute;
-				right: 6px;
-				top: 6px;
-				bottom: 6px;
-				display: flex;
-				flex-direction: column;
-				justify-content: space-between;
-				pointer-events: none;
-				color: var(--muted);
-				font-size: 12px;
-			}
-			.spin-arrows span {
-				display: inline-block;
-				line-height: 1;
-				opacity: 0.7;
-			}
-			#btnRoll {
-				min-height: 46px;
-				padding: 10px 16px;
-				border-radius: 10px;
 			}
 			.dice-summary {
 				margin-top: 6px;
@@ -2109,37 +2075,28 @@
 							flex-wrap: wrap;
 						"
 					>
-						<div class="spin-wrapper">
-							<input
-								id="diceExpr"
-								type="text"
-								inputmode="none"
-								class="spin-field"
-								placeholder="e.g. 6d6+2"
-							/>
-							<div class="spin-arrows" aria-hidden="true">
-								<span>▲</span>
-								<span>▼</span>
-							</div>
-						</div>
+						<input
+							id="diceExpr"
+							type="number"
+							min="1"
+							max="100"
+							step="1"
+							inputmode="numeric"
+							class="spin-field"
+							placeholder="Rolls (default d6), 1-100"
+						/>
 						<button id="btnRoll">Roll</button>
 
-						<div class="spin-wrapper">
-							<input
-								type="number"
-								id="diceHighlight"
-								min="0"
-								max="100"
-								inputmode="none"
-								class="spin-field"
-								placeholder="Highlight rolls ≥"
-								style="flex: 1"
-							/>
-							<div class="spin-arrows" aria-hidden="true">
-								<span>▲</span>
-								<span>▼</span>
-							</div>
-						</div>
+						<input
+							type="number"
+							id="diceHighlight"
+							min="0"
+							max="100"
+							inputmode="none"
+							class="spin-field"
+							placeholder="Highlight rolls ≥"
+							style="flex: 1"
+						/>
 						<label class="sub" style="display: flex; align-items: center; gap: 6px">
 							<input type="checkbox" id="diceTypingToggle" />
 							<span>Type manually</span>
@@ -6526,18 +6483,67 @@
 				attachSwipeSpinner(diceHighlightInput, { min: 0, max: 100, step: 1 });
 				const diceTypingToggle = document.getElementById("diceTypingToggle");
 				window.__diceTypingMode = false;
+				const clampDiceNumber = (el) => {
+					if (!el) return;
+					const n = parseInt(el.value, 10);
+					if (!Number.isFinite(n)) {
+						el.value = "";
+						return;
+					}
+					const min = Number(el.getAttribute("min") ?? "0");
+					const max = Number(el.getAttribute("max") ?? "100");
+					el.value = String(Math.max(min, Math.min(max, n)));
+				};
 				function applyDiceTypingMode() {
 					const enabled = !!window.__diceTypingMode;
 					if (diceExpr) {
-						diceExpr.inputMode = enabled ? "text" : "none";
-						diceExpr.readOnly = !enabled;
-						diceExpr.classList.toggle("spin-field", !enabled);
+						if (enabled) {
+							diceExpr.type = "text";
+							diceExpr.inputMode = "text";
+							diceExpr.readOnly = false;
+							diceExpr.placeholder = "e.g. 6d6+2 or 2d3";
+						} else {
+							diceExpr.type = "number";
+							diceExpr.min = "1";
+							diceExpr.max = "100";
+							diceExpr.step = "1";
+							diceExpr.inputMode = "numeric";
+							diceExpr.readOnly = false;
+							diceExpr.placeholder = "Rolls (default d6), 1-100";
+							clampDiceNumber(diceExpr);
+						}
 					}
 					if (diceHighlightInput) {
-						diceHighlightInput.inputMode = enabled ? "numeric" : "none";
-						diceHighlightInput.readOnly = !enabled;
-						diceHighlightInput.classList.toggle("spin-field", !enabled);
+						diceHighlightInput.type = "number";
+						diceHighlightInput.min = "0";
+						diceHighlightInput.max = "100";
+						diceHighlightInput.step = "1";
+						diceHighlightInput.inputMode = enabled ? "numeric" : "numeric";
+						diceHighlightInput.readOnly = false;
+						if (!enabled) clampDiceNumber(diceHighlightInput);
 					}
+				}
+				const maybeShowPicker = (el) => {
+					if (!el || window.__diceTypingMode) return;
+					if (typeof el.showPicker === "function") {
+						try {
+							el.showPicker();
+						} catch (_) {
+							/* ignore */
+						}
+					}
+				};
+				if (diceExpr) {
+					["focus", "pointerdown"].forEach((ev) =>
+						diceExpr.addEventListener(ev, () => maybeShowPicker(diceExpr)),
+					);
+				}
+				if (diceHighlightInput) {
+					["focus", "pointerdown"].forEach((ev) =>
+						diceHighlightInput.addEventListener(ev, () =>
+							maybeShowPicker(diceHighlightInput),
+						),
+					);
 				}
 				if (diceTypingToggle) {
 					diceTypingToggle.addEventListener("change", (e) => {
