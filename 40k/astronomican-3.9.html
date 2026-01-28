@@ -1207,6 +1207,53 @@
 				color: var(--text);
 				font-size: 18px;
 			}
+			.add-unit-btn {
+				margin-left: auto;
+				background: #0d2514;
+				border: 1px solid #1f7a36;
+				color: #9cf5b3;
+				border-radius: 10px;
+				padding: 6px 10px;
+				font-weight: 700;
+				display: inline-flex;
+				align-items: center;
+				gap: 6px;
+				cursor: pointer;
+			}
+			.add-unit-btn:hover {
+				background: #103019;
+				border-color: #2fa155;
+			}
+			.add-unit-grid {
+				display: grid;
+				grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+				gap: 10px;
+				margin-top: 10px;
+			}
+			.add-unit-card {
+				border: 1px solid var(--border);
+				border-radius: 10px;
+				padding: 10px;
+				background: #0f141a;
+			}
+			.add-unit-list {
+				display: flex;
+				flex-direction: column;
+				gap: 6px;
+				margin-top: 8px;
+			}
+			.add-unit-pill {
+				text-align: left;
+				border: 1px solid var(--border);
+				border-radius: 8px;
+				background: #121820;
+				color: var(--text);
+				padding: 6px 10px;
+				cursor: pointer;
+			}
+			.add-unit-pill:hover {
+				border-color: #2d3b4b;
+			}
 			.dice-summary {
 				margin-top: 6px;
 				font-size: 14px;
@@ -1936,6 +1983,9 @@
 				<section class="panel">
 					<div class="card-title">
 						<h3 id="p1Header">Player 1 Army</h3>
+						<button class="add-unit-btn" data-add-unit="0" title="Add a unit">
+							<span>＋</span> Add unit
+						</button>
 					</div>
 					<div class="faction-row">
 						<div id="p1Faction" class="faction-name"></div>
@@ -1952,6 +2002,9 @@
 				<section class="panel">
 					<div class="card-title">
 						<h3 id="p2Header">Player 2 Army</h3>
+						<button class="add-unit-btn" data-add-unit="1" title="Add a unit">
+							<span>＋</span> Add unit
+						</button>
 					</div>
 					<div class="faction-row">
 						<div id="p2Faction" class="faction-name"></div>
@@ -2452,6 +2505,28 @@
 				</div>
 			</div>
 		</div>
+		<!-- Add Unit Modal -->
+		<div id="addUnitModal" class="modal-backdrop">
+			<div class="modal-dialog">
+				<div class="modal-header">
+					<strong id="addUnitTitle" class="faction-name">Add Unit</strong>
+					<button id="addUnitClose" class="modal-close" aria-label="Close">
+						✕
+					</button>
+				</div>
+				<div class="modal-body">
+					<div class="sub" id="addUnitFaction"></div>
+					<input
+						id="addUnitSearch"
+						type="search"
+						placeholder="Search unit name..."
+						style="margin-top: 8px; width: 100%"
+					/>
+					<div id="addUnitGroups" class="add-unit-grid"></div>
+					<div id="addUnitEmpty" class="sub" style="margin-top: 8px"></div>
+				</div>
+			</div>
+		</div>
 		<!-- Audio element for PoolHouseAI TTS -->
 		<audio id="aiTtsAudio"></audio>
 		<button id="floatingDiceBtn" class="floating-dice-btn">🎲</button>
@@ -2462,19 +2537,28 @@
 				"adepta-sororitas": "sisters",
 				"astra-militarum": "imperial-guard",
 				"imperial guard": "imperial-guard",
-				"chaos space marines": "chaos-marines",
-				"chaos-space-marines": "chaos-marines",
-				"chaos marines": "chaos-marines",
-				"chaos marine": "chaos-marines",
-				chaos: "chaos-marines",
-				csm: "chaos-marines",
+				// CSM / Heretic Astartes
+				"chaos space marines": "heretic-astartes",
+				"chaos-space-marines": "heretic-astartes",
+				"chaos marines": "heretic-astartes",
+				"chaos marine": "heretic-astartes",
+				chaos: "heretic-astartes",
+				csm: "heretic-astartes",
+				"heretic astartes": "heretic-astartes",
+				"heretic-astartes": "heretic-astartes",
 				aeldari: "eldar",
 				asuryani: "eldar",
+				eldar: "eldar",
 				"druk-hari": "drukhari",
+				drukhari: "drukhari",
 				"genestealer-cults": "genestealer",
 				"genestealer cults": "genestealer",
 				"t'au": "tau",
 				"tau empire": "tau",
+				// Orks
+				ork: "orks",
+				orcs: "orks",
+				orks: "orks",
 				// Added alias keys:
 				"adepta sororitas": "sisters",
 				"astra militarum": "imperial-guard",
@@ -2529,6 +2613,12 @@
 			const factionCommands = {};
 			const factionOrders = {};
 			const coreStratagems = [];
+			const ADD_UNIT_CATEGORIES = [
+				{ key: "characters", label: "Characters" },
+				{ key: "battleline", label: "Battleline" },
+				{ key: "transport", label: "Dedicated Transport" },
+				{ key: "other", label: "Other datasheets" },
+			];
 			// Core weapon ability reference (10th edition)
 			const WEAPON_ABILITY_TEXT = {
 				"twin-linked":
@@ -2644,6 +2734,7 @@
 				const flat = keywords
 					.flatMap((k) => (k.words ? k.words : k))
 					.map((k) => String(k).toLowerCase());
+				if (flat.some((k) => k.includes("transport"))) return "Dedicated Transport";
 				if (flat.includes("battleline")) return "Battleline";
 				if (flat.includes("character")) return "Character";
 				if (flat.includes("vehicle")) return "Vehicle";
@@ -2785,6 +2876,7 @@
 						models: parseNumber(
 							row.unitcompo?.units?.[0]?.models || row.unitcompo?.models || 1,
 						),
+						keywords: row.keywords || [],
 						wounds,
 						save,
 						leadership,
@@ -2894,6 +2986,13 @@
 					Ld: u.leadership,
 					OC: u.oc,
 				};
+			}
+			function categorizeUnitRole(u) {
+				const role = String(u.role || "").toLowerCase();
+				if (role.includes("character")) return "characters";
+				if (role.includes("battleline")) return "battleline";
+				if (role.includes("transport")) return "transport";
+				return "other";
 			}
 			// Kick off async data load from wh40k_10th.json
 			dataReadyPromise = loadWh40kData().then(() => {
@@ -3872,6 +3971,125 @@
 						: null,
 				};
 			}
+			// ------------------------------
+			// Add Unit (mid-battle)
+			// ------------------------------
+			let __addUnitPlayerIdx = null;
+			function getFactionUnits(factionLabel) {
+				const fKey = canonicalFactionKey(factionLabel);
+				return window.unitDatabase?.[fKey] || [];
+			}
+			function addUnitFromProfile(profile, playerIdx) {
+				if (!profile || playerIdx == null) return;
+				const player = State.players[playerIdx];
+				if (!player) return;
+				const factionLabel =
+					(player.army && player.army.faction) || player.faction || "";
+				const unit = createUnit({
+					name: profile.name,
+					models: profile.models || 1,
+					keywords: profile.keywords || [],
+					__faction: factionLabel,
+				});
+				player.units.push(unit);
+				log(
+					`${player.name}: Added ${profile.name} from faction database during battle.`,
+				);
+				saveLocal();
+				render();
+				closeAddUnitModal();
+			}
+			function renderAddUnitGroups(query = "") {
+				const groupsEl = document.getElementById("addUnitGroups");
+				const emptyEl = document.getElementById("addUnitEmpty");
+				if (!groupsEl || __addUnitPlayerIdx == null) return;
+				const player = State.players[__addUnitPlayerIdx];
+				if (!player) return;
+				const factionLabel =
+					(player.army && player.army.faction) || player.faction || "";
+				const list = getFactionUnits(factionLabel);
+				const term = query.trim().toLowerCase();
+				const filtered = term
+					? list.filter((u) => (u.name || "").toLowerCase().includes(term))
+					: list;
+				const grouped = {
+					characters: [],
+					battleline: [],
+					transport: [],
+					other: [],
+				};
+				filtered.forEach((u) => {
+					const bucket = categorizeUnitRole(u);
+					grouped[bucket].push(u);
+				});
+				groupsEl.innerHTML = "";
+				let total = 0;
+				ADD_UNIT_CATEGORIES.forEach((cat) => {
+					const items = grouped[cat.key] || [];
+					if (!items.length) return;
+					total += items.length;
+					const card = document.createElement("div");
+					card.className = "add-unit-card";
+					card.innerHTML = `<div class="card-title"><strong>${cat.label}</strong></div>`;
+					const listEl = document.createElement("div");
+					listEl.className = "add-unit-list";
+					items
+						.sort((a, b) => a.name.localeCompare(b.name))
+						.forEach((u) => {
+							const btn = document.createElement("button");
+							btn.type = "button";
+							btn.className = "add-unit-pill";
+							btn.textContent = u.name;
+							btn.addEventListener("click", () =>
+								addUnitFromProfile(u, __addUnitPlayerIdx),
+							);
+							listEl.appendChild(btn);
+						});
+					card.appendChild(listEl);
+					groupsEl.appendChild(card);
+				});
+				if (emptyEl) {
+					emptyEl.textContent = total
+						? ""
+						: "No units found for this faction. Try enabling manual typing or check the faction name.";
+				}
+			}
+			function openAddUnitModal(playerIdx) {
+				const ensureData = dataReadyPromise
+					? dataReadyPromise.catch(() => null)
+					: Promise.resolve();
+				__addUnitPlayerIdx = playerIdx;
+				const player = State.players[playerIdx];
+				const title = document.getElementById("addUnitTitle");
+				const faction = document.getElementById("addUnitFaction");
+				const search = document.getElementById("addUnitSearch");
+				const modal = document.getElementById("addUnitModal");
+				const groups = document.getElementById("addUnitGroups");
+				const empty = document.getElementById("addUnitEmpty");
+				if (title && player) title.textContent = `Add Unit — ${player.name}`;
+				if (faction && player) {
+					const fLabel =
+						(player.army && player.army.faction) || player.faction || "";
+					faction.textContent = fLabel
+						? `Faction: ${fLabel}`
+						: "Faction unknown";
+				}
+				if (groups) groups.innerHTML = "";
+				if (empty) empty.textContent = "Loading faction units…";
+				if (search) {
+					search.value = "";
+					search.oninput = (e) => renderAddUnitGroups(e.target.value || "");
+				}
+				ensureData.then(() => {
+					renderAddUnitGroups("");
+					if (modal) modal.classList.add("active");
+				});
+			}
+			function closeAddUnitModal() {
+				const modal = document.getElementById("addUnitModal");
+				if (modal) modal.classList.remove("active");
+				__addUnitPlayerIdx = null;
+			}
 
 			function applyDamage(unit, delta) {
 				const before = unit.remainingWounds;
@@ -4267,6 +4485,11 @@
 					.split(/\n+/)
 					.map((s) => s.trim())
 					.filter(Boolean);
+				const cleanFactionLabel = (s) =>
+					String(s || "")
+						.replace(/\(.*?points?\)/gi, "")
+						.replace(/\(.*?\)/g, "")
+						.trim();
 
 				const SECTION_HEADERS = new Set([
 					"CHARACTERS",
@@ -4294,7 +4517,21 @@
 							L,
 						)
 					)
-						faction = L;
+						faction = cleanFactionLabel(L);
+				}
+				// Fallback: use any line that matches a known faction label from unitDatabase
+				if (!faction && window.unitDatabase) {
+					const knownFactions = Object.keys(window.unitDatabase || {});
+					for (let i = 0; i < Math.min(20, lines.length); i++) {
+						const L = lines[i].toLowerCase();
+						const hit = knownFactions.find((f) =>
+							L.includes(f.toLowerCase()),
+						);
+						if (hit) {
+							faction = cleanFactionLabel(hit);
+							break;
+						}
+					}
 				}
 
 				// --- Helper: model line detection and tokens ---
@@ -5599,6 +5836,14 @@
 					render();
 					saveLocal();
 				});
+				// Add unit buttons
+				document.querySelectorAll("[data-add-unit]").forEach((btn) => {
+					btn.addEventListener("click", () => {
+						const idx = Number(btn.getAttribute("data-add-unit"));
+						if (!Number.isFinite(idx)) return;
+						openAddUnitModal(idx);
+					});
+				});
 				// Roles
 				document.querySelectorAll('input[name="p1Role"]').forEach((el) => {
 					el.addEventListener("change", (e) => {
@@ -6313,6 +6558,15 @@
 					const type = card.dataset.type;
 					card.addEventListener("click", () => revealMissionCard(pIdx, type));
 				});
+				// Add Unit modal close & backdrop
+				const addUnitModal = document.getElementById("addUnitModal");
+				const addUnitClose = document.getElementById("addUnitClose");
+				if (addUnitClose) addUnitClose.addEventListener("click", closeAddUnitModal);
+				if (addUnitModal) {
+					addUnitModal.addEventListener("click", (e) => {
+						if (e.target === addUnitModal) closeAddUnitModal();
+					});
+				}
 
 				// Ability modal close & backdrop — null-safe
 				const abilityModal = document.getElementById("abilityModal");
@@ -6644,6 +6898,7 @@
 							"missionModal",
 							"startModal",
 							"commandModal",
+							"addUnitModal",
 						].forEach((id) => {
 							const m = document.getElementById(id);
 							if (m && m.classList.contains("active"))
