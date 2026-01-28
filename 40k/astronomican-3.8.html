@@ -1199,6 +1199,40 @@
 			}
 			.spin-field {
 				touch-action: none;
+				min-height: 46px;
+				padding: 10px 12px;
+				border-radius: 10px;
+				border: 1px solid var(--border);
+				background: #0f141a;
+				color: var(--text);
+				font-size: 16px;
+			}
+			.spin-wrapper {
+				position: relative;
+				flex: 1;
+				min-width: 180px;
+			}
+			.spin-arrows {
+				position: absolute;
+				right: 6px;
+				top: 6px;
+				bottom: 6px;
+				display: flex;
+				flex-direction: column;
+				justify-content: space-between;
+				pointer-events: none;
+				color: var(--muted);
+				font-size: 12px;
+			}
+			.spin-arrows span {
+				display: inline-block;
+				line-height: 1;
+				opacity: 0.7;
+			}
+			#btnRoll {
+				min-height: 46px;
+				padding: 10px 16px;
+				border-radius: 10px;
 			}
 			.dice-summary {
 				margin-top: 6px;
@@ -2075,25 +2109,37 @@
 							flex-wrap: wrap;
 						"
 					>
-						<input
-							id="diceExpr"
-							type="text"
-							inputmode="none"
-							class="spin-field"
-							placeholder="e.g. 6d6+2"
-						/>
+						<div class="spin-wrapper">
+							<input
+								id="diceExpr"
+								type="text"
+								inputmode="none"
+								class="spin-field"
+								placeholder="e.g. 6d6+2"
+							/>
+							<div class="spin-arrows" aria-hidden="true">
+								<span>▲</span>
+								<span>▼</span>
+							</div>
+						</div>
 						<button id="btnRoll">Roll</button>
 
-						<input
-							type="number"
-							id="diceHighlight"
-							min="0"
-							max="100"
-							inputmode="none"
-							class="spin-field"
-							placeholder="Highlight rolls ≥"
-							style="flex: 1"
-						/>
+						<div class="spin-wrapper">
+							<input
+								type="number"
+								id="diceHighlight"
+								min="0"
+								max="100"
+								inputmode="none"
+								class="spin-field"
+								placeholder="Highlight rolls ≥"
+								style="flex: 1"
+							/>
+							<div class="spin-arrows" aria-hidden="true">
+								<span>▲</span>
+								<span>▼</span>
+							</div>
+						</div>
 						<label class="sub" style="display: flex; align-items: center; gap: 6px">
 							<input type="checkbox" id="diceTypingToggle" />
 							<span>Type manually</span>
