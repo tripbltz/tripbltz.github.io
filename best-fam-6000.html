@@ -6,17 +6,17 @@
 		<title>Best family calculator 6000</title>
 		<style>
 			:root {
-				--bg: #0b0f19;
-				--panel: #121a2a;
-				--panel2: #0f1524;
-				--text: #e7ecff;
-				--muted: #a9b4d6;
-				--accent: #7c5cff;
-				--good: #31d0aa;
-				--bad: #ff5c7a;
-				--warn: #ffd166;
-				--border: rgba(255, 255, 255, 0.09);
-				--shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+				--bg: #071a30;
+				--panel: #0f2741;
+				--panel2: #0c2037;
+				--text: #f8fbff;
+				--muted: #cde1ff;
+				--accent: #ff4fd8;
+				--good: #5fffba;
+				--bad: #ff6b6b;
+				--warn: #ffd447;
+				--border: rgba(255, 255, 255, 0.12);
+				--shadow: 0 14px 38px rgba(0, 0, 0, 0.45);
 				--radius: 16px;
 				--mono:
 					ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
@@ -33,18 +33,19 @@
 				margin: 0;
 				font-family: var(--sans);
 				background:
-					radial-gradient(
-						1200px 600px at 20% -10%,
-						rgba(124, 92, 255, 0.35),
-						transparent 60%
-					),
-					radial-gradient(
-						900px 500px at 90% 0%,
-						rgba(49, 208, 170, 0.22),
-						transparent 55%
+					radial-gradient(240px 120px at 15% 12%, rgba(255, 79, 216, 0.45), transparent 55%),
+					radial-gradient(260px 140px at 85% 18%, rgba(0, 255, 209, 0.38), transparent 60%),
+					radial-gradient(340px 140px at 60% -6%, rgba(255, 212, 71, 0.32), transparent 60%),
+					repeating-linear-gradient(
+						135deg,
+						rgba(255, 255, 255, 0.05) 0,
+						rgba(255, 255, 255, 0.05) 10px,
+						transparent 10px,
+						transparent 20px
 					),
 					var(--bg);
 				color: var(--text);
+				min-height: 100vh;
 			}
 
 			header {
@@ -54,8 +55,11 @@
 			}
 			h1 {
 				margin: 0 0 6px;
-				font-size: 22px;
-				letter-spacing: 0.2px;
+				font-size: 26px;
+				letter-spacing: 0.6px;
+				font-family: "Comic Sans MS", "Comic Sans", cursive;
+				color: #ff59de;
+				text-shadow: 0 2px 0 #0b0f19, 0 6px 14px rgba(0, 0, 0, 0.45);
 			}
 			.subtitle {
 				color: var(--muted);
@@ -71,11 +75,14 @@
 			}
 			.pill {
 				border: 1px solid var(--border);
-				background: rgba(255, 255, 255, 0.03);
-				padding: 8px 10px;
-				border-radius: 999px;
+				background: linear-gradient(135deg, rgba(0, 255, 209, 0.18), rgba(255, 79, 216, 0.18));
+				padding: 8px 12px;
+				border-radius: 14px;
 				font-size: 12px;
-				color: var(--muted);
+				color: var(--text);
+				box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+				text-transform: uppercase;
+				letter-spacing: 0.4px;
 			}
 			.pill b {
 				color: var(--text);
@@ -98,14 +105,36 @@
 
 			.card {
 				background: linear-gradient(
-					180deg,
-					rgba(255, 255, 255, 0.035),
-					rgba(255, 255, 255, 0.02)
-				);
+						160deg,
+						rgba(0, 255, 209, 0.08),
+						rgba(255, 79, 216, 0.07)
+					),
+					linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.02));
 				border: 1px solid var(--border);
 				border-radius: var(--radius);
 				box-shadow: var(--shadow);
 				overflow: hidden;
+				position: relative;
+			}
+			.card > * {
+				position: relative;
+				z-index: 1;
+			}
+			.card::before {
+				content: "";
+				position: absolute;
+				inset: -1px;
+				border-radius: var(--radius);
+				pointer-events: none;
+				background: conic-gradient(
+					from 120deg,
+					rgba(255, 79, 216, 0.3),
+					rgba(0, 255, 209, 0.3),
+					rgba(255, 212, 71, 0.25),
+					rgba(255, 79, 216, 0.3)
+				);
+				opacity: 0.25;
+				z-index: 0;
 			}
 
 			.card .hd {
@@ -121,7 +150,7 @@
 				font-size: 14px;
 				letter-spacing: 0.3px;
 				text-transform: uppercase;
-				color: var(--muted);
+				color: #ffd447;
 			}
 			.card .bd {
 				padding: 14px;
@@ -176,16 +205,18 @@
 			}
 			button {
 				border: 1px solid var(--border);
-				background: rgba(124, 92, 255, 0.18);
+				background: linear-gradient(135deg, rgba(255, 79, 216, 0.32), rgba(0, 255, 209, 0.28));
 				color: var(--text);
 				padding: 10px 12px;
 				border-radius: 12px;
 				cursor: pointer;
 				font-weight: 600;
 				letter-spacing: 0.2px;
+				transition: transform 0.08s ease, filter 0.15s ease;
 			}
 			button:hover {
-				filter: brightness(1.1);
+				filter: brightness(1.1) saturate(1.1);
+				transform: translateY(-1px) rotate(-0.6deg);
 			}
 			button.secondary {
 				background: rgba(255, 255, 255, 0.06);
@@ -223,10 +254,11 @@
 			}
 			th {
 				text-align: left;
-				color: var(--muted);
+				color: var(--text);
 				font-size: 12px;
 				letter-spacing: 0.25px;
 				text-transform: uppercase;
+				background: rgba(0, 255, 209, 0.08);
 			}
 			td .sub {
 				color: var(--muted);
