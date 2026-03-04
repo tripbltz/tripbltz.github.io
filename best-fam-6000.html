@@ -5,6 +5,8 @@
 		<meta name="viewport" content="width=device-width,initial-scale=1" />
 		<title>Best family calculator 6000</title>
 		<style>
+			@import url("https://fonts.googleapis.com/css2?family=Comic+Neue:wght@700&display=swap");
+
 			:root {
 				--bg: #071a30;
 				--panel: #0f2741;
@@ -33,15 +35,20 @@
 				margin: 0;
 				font-family: var(--sans);
 				background:
-					radial-gradient(240px 120px at 15% 12%, rgba(255, 79, 216, 0.45), transparent 55%),
-					radial-gradient(260px 140px at 85% 18%, rgba(0, 255, 209, 0.38), transparent 60%),
-					radial-gradient(340px 140px at 60% -6%, rgba(255, 212, 71, 0.32), transparent 60%),
-					repeating-linear-gradient(
-						135deg,
-						rgba(255, 255, 255, 0.05) 0,
-						rgba(255, 255, 255, 0.05) 10px,
-						transparent 10px,
-						transparent 20px
+					radial-gradient(
+						240px 120px at 15% 12%,
+						rgba(255, 79, 216, 0.45),
+						transparent 55%
+					),
+					radial-gradient(
+						260px 140px at 85% 18%,
+						rgba(0, 255, 209, 0.38),
+						transparent 60%
+					),
+					radial-gradient(
+						340px 140px at 60% -6%,
+						rgba(255, 212, 71, 0.32),
+						transparent 60%
 					),
 					var(--bg);
 				color: var(--text);
@@ -57,9 +64,11 @@
 				margin: 0 0 6px;
 				font-size: 26px;
 				letter-spacing: 0.6px;
-				font-family: "Comic Sans MS", "Comic Sans", cursive;
+				font-family: "Comic Neue", "Comic Sans MS", "Comic Sans", cursive;
 				color: #ff59de;
-				text-shadow: 0 2px 0 #0b0f19, 0 6px 14px rgba(0, 0, 0, 0.45);
+				text-shadow:
+					0 2px 0 #0b0f19,
+					0 6px 14px rgba(0, 0, 0, 0.45);
 			}
 			.subtitle {
 				color: var(--muted);
@@ -75,7 +84,11 @@
 			}
 			.pill {
 				border: 1px solid var(--border);
-				background: linear-gradient(135deg, rgba(0, 255, 209, 0.18), rgba(255, 79, 216, 0.18));
+				background: linear-gradient(
+					135deg,
+					rgba(0, 255, 209, 0.18),
+					rgba(255, 79, 216, 0.18)
+				);
 				padding: 8px 12px;
 				border-radius: 14px;
 				font-size: 12px;
@@ -102,14 +115,42 @@
 					grid-template-columns: 1fr;
 				}
 			}
+			main.single {
+				grid-template-columns: 1fr;
+			}
+
+			.tabbar {
+				max-width: 1100px;
+				margin: 10px auto 0;
+				padding: 0 18px 6px;
+				display: flex;
+				gap: 10px;
+				flex-wrap: wrap;
+			}
+			.tabbar button {
+				border-radius: 18px;
+				font-size: 13px;
+				padding: 10px 14px;
+				background: rgba(0, 0, 0, 0.18);
+			}
+			.tabbar button.active {
+				border-color: var(--accent);
+				box-shadow: 0 0 0 2px rgba(255, 79, 216, 0.25);
+				transform: translateY(-1px);
+			}
 
 			.card {
-				background: linear-gradient(
+				background:
+					linear-gradient(
 						160deg,
 						rgba(0, 255, 209, 0.08),
 						rgba(255, 79, 216, 0.07)
 					),
-					linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.02));
+					linear-gradient(
+						180deg,
+						rgba(255, 255, 255, 0.04),
+						rgba(255, 255, 255, 0.02)
+					);
 				border: 1px solid var(--border);
 				border-radius: var(--radius);
 				box-shadow: var(--shadow);
@@ -205,14 +246,20 @@
 			}
 			button {
 				border: 1px solid var(--border);
-				background: linear-gradient(135deg, rgba(255, 79, 216, 0.32), rgba(0, 255, 209, 0.28));
+				background: linear-gradient(
+					135deg,
+					rgba(255, 79, 216, 0.32),
+					rgba(0, 255, 209, 0.28)
+				);
 				color: var(--text);
 				padding: 10px 12px;
 				border-radius: 12px;
 				cursor: pointer;
 				font-weight: 600;
 				letter-spacing: 0.2px;
-				transition: transform 0.08s ease, filter 0.15s ease;
+				transition:
+					transform 0.08s ease,
+					filter 0.15s ease;
 			}
 			button:hover {
 				filter: brightness(1.1) saturate(1.1);
@@ -342,16 +389,22 @@
 			<h1>Best family calculator 6000 🏆</h1>
 			<p class="subtitle">Scoreboard + MVP calculator</p>
 			<div class="pillbar">
-				<div class="pill">Storage: <b>local</b></div>
 				<div class="pill">MVP Formula: <b>points + wins + style</b></div>
 			</div>
 		</header>
 
+		<nav class="tabbar">
+			<button data-view="standings" class="active">Standings & MVP</button>
+			<button data-view="add">Add family & player</button>
+			<button data-view="record">Record a match</button>
+			<button data-view="secret">Secret</button>
+		</nav>
+
 		<main>
 			<!-- Left: data entry -->
-			<section class="card">
+			<section class="card" id="addCard">
 				<div class="hd">
-					<h2>Setup & Match Entry</h2>
+					<h2>Setup</h2>
 					<div class="btns">
 						<button id="seedBtn" class="secondary">Seed example league</button>
 						<button id="resetBtn" class="danger">Reset everything</button>
@@ -399,11 +452,11 @@
 								<div class="row" style="margin-top: 10px">
 									<div>
 										<label>Player name</label>
-										<input id="playerName" placeholder="e.g. Stinker Steve" />
+										<input id="playerName" placeholder="e.g. Stinker Stephen" />
 									</div>
 									<div>
 										<label>Nickname (optional)</label>
-										<input id="playerNick" placeholder="e.g. 'Elbows McGee'" />
+										<input id="playerNick" placeholder="e.g. 'Elbows Hayley'" />
 									</div>
 								</div>
 								<div class="row">
@@ -435,97 +488,6 @@
 						</div>
 					</div>
 
-					<div style="height: 10px"></div>
-
-					<div class="card" style="box-shadow: none">
-						<div class="hd"><h2>Record a match</h2></div>
-						<div class="bd">
-							<div class="row3">
-								<div>
-									<label>Sport / game</label>
-									<input
-										id="matchSport"
-										placeholder="e.g. Rounders, Football, Tug of War"
-									/>
-								</div>
-								<div>
-									<label>Family A</label>
-									<select id="matchFamA"></select>
-								</div>
-								<div>
-									<label>Family B</label>
-									<select id="matchFamB"></select>
-								</div>
-							</div>
-
-							<div class="row3">
-								<div>
-									<label>Score A</label>
-									<input
-										id="matchScoreA"
-										type="number"
-										min="0"
-										step="1"
-										value="0"
-									/>
-								</div>
-								<div>
-									<label>Score B</label>
-									<input
-										id="matchScoreB"
-										type="number"
-										min="0"
-										step="1"
-										value="0"
-									/>
-								</div>
-								<div>
-									<label>Date (optional)</label>
-									<input id="matchDate" type="date" />
-								</div>
-							</div>
-
-							<div class="row">
-								<div>
-									<label>MVP (optional)</label>
-									<select id="matchMvp"></select>
-									<div class="tiny" style="margin-top: 6px">
-										If blank, the page will still calculate overall MVP from
-										stats.
-									</div>
-								</div>
-								<div>
-									<label>Style bonus for MVP (optional)</label>
-									<input
-										id="matchMvpBonus"
-										type="number"
-										min="0"
-										step="1"
-										value="2"
-									/>
-									<div class="tiny" style="margin-top: 6px">
-										Adds cheeky extra credit to the chosen MVP.
-									</div>
-								</div>
-							</div>
-
-							<div>
-								<label>Notes (optional)</label>
-								<textarea
-									id="matchNotes"
-									placeholder="e.g. 'Controversial disallowed goal due to slippery flip-flops.'"
-								></textarea>
-							</div>
-
-							<div class="btns" style="margin-top: 10px">
-								<button id="addMatchBtn" class="good">Add match</button>
-								<span class="tiny mono" id="stateHint"></span>
-							</div>
-						</div>
-					</div>
-
-					<div style="height: 10px"></div>
-
 					<div class="callout">
 						<b>How MVP is calculated:</b><br />
 						Player MVP Score = (total points from matches) + (wins × 3) + (style
@@ -534,8 +496,131 @@
 				</div>
 			</section>
 
+			<section class="card" id="recordCard">
+				<div class="hd"><h2>Record a match</h2></div>
+				<div class="bd">
+					<div class="row3">
+						<div>
+							<label>Sport / game</label>
+							<input
+								id="matchSport"
+								placeholder="e.g. Rounders, Football, Tug of War"
+							/>
+						</div>
+						<div>
+							<label>Family A</label>
+							<select id="matchFamA"></select>
+						</div>
+						<div>
+							<label>Family B</label>
+							<select id="matchFamB"></select>
+						</div>
+					</div>
+
+					<div class="row3">
+						<div>
+							<label>Score A</label>
+							<input
+								id="matchScoreA"
+								type="number"
+								min="0"
+								step="1"
+								value="0"
+							/>
+						</div>
+						<div>
+							<label>Score B</label>
+							<input
+								id="matchScoreB"
+								type="number"
+								min="0"
+								step="1"
+								value="0"
+							/>
+						</div>
+						<div>
+							<label>Date (optional)</label>
+							<input id="matchDate" type="date" />
+						</div>
+					</div>
+
+					<div class="row">
+						<div>
+							<label>MVP (optional)</label>
+							<select id="matchMvp"></select>
+							<div class="tiny" style="margin-top: 6px">
+								If blank, the page will still calculate overall MVP from stats.
+							</div>
+						</div>
+						<div>
+							<label>Style bonus for MVP (optional)</label>
+							<input
+								id="matchMvpBonus"
+								type="number"
+								min="0"
+								step="1"
+								value="2"
+							/>
+							<div class="tiny" style="margin-top: 6px">
+								Adds cheeky extra credit to the chosen MVP.
+							</div>
+						</div>
+					</div>
+
+					<div>
+						<label>Notes (optional)</label>
+						<textarea
+							id="matchNotes"
+							placeholder="e.g. 'Controversial disallowed goal due to slippery flip-flops.'"
+						></textarea>
+					</div>
+
+					<div class="btns" style="margin-top: 10px">
+						<button id="addMatchBtn" class="good">Add match</button>
+						<span class="tiny mono" id="stateHint"></span>
+					</div>
+				</div>
+			</section>
+
+			<section class="card" id="secretCard" style="display: none">
+				<div class="hd"><h2>Evidence</h2></div>
+				<div class="bd">
+					<div
+						id="secretImage"
+						style="
+							width: 100%;
+							min-height: 220px;
+							border: 2px dashed rgba(255, 255, 255, 0.3);
+							border-radius: 16px;
+							display: grid;
+							place-items: center;
+							background: rgba(255, 79, 216, 0.08);
+							color: var(--muted);
+							text-align: center;
+							padding: 24px;
+						"
+					>
+						<div>
+							<div class="tiny">
+								<a
+									href="https://tripbltz.github.io/best-fam-6000.html"
+									target="_blank"
+									rel="noopener noreferrer"
+									style="
+										color: var(--text);
+										font-weight: 700;
+										text-decoration: underline;
+									"
+									>🌐 Important document</a
+								>
+							</div>
+						</div>
+					</div>
+				</div>
+			</section>
+
 			<!-- Right: standings -->
-			<aside class="card">
+			<aside class="card" id="standingsCard">
 				<div class="hd">
 					<h2>Standings & MVP</h2>
 					<div class="btns">
@@ -712,6 +797,39 @@
 				setSelect($("matchMvp"), playerOptions, "No match MVP (optional)");
 			}
 
+			// ---------- Views ----------
+			let currentView = "standings";
+			const viewButtons = () =>
+				Array.from(document.querySelectorAll("[data-view]"));
+			function applyView() {
+				const showAdd = currentView === "add";
+				const showRecord = currentView === "record";
+				const showStandings = currentView === "standings";
+				const showSecret = currentView === "secret";
+
+				$("addCard").style.display = showAdd ? "block" : "none";
+				$("recordCard").style.display = showRecord ? "block" : "none";
+				$("standingsCard").style.display = showStandings ? "block" : "none";
+				const secretEl = $("secretCard");
+				if (secretEl) secretEl.style.display = showSecret ? "block" : "none";
+
+				const mainEl = document.querySelector("main");
+				if (mainEl) {
+					mainEl.classList.toggle("single", true);
+				}
+
+				viewButtons().forEach((btn) => {
+					btn.classList.toggle("active", btn.dataset.view === currentView);
+				});
+			}
+
+			viewButtons().forEach((btn) => {
+				btn.onclick = () => {
+					currentView = btn.dataset.view;
+					applyView();
+				};
+			});
+
 			function updateFamilyLimitUI() {
 				const count = state.families.length;
 				const hint = $("familyCountHint");
@@ -823,6 +941,7 @@
 			function render() {
 				refreshSelects();
 				updateFamilyLimitUI();
+				applyView();
 
 				const stats = computeStats();
 
@@ -1285,6 +1404,7 @@
 
 			// Initialize date default
 			if (!$("matchDate").value) $("matchDate").value = nowISODate();
+			applyView();
 			render();
 		</script>
 	</body>
