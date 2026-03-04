@@ -625,16 +625,6 @@
 			<aside class="card" id="standingsCard">
 				<div class="hd">
 					<h2>Standings & MVP</h2>
-					<div class="btns">
-						<button id="exportBtn" class="secondary">Export JSON</button>
-						<button id="importBtn" class="secondary">Import JSON</button>
-						<input
-							id="importFile"
-							type="file"
-							accept="application/json"
-							style="display: none"
-						/>
-					</div>
 				</div>
 
 				<div class="bd">
@@ -1354,56 +1344,6 @@
 			};
 
 			// Export / Import
-			$("exportBtn").onclick = () => {
-				const blob = new Blob([JSON.stringify(state, null, 2)], {
-					type: "application/json",
-				});
-				const url = URL.createObjectURL(blob);
-				const a = document.createElement("a");
-				a.href = url;
-				a.download = "family-games-league.json";
-				document.body.appendChild(a);
-				a.click();
-				a.remove();
-				URL.revokeObjectURL(url);
-				toast("Exported JSON.");
-			};
-
-			$("importBtn").onclick = () => $("importFile").click();
-
-			$("importFile").addEventListener("change", async (e) => {
-				const file = e.target.files?.[0];
-				if (!file) return;
-				try {
-					const text = await file.text();
-					const parsed = JSON.parse(text);
-					if (
-						!parsed ||
-						!Array.isArray(parsed.families) ||
-						!Array.isArray(parsed.players) ||
-						!Array.isArray(parsed.matches)
-					) {
-						return toast("Invalid file format.");
-					}
-					if (parsed.families.length > MAX_FAMILIES) {
-						return toast(`Import has more than ${MAX_FAMILIES} families.`);
-					}
-					state = {
-						families: parsed.families,
-						players: parsed.players,
-						matches: parsed.matches,
-					};
-					saveState();
-					render();
-					toast("Imported JSON.");
-				} catch (err) {
-					console.warn(err);
-					toast("Import failed.");
-				} finally {
-					e.target.value = "";
-				}
-			});
-
 			// Initialize date default
 			if (!$("matchDate").value) $("matchDate").value = nowISODate();
 			applyView();
