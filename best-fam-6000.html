@@ -1,0 +1,1259 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width,initial-scale=1" />
+		<title>Best family calculator 6000</title>
+		<style>
+			:root {
+				--bg: #0b0f19;
+				--panel: #121a2a;
+				--panel2: #0f1524;
+				--text: #e7ecff;
+				--muted: #a9b4d6;
+				--accent: #7c5cff;
+				--good: #31d0aa;
+				--bad: #ff5c7a;
+				--warn: #ffd166;
+				--border: rgba(255, 255, 255, 0.09);
+				--shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+				--radius: 16px;
+				--mono:
+					ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+					"Liberation Mono", "Courier New", monospace;
+				--sans:
+					ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica,
+					Arial, "Apple Color Emoji", "Segoe UI Emoji";
+			}
+
+			* {
+				box-sizing: border-box;
+			}
+			body {
+				margin: 0;
+				font-family: var(--sans);
+				background:
+					radial-gradient(
+						1200px 600px at 20% -10%,
+						rgba(124, 92, 255, 0.35),
+						transparent 60%
+					),
+					radial-gradient(
+						900px 500px at 90% 0%,
+						rgba(49, 208, 170, 0.22),
+						transparent 55%
+					),
+					var(--bg);
+				color: var(--text);
+			}
+
+			header {
+				padding: 22px 18px 10px;
+				max-width: 1100px;
+				margin: 0 auto;
+			}
+			h1 {
+				margin: 0 0 6px;
+				font-size: 22px;
+				letter-spacing: 0.2px;
+			}
+			.subtitle {
+				color: var(--muted);
+				margin: 0;
+				font-size: 14px;
+				line-height: 1.35;
+			}
+			.pillbar {
+				display: flex;
+				gap: 10px;
+				flex-wrap: wrap;
+				margin-top: 14px;
+			}
+			.pill {
+				border: 1px solid var(--border);
+				background: rgba(255, 255, 255, 0.03);
+				padding: 8px 10px;
+				border-radius: 999px;
+				font-size: 12px;
+				color: var(--muted);
+			}
+			.pill b {
+				color: var(--text);
+			}
+
+			main {
+				max-width: 1100px;
+				margin: 0 auto;
+				padding: 12px 18px 34px;
+				display: grid;
+				grid-template-columns: 1.1fr 0.9fr;
+				gap: 14px;
+			}
+
+			@media (max-width: 940px) {
+				main {
+					grid-template-columns: 1fr;
+				}
+			}
+
+			.card {
+				background: linear-gradient(
+					180deg,
+					rgba(255, 255, 255, 0.035),
+					rgba(255, 255, 255, 0.02)
+				);
+				border: 1px solid var(--border);
+				border-radius: var(--radius);
+				box-shadow: var(--shadow);
+				overflow: hidden;
+			}
+
+			.card .hd {
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+				padding: 14px 14px 10px;
+				border-bottom: 1px solid var(--border);
+				background: rgba(255, 255, 255, 0.02);
+			}
+			.card .hd h2 {
+				margin: 0;
+				font-size: 14px;
+				letter-spacing: 0.3px;
+				text-transform: uppercase;
+				color: var(--muted);
+			}
+			.card .bd {
+				padding: 14px;
+			}
+
+			.row {
+				display: grid;
+				grid-template-columns: 1fr 1fr;
+				gap: 10px;
+				margin-bottom: 10px;
+			}
+			.row3 {
+				display: grid;
+				grid-template-columns: 1fr 1fr 1fr;
+				gap: 10px;
+				margin-bottom: 10px;
+			}
+			@media (max-width: 520px) {
+				.row,
+				.row3 {
+					grid-template-columns: 1fr;
+				}
+			}
+
+			label {
+				display: block;
+				font-size: 12px;
+				color: var(--muted);
+				margin-bottom: 6px;
+			}
+			input,
+			select,
+			textarea {
+				width: 100%;
+				padding: 10px 10px;
+				border-radius: 12px;
+				border: 1px solid var(--border);
+				background: rgba(0, 0, 0, 0.25);
+				color: var(--text);
+				outline: none;
+			}
+			textarea {
+				min-height: 78px;
+				resize: vertical;
+			}
+
+			.btns {
+				display: flex;
+				gap: 10px;
+				flex-wrap: wrap;
+				align-items: center;
+			}
+			button {
+				border: 1px solid var(--border);
+				background: rgba(124, 92, 255, 0.18);
+				color: var(--text);
+				padding: 10px 12px;
+				border-radius: 12px;
+				cursor: pointer;
+				font-weight: 600;
+				letter-spacing: 0.2px;
+			}
+			button:hover {
+				filter: brightness(1.1);
+			}
+			button.secondary {
+				background: rgba(255, 255, 255, 0.06);
+			}
+			button.danger {
+				background: rgba(255, 92, 122, 0.15);
+			}
+			button.good {
+				background: rgba(49, 208, 170, 0.14);
+			}
+			button:disabled {
+				opacity: 0.55;
+				cursor: not-allowed;
+				filter: grayscale(0.3);
+			}
+
+			.tiny {
+				font-size: 12px;
+				color: var(--muted);
+			}
+			.mono {
+				font-family: var(--mono);
+			}
+
+			table {
+				width: 100%;
+				border-collapse: collapse;
+				font-size: 13px;
+			}
+			th,
+			td {
+				padding: 10px 8px;
+				border-bottom: 1px solid var(--border);
+				vertical-align: top;
+			}
+			th {
+				text-align: left;
+				color: var(--muted);
+				font-size: 12px;
+				letter-spacing: 0.25px;
+				text-transform: uppercase;
+			}
+			td .sub {
+				color: var(--muted);
+				font-size: 12px;
+				margin-top: 2px;
+			}
+			.right {
+				text-align: right;
+			}
+
+			.badge {
+				display: inline-flex;
+				align-items: center;
+				gap: 6px;
+				padding: 4px 8px;
+				border: 1px solid var(--border);
+				border-radius: 999px;
+				font-size: 12px;
+				color: var(--muted);
+				background: rgba(255, 255, 255, 0.03);
+			}
+
+			.grid2 {
+				display: grid;
+				grid-template-columns: 1fr 1fr;
+				gap: 12px;
+			}
+			@media (max-width: 520px) {
+				.grid2 {
+					grid-template-columns: 1fr;
+				}
+			}
+
+			.callout {
+				border: 1px dashed rgba(255, 255, 255, 0.2);
+				background: rgba(255, 255, 255, 0.03);
+				border-radius: 14px;
+				padding: 12px;
+				color: var(--muted);
+				line-height: 1.35;
+				font-size: 13px;
+			}
+
+			.winner {
+				color: var(--good);
+				font-weight: 700;
+			}
+			.loser {
+				color: var(--bad);
+				font-weight: 700;
+			}
+			.draw {
+				color: var(--warn);
+				font-weight: 700;
+			}
+
+			.toast {
+				position: fixed;
+				left: 50%;
+				bottom: 18px;
+				transform: translateX(-50%);
+				background: rgba(0, 0, 0, 0.7);
+				border: 1px solid var(--border);
+				border-radius: 999px;
+				padding: 10px 14px;
+				color: var(--text);
+				font-size: 13px;
+				box-shadow: var(--shadow);
+				opacity: 0;
+				pointer-events: none;
+				transition: opacity 0.25s ease;
+			}
+			.toast.show {
+				opacity: 1;
+			}
+		</style>
+	</head>
+
+	<body>
+		<header>
+			<h1>Best family calculator 6000 🏆</h1>
+			<p class="subtitle">Scoreboard + MVP calculator</p>
+			<div class="pillbar">
+				<div class="pill">Storage: <b>local</b></div>
+				<div class="pill">MVP Formula: <b>points + wins + style</b></div>
+			</div>
+		</header>
+
+		<main>
+			<!-- Left: data entry -->
+			<section class="card">
+				<div class="hd">
+					<h2>Setup & Match Entry</h2>
+					<div class="btns">
+						<button id="seedBtn" class="secondary">Seed example league</button>
+						<button id="resetBtn" class="danger">Reset everything</button>
+					</div>
+				</div>
+				<div class="bd">
+					<div class="grid2">
+						<div class="card" style="box-shadow: none">
+							<div class="hd"><h2>Add family</h2></div>
+							<div class="bd">
+								<div class="row">
+									<div>
+										<label>Family name</label>
+										<input
+											id="familyName"
+											placeholder="e.g. The Ward-Smith's"
+										/>
+									</div>
+									<div>
+										<label>Motto (optional)</label>
+										<input
+											id="familyMotto"
+											placeholder="e.g. 'Never skip leg day'"
+										/>
+									</div>
+								</div>
+								<div class="btns">
+									<button id="addFamilyBtn" class="good">Add family</button>
+									<span class="tiny mono" id="familyCountHint"></span>
+								</div>
+								<p class="tiny" style="margin: 10px 0 0">
+									Tip: add families first, then players, then record matches. Up
+									to 10 families are supported.
+								</p>
+							</div>
+						</div>
+
+						<div class="card" style="box-shadow: none">
+							<div class="hd"><h2>Add player</h2></div>
+							<div class="bd">
+								<div>
+									<label>Family</label>
+									<select id="playerFamily"></select>
+								</div>
+								<div class="row" style="margin-top: 10px">
+									<div>
+										<label>Player name</label>
+										<input id="playerName" placeholder="e.g. Stinker Steve" />
+									</div>
+									<div>
+										<label>Nickname (optional)</label>
+										<input id="playerNick" placeholder="e.g. 'Elbows McGee'" />
+									</div>
+								</div>
+								<div class="row">
+									<div>
+										<label>Style points per match (default)</label>
+										<input
+											id="playerStyleDefault"
+											type="number"
+											min="0"
+											step="1"
+											value="1"
+										/>
+									</div>
+									<div>
+										<label>Multiplier (optional)</label>
+										<input
+											id="playerMultiplier"
+											type="number"
+											min="0.5"
+											step="0.1"
+											value="1.0"
+										/>
+									</div>
+								</div>
+								<div class="btns">
+									<button id="addPlayerBtn" class="good">Add player</button>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<div style="height: 10px"></div>
+
+					<div class="card" style="box-shadow: none">
+						<div class="hd"><h2>Record a match</h2></div>
+						<div class="bd">
+							<div class="row3">
+								<div>
+									<label>Sport / game</label>
+									<input
+										id="matchSport"
+										placeholder="e.g. Rounders, Football, Tug of War"
+									/>
+								</div>
+								<div>
+									<label>Family A</label>
+									<select id="matchFamA"></select>
+								</div>
+								<div>
+									<label>Family B</label>
+									<select id="matchFamB"></select>
+								</div>
+							</div>
+
+							<div class="row3">
+								<div>
+									<label>Score A</label>
+									<input
+										id="matchScoreA"
+										type="number"
+										min="0"
+										step="1"
+										value="0"
+									/>
+								</div>
+								<div>
+									<label>Score B</label>
+									<input
+										id="matchScoreB"
+										type="number"
+										min="0"
+										step="1"
+										value="0"
+									/>
+								</div>
+								<div>
+									<label>Date (optional)</label>
+									<input id="matchDate" type="date" />
+								</div>
+							</div>
+
+							<div class="row">
+								<div>
+									<label>MVP (optional)</label>
+									<select id="matchMvp"></select>
+									<div class="tiny" style="margin-top: 6px">
+										If blank, the page will still calculate overall MVP from
+										stats.
+									</div>
+								</div>
+								<div>
+									<label>Style bonus for MVP (optional)</label>
+									<input
+										id="matchMvpBonus"
+										type="number"
+										min="0"
+										step="1"
+										value="2"
+									/>
+									<div class="tiny" style="margin-top: 6px">
+										Adds cheeky extra credit to the chosen MVP.
+									</div>
+								</div>
+							</div>
+
+							<div>
+								<label>Notes (optional)</label>
+								<textarea
+									id="matchNotes"
+									placeholder="e.g. 'Controversial disallowed goal due to slippery flip-flops.'"
+								></textarea>
+							</div>
+
+							<div class="btns" style="margin-top: 10px">
+								<button id="addMatchBtn" class="good">Add match</button>
+								<span class="tiny mono" id="stateHint"></span>
+							</div>
+						</div>
+					</div>
+
+					<div style="height: 10px"></div>
+
+					<div class="callout">
+						<b>How MVP is calculated:</b><br />
+						Player MVP Score = (total points from matches) + (wins × 3) + (style
+						points) × multiplier
+					</div>
+				</div>
+			</section>
+
+			<!-- Right: standings -->
+			<aside class="card">
+				<div class="hd">
+					<h2>Standings & MVP</h2>
+					<div class="btns">
+						<button id="exportBtn" class="secondary">Export JSON</button>
+						<button id="importBtn" class="secondary">Import JSON</button>
+						<input
+							id="importFile"
+							type="file"
+							accept="application/json"
+							style="display: none"
+						/>
+					</div>
+				</div>
+
+				<div class="bd">
+					<div class="card" style="box-shadow: none; margin-bottom: 12px">
+						<div class="hd"><h2>Overall MVP</h2></div>
+						<div class="bd" id="mvpBox">
+							<div class="tiny">Add players and matches to see MVP.</div>
+						</div>
+					</div>
+
+					<div class="card" style="box-shadow: none; margin-bottom: 12px">
+						<div class="hd"><h2>Family leaderboard</h2></div>
+						<div class="bd">
+							<div id="familyTableWrap"></div>
+						</div>
+					</div>
+
+					<div class="card" style="box-shadow: none; margin-bottom: 12px">
+						<div class="hd"><h2>Player leaderboard</h2></div>
+						<div class="bd">
+							<div id="playerTableWrap"></div>
+						</div>
+					</div>
+
+					<div class="card" style="box-shadow: none">
+						<div class="hd"><h2>Match log</h2></div>
+						<div class="bd">
+							<div id="matchLogWrap"></div>
+						</div>
+					</div>
+				</div>
+			</aside>
+		</main>
+
+		<div class="toast" id="toast"></div>
+
+		<script>
+			/* ============================
+   Family Games League - v1
+   Single-file app w/ localStorage
+   ============================ */
+
+			const STORAGE_KEY = "familyGamesLeague_v1";
+			const MAX_FAMILIES = 10;
+
+			const $ = (id) => document.getElementById(id);
+			const toastEl = $("toast");
+
+			function toast(msg) {
+				toastEl.textContent = msg;
+				toastEl.classList.add("show");
+				clearTimeout(toastEl._t);
+				toastEl._t = setTimeout(() => toastEl.classList.remove("show"), 1600);
+			}
+
+			function uid(prefix = "id") {
+				return (
+					prefix +
+					"_" +
+					Math.random().toString(16).slice(2) +
+					"_" +
+					Date.now().toString(16)
+				);
+			}
+
+			function nowISODate() {
+				const d = new Date();
+				// returns YYYY-MM-DD in local time
+				const pad = (n) => String(n).padStart(2, "0");
+				return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+			}
+
+			// ---------- State ----------
+			const defaultState = () => ({
+				families: [], // {id,name,motto}
+				players: [], // {id,familyId,name,nick,styleDefault,multiplier}
+				matches: [], // {id,sport,famA,famB,scoreA,scoreB,dateISO,notes,mvpPlayerId,mvpBonus}
+			});
+
+			let state = loadState();
+
+			// ---------- Persistence ----------
+			function loadState() {
+				try {
+					const raw = localStorage.getItem(STORAGE_KEY);
+					if (!raw) return defaultState();
+					const parsed = JSON.parse(raw);
+					// minimal shape validation
+					return {
+						families: Array.isArray(parsed.families) ? parsed.families : [],
+						players: Array.isArray(parsed.players) ? parsed.players : [],
+						matches: Array.isArray(parsed.matches) ? parsed.matches : [],
+					};
+				} catch (e) {
+					console.warn("Failed to load state:", e);
+					return defaultState();
+				}
+			}
+			function saveState() {
+				localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+				$("stateHint").textContent = `saved ${new Date().toLocaleTimeString()}`;
+			}
+
+			// ---------- Helpers ----------
+			function familyName(id) {
+				return (
+					state.families.find((f) => f.id === id)?.name || "Unknown family"
+				);
+			}
+			function playerLabel(p) {
+				const nick = p.nick ? ` “${p.nick}”` : "";
+				return `${p.name}${nick} (${familyName(p.familyId)})`;
+			}
+
+			// ---------- UI: selects ----------
+			function refreshSelects() {
+				const famOptions = state.families
+					.slice()
+					.sort((a, b) => a.name.localeCompare(b.name))
+					.map((f) => ({
+						value: f.id,
+						label: f.motto ? `${f.name} — ${f.motto}` : f.name,
+					}));
+
+				const setSelect = (sel, options, placeholder) => {
+					sel.innerHTML = "";
+					if (placeholder) {
+						const opt = document.createElement("option");
+						opt.value = "";
+						opt.textContent = placeholder;
+						sel.appendChild(opt);
+					}
+					for (const o of options) {
+						const opt = document.createElement("option");
+						opt.value = o.value;
+						opt.textContent = o.label;
+						sel.appendChild(opt);
+					}
+				};
+
+				setSelect(
+					$("playerFamily"),
+					famOptions,
+					state.families.length ? "Select family…" : "Add a family first",
+				);
+				setSelect(
+					$("matchFamA"),
+					famOptions,
+					state.families.length ? "Family A…" : "Add families first",
+				);
+				setSelect(
+					$("matchFamB"),
+					famOptions,
+					state.families.length ? "Family B…" : "Add families first",
+				);
+
+				const playerOptions = state.players
+					.slice()
+					.sort((a, b) => a.name.localeCompare(b.name))
+					.map((p) => ({ value: p.id, label: playerLabel(p) }));
+
+				setSelect($("matchMvp"), playerOptions, "No match MVP (optional)");
+			}
+
+			function updateFamilyLimitUI() {
+				const count = state.families.length;
+				const hint = $("familyCountHint");
+				const btn = $("addFamilyBtn");
+				if (hint) hint.textContent = `${count}/${MAX_FAMILIES} families`;
+				if (btn) {
+					const capped = count >= MAX_FAMILIES;
+					btn.disabled = capped;
+					btn.textContent = capped ? "Max families reached" : "Add family";
+				}
+			}
+
+			// ---------- Stats / MVP ----------
+			function computeStats() {
+				// Family stats
+				const famStats = new Map(); // id -> {played,wins,draws,losses,for,against,points}
+				for (const f of state.families) {
+					famStats.set(f.id, {
+						familyId: f.id,
+						played: 0,
+						wins: 0,
+						draws: 0,
+						losses: 0,
+						for: 0,
+						against: 0,
+						points: 0,
+					});
+				}
+
+				// Player stats
+				const playerStats = new Map(); // id -> {playerId, points, wins, style, mvpScore}
+				for (const p of state.players) {
+					playerStats.set(p.id, {
+						playerId: p.id,
+						points: 0,
+						wins: 0,
+						style: 0,
+						mvpScore: 0,
+					});
+				}
+
+				// Process matches
+				for (const m of state.matches) {
+					const a = famStats.get(m.famA);
+					const b = famStats.get(m.famB);
+					if (!a || !b) continue;
+
+					a.played++;
+					b.played++;
+					a.for += m.scoreA;
+					a.against += m.scoreB;
+					b.for += m.scoreB;
+					b.against += m.scoreA;
+
+					if (m.scoreA > m.scoreB) {
+						a.wins++;
+						b.losses++;
+						a.points += 3;
+					} else if (m.scoreB > m.scoreA) {
+						b.wins++;
+						a.losses++;
+						b.points += 3;
+					} else {
+						a.draws++;
+						b.draws++;
+						a.points += 1;
+						b.points += 1;
+					}
+
+					// “Points” contribution to players:
+					// Simple approach: give all players on the family 1 point per team point scored,
+					// then add default style. (You can change this later to track actual scorers.)
+					const playersA = state.players.filter((p) => p.familyId === m.famA);
+					const playersB = state.players.filter((p) => p.familyId === m.famB);
+
+					for (const p of playersA) {
+						const ps = playerStats.get(p.id);
+						ps.points += m.scoreA;
+						ps.style += Number(p.styleDefault || 0);
+						if (m.scoreA > m.scoreB) ps.wins += 1;
+					}
+					for (const p of playersB) {
+						const ps = playerStats.get(p.id);
+						ps.points += m.scoreB;
+						ps.style += Number(p.styleDefault || 0);
+						if (m.scoreB > m.scoreA) ps.wins += 1;
+					}
+
+					// Optional match MVP + bonus style
+					if (m.mvpPlayerId && playerStats.has(m.mvpPlayerId)) {
+						playerStats.get(m.mvpPlayerId).style += Number(m.mvpBonus || 0);
+					}
+				}
+
+				// MVP score formula (tweak here)
+				for (const p of state.players) {
+					const ps = playerStats.get(p.id);
+					const mult = Number(p.multiplier || 1);
+					ps.mvpScore = ps.points + ps.wins * 3 + ps.style * mult;
+				}
+
+				return {
+					families: Array.from(famStats.values()),
+					players: Array.from(playerStats.values()),
+				};
+			}
+
+			// ---------- Render ----------
+			function render() {
+				refreshSelects();
+				updateFamilyLimitUI();
+
+				const stats = computeStats();
+
+				// Family table
+				const famRows = stats.families
+					.slice()
+					.sort(
+						(a, b) =>
+							b.points - a.points || b.for - b.against - (a.for - a.against),
+					)
+					.map(
+						(s, i) => `
+      <tr>
+        <td>
+          <div><b>${i + 1}. ${familyName(s.familyId)}</b></div>
+          <div class="sub">${state.families.find((f) => f.id === s.familyId)?.motto || ""}</div>
+        </td>
+        <td class="right">${s.played}</td>
+        <td class="right">${s.wins}-${s.draws}-${s.losses}</td>
+        <td class="right">${s.for}:${s.against}</td>
+        <td class="right"><b>${s.points}</b></td>
+      </tr>
+    `,
+					)
+					.join("");
+
+				$("familyTableWrap").innerHTML = stats.families.length
+					? `<table>
+        <thead>
+          <tr>
+            <th>Family</th>
+            <th class="right">P</th>
+            <th class="right">W-D-L</th>
+            <th class="right">F:A</th>
+            <th class="right">Pts</th>
+          </tr>
+        </thead>
+        <tbody>${famRows}</tbody>
+      </table>`
+					: `<div class="tiny">No families yet.</div>`;
+
+				// Player table
+				const playerRows = stats.players
+					.slice()
+					.sort((a, b) => b.mvpScore - a.mvpScore)
+					.map((ps, i) => {
+						const p = state.players.find((x) => x.id === ps.playerId);
+						if (!p) return "";
+						return `
+        <tr>
+          <td>
+            <div><b>${i + 1}. ${p.name}${p.nick ? ` “${p.nick}”` : ""}</b></div>
+            <div class="sub">${familyName(p.familyId)} • mult ${Number(p.multiplier || 1).toFixed(1)}</div>
+          </td>
+          <td class="right">${ps.points}</td>
+          <td class="right">${ps.wins}</td>
+          <td class="right">${ps.style}</td>
+          <td class="right"><b>${ps.mvpScore.toFixed(1)}</b></td>
+        </tr>
+      `;
+					})
+					.join("");
+
+				$("playerTableWrap").innerHTML = stats.players.length
+					? `<table>
+        <thead>
+          <tr>
+            <th>Player</th>
+            <th class="right">Pts</th>
+            <th class="right">Wins</th>
+            <th class="right">Style</th>
+            <th class="right">MVP</th>
+          </tr>
+        </thead>
+        <tbody>${playerRows}</tbody>
+      </table>`
+					: `<div class="tiny">No players yet.</div>`;
+
+				// MVP box
+				const top = stats.players
+					.slice()
+					.sort((a, b) => b.mvpScore - a.mvpScore)[0];
+				if (top) {
+					const p = state.players.find((x) => x.id === top.playerId);
+					const title = p
+						? `${p.name}${p.nick ? ` “${p.nick}”` : ""}`
+						: "Unknown";
+					$("mvpBox").innerHTML = `
+      <div style="display:flex; justify-content:space-between; gap:10px; align-items:flex-start;">
+        <div>
+          <div class="badge">🏅 MVP</div>
+          <div style="margin-top:8px; font-size:18px; font-weight:800;">${title}</div>
+          <div class="tiny" style="margin-top:4px;">
+            ${p ? familyName(p.familyId) : ""} • MVP score <b>${top.mvpScore.toFixed(1)}</b>
+          </div>
+        </div>
+        <div class="tiny mono" style="text-align:right;">
+          points=${top.points}<br/>
+          wins=${top.wins}<br/>
+          style=${top.style}
+        </div>
+      </div>
+    `;
+				} else {
+					$("mvpBox").innerHTML =
+						`<div class="tiny">Add players and matches to see MVP.</div>`;
+				}
+
+				// Match log
+				const matchRows = state.matches
+					.slice()
+					.sort(
+						(a, b) =>
+							(b.dateISO || "").localeCompare(a.dateISO || "") ||
+							b.id.localeCompare(a.id),
+					)
+					.map((m) => {
+						const outcome =
+							m.scoreA > m.scoreB
+								? `<span class="winner">${familyName(m.famA)} win</span>`
+								: m.scoreB > m.scoreA
+									? `<span class="winner">${familyName(m.famB)} win</span>`
+									: `<span class="draw">draw</span>`;
+
+						const mvpText = m.mvpPlayerId
+							? (() => {
+									const p = state.players.find((x) => x.id === m.mvpPlayerId);
+									return p ? ` • MVP: <b>${p.name}</b>` : "";
+								})()
+							: "";
+
+						const date = m.dateISO ? m.dateISO : "—";
+						const notes = m.notes
+							? `<div class="sub">📝 ${escapeHTML(m.notes)}</div>`
+							: "";
+						return `
+        <tr>
+          <td>
+            <div><b>${escapeHTML(m.sport || "Match")}</b> <span class="badge">${date}</span></div>
+            <div class="sub">${outcome}${mvpText}</div>
+            ${notes}
+          </td>
+          <td class="right">
+            <div><b>${familyName(m.famA)}</b> ${m.scoreA}</div>
+            <div><b>${familyName(m.famB)}</b> ${m.scoreB}</div>
+          </td>
+          <td class="right">
+            <button class="secondary" data-delmatch="${m.id}">Delete</button>
+          </td>
+        </tr>
+      `;
+					})
+					.join("");
+
+				$("matchLogWrap").innerHTML = state.matches.length
+					? `<table>
+        <thead>
+          <tr>
+            <th>Match</th>
+            <th class="right">Score</th>
+            <th class="right">Actions</th>
+          </tr>
+        </thead>
+        <tbody>${matchRows}</tbody>
+      </table>`
+					: `<div class="tiny">No matches yet.</div>`;
+
+				// wire delete buttons
+				document.querySelectorAll("[data-delmatch]").forEach((btn) => {
+					btn.onclick = () => {
+						const id = btn.getAttribute("data-delmatch");
+						state.matches = state.matches.filter((m) => m.id !== id);
+						saveState();
+						render();
+						toast("Match deleted.");
+					};
+				});
+			}
+
+			function escapeHTML(str) {
+				return String(str)
+					.replaceAll("&", "&amp;")
+					.replaceAll("<", "&lt;")
+					.replaceAll(">", "&gt;")
+					.replaceAll('"', "&quot;")
+					.replaceAll("'", "&#039;");
+			}
+
+			// ---------- Actions ----------
+			$("addFamilyBtn").onclick = () => {
+				const name = $("familyName").value.trim();
+				const motto = $("familyMotto").value.trim();
+
+				if (state.families.length >= MAX_FAMILIES) {
+					return toast(`Maximum of ${MAX_FAMILIES} families reached.`);
+				}
+				if (!name) return toast("Family name required.");
+				if (
+					state.families.some(
+						(f) => f.name.toLowerCase() === name.toLowerCase(),
+					)
+				) {
+					return toast("That family already exists.");
+				}
+
+				state.families.push({ id: uid("fam"), name, motto });
+				$("familyName").value = "";
+				$("familyMotto").value = "";
+				saveState();
+				render();
+				toast("Family added.");
+			};
+
+			$("addPlayerBtn").onclick = () => {
+				const familyId = $("playerFamily").value;
+				const name = $("playerName").value.trim();
+				const nick = $("playerNick").value.trim();
+				const styleDefault = Number($("playerStyleDefault").value || 0);
+				const multiplier = Number($("playerMultiplier").value || 1);
+
+				if (!familyId) return toast("Pick a family first.");
+				if (!name) return toast("Player name required.");
+
+				state.players.push({
+					id: uid("ply"),
+					familyId,
+					name,
+					nick,
+					styleDefault: isFinite(styleDefault) ? styleDefault : 1,
+					multiplier: isFinite(multiplier) ? multiplier : 1,
+				});
+
+				$("playerName").value = "";
+				$("playerNick").value = "";
+				saveState();
+				render();
+				toast("Player added.");
+			};
+
+			$("addMatchBtn").onclick = () => {
+				const sport = $("matchSport").value.trim() || "Match";
+				const famA = $("matchFamA").value;
+				const famB = $("matchFamB").value;
+
+				const scoreA = Number($("matchScoreA").value || 0);
+				const scoreB = Number($("matchScoreB").value || 0);
+				const dateISO = $("matchDate").value || "";
+				const notes = $("matchNotes").value.trim();
+
+				const mvpPlayerId = $("matchMvp").value || "";
+				const mvpBonus = Number($("matchMvpBonus").value || 0);
+
+				if (!famA || !famB) return toast("Choose both families.");
+				if (famA === famB) return toast("Family A and B must be different.");
+				if (
+					!Number.isFinite(scoreA) ||
+					!Number.isFinite(scoreB) ||
+					scoreA < 0 ||
+					scoreB < 0
+				) {
+					return toast("Scores must be 0 or greater.");
+				}
+
+				state.matches.push({
+					id: uid("m"),
+					sport,
+					famA,
+					famB,
+					scoreA: Math.floor(scoreA),
+					scoreB: Math.floor(scoreB),
+					dateISO,
+					notes,
+					mvpPlayerId,
+					mvpBonus: Math.floor(mvpBonus),
+				});
+
+				// small UX reset
+				$("matchSport").value = "";
+				$("matchScoreA").value = 0;
+				$("matchScoreB").value = 0;
+				$("matchNotes").value = "";
+				$("matchMvp").value = "";
+				$("matchMvpBonus").value = 2;
+				if (!$("matchDate").value) $("matchDate").value = nowISODate();
+
+				saveState();
+				render();
+				toast("Match added.");
+			};
+
+			$("resetBtn").onclick = () => {
+				if (
+					!confirm(
+						"Reset everything? This clears families, players, and matches on this device.",
+					)
+				)
+					return;
+				state = defaultState();
+				saveState();
+				render();
+				toast("Reset complete.");
+			};
+
+			$("seedBtn").onclick = () => {
+				state = defaultState();
+
+				const fams = [
+					{ name: "The Ward-Smith's", motto: "Never skip snack time" },
+					{ name: "Team Biscuit", motto: "Powered by tea" },
+					{ name: "The Flip-Flops", motto: "No traction, no fear" },
+				];
+				for (const f of fams) state.families.push({ id: uid("fam"), ...f });
+
+				const pick = (n) => state.families.find((f) => f.name === n).id;
+
+				const players = [
+					{
+						familyId: pick("The Ward-Smith's"),
+						name: "Chris",
+						nick: "Captain Determination",
+						styleDefault: 2,
+						multiplier: 1.1,
+					},
+					{
+						familyId: pick("The Ward-Smith's"),
+						name: "Alice",
+						nick: "Super Mum 6000",
+						styleDefault: 3,
+						multiplier: 1.2,
+					},
+					{
+						familyId: pick("Team Biscuit"),
+						name: "Uncle Dave",
+						nick: "Elbows McGee",
+						styleDefault: 1,
+						multiplier: 1.0,
+					},
+					{
+						familyId: pick("Team Biscuit"),
+						name: "Auntie Jo",
+						nick: "The Ref Whisperer",
+						styleDefault: 2,
+						multiplier: 1.0,
+					},
+					{
+						familyId: pick("The Flip-Flops"),
+						name: "Cousin Sam",
+						nick: "Slide Tackle",
+						styleDefault: 1,
+						multiplier: 1.0,
+					},
+					{
+						familyId: pick("The Flip-Flops"),
+						name: "Gran",
+						nick: "The Enforcer",
+						styleDefault: 4,
+						multiplier: 1.3,
+					},
+				];
+				for (const p of players) state.players.push({ id: uid("ply"), ...p });
+
+				const fa = pick("The Ward-Smith's");
+				const fb = pick("Team Biscuit");
+				const fc = pick("The Flip-Flops");
+				const pAlice = state.players.find((p) => p.name === "Alice").id;
+				const pGran = state.players.find((p) => p.name === "Gran").id;
+
+				state.matches.push({
+					id: uid("m"),
+					sport: "Rounders",
+					famA: fa,
+					famB: fb,
+					scoreA: 6,
+					scoreB: 4,
+					dateISO: nowISODate(),
+					notes: "Ball lost in hedge. Everyone pretended it was strategic.",
+					mvpPlayerId: pAlice,
+					mvpBonus: 3,
+				});
+				state.matches.push({
+					id: uid("m"),
+					sport: "Tug of War",
+					famA: fb,
+					famB: fc,
+					scoreA: 1,
+					scoreB: 1,
+					dateISO: nowISODate(),
+					notes: "Draw declared due to 'rope-related diplomacy'.",
+					mvpPlayerId: "",
+					mvpBonus: 2,
+				});
+				state.matches.push({
+					id: uid("m"),
+					sport: "Penalty Shootout",
+					famA: fa,
+					famB: fc,
+					scoreA: 2,
+					scoreB: 3,
+					dateISO: nowISODate(),
+					notes: "Flip-flops confirmed as performance-enhancing footwear.",
+					mvpPlayerId: pGran,
+					mvpBonus: 4,
+				});
+
+				saveState();
+				render();
+				toast("Seeded example league.");
+			};
+
+			// Export / Import
+			$("exportBtn").onclick = () => {
+				const blob = new Blob([JSON.stringify(state, null, 2)], {
+					type: "application/json",
+				});
+				const url = URL.createObjectURL(blob);
+				const a = document.createElement("a");
+				a.href = url;
+				a.download = "family-games-league.json";
+				document.body.appendChild(a);
+				a.click();
+				a.remove();
+				URL.revokeObjectURL(url);
+				toast("Exported JSON.");
+			};
+
+			$("importBtn").onclick = () => $("importFile").click();
+
+			$("importFile").addEventListener("change", async (e) => {
+				const file = e.target.files?.[0];
+				if (!file) return;
+				try {
+					const text = await file.text();
+					const parsed = JSON.parse(text);
+					if (
+						!parsed ||
+						!Array.isArray(parsed.families) ||
+						!Array.isArray(parsed.players) ||
+						!Array.isArray(parsed.matches)
+					) {
+						return toast("Invalid file format.");
+					}
+					if (parsed.families.length > MAX_FAMILIES) {
+						return toast(`Import has more than ${MAX_FAMILIES} families.`);
+					}
+					state = {
+						families: parsed.families,
+						players: parsed.players,
+						matches: parsed.matches,
+					};
+					saveState();
+					render();
+					toast("Imported JSON.");
+				} catch (err) {
+					console.warn(err);
+					toast("Import failed.");
+				} finally {
+					e.target.value = "";
+				}
+			});
+
+			// Initialize date default
+			if (!$("matchDate").value) $("matchDate").value = nowISODate();
+			render();
+		</script>
+	</body>
+</html>
