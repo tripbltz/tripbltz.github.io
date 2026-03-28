@@ -1,0 +1,861 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Pirata+One&display=swap"
+			rel="stylesheet"
+		/>
+		<title>Astronomican Dice Roller</title>
+		<style>
+			:root {
+				--bg: #0d0f12;
+				--panel: #151a20;
+				--panel-2: #1b2129;
+				--text: #e6ebf2;
+				--muted: #9fb0c3;
+				--accent: #62d3ff;
+				--accent-2: #ffd166;
+				--danger: #ff6b6b;
+				--ok: #2ecc71;
+				--border: #26303b;
+			}
+			* {
+				box-sizing: border-box;
+			}
+			body {
+				margin: 0;
+				min-height: 100vh;
+				font-family:
+					ui-sans-serif,
+					system-ui,
+					-apple-system,
+					"Segoe UI",
+					Roboto,
+					Helvetica,
+					Arial,
+					"Apple Color Emoji",
+					"Segoe UI Emoji";
+				background:
+					radial-gradient(
+						circle at 20% 20%,
+						rgba(98, 211, 255, 0.08),
+						transparent 30%
+					),
+					radial-gradient(
+						circle at 80% 0%,
+						rgba(255, 209, 102, 0.06),
+						transparent 25%
+					),
+					linear-gradient(180deg, #0b0e12, #0a0d11 30%, #0b0e12);
+				color: var(--text);
+			}
+			.container {
+				max-width: 960px;
+				margin: 0 auto;
+				padding: 20px 16px 48px;
+			}
+			header {
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				flex-wrap: wrap;
+				gap: 8px;
+				margin-bottom: 16px;
+			}
+			.title {
+				font-family: "Pirata One", system-ui;
+				font-size: 34px;
+				letter-spacing: 0.5px;
+				margin: 0;
+			}
+			.subtitle {
+				color: var(--muted);
+				font-size: 14px;
+			}
+			.panel {
+				background: linear-gradient(180deg, var(--panel), var(--panel-2));
+				border: 1px solid var(--border);
+				border-radius: 12px;
+				padding: 14px;
+				box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+			}
+			.section-title {
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				gap: 10px;
+				margin: 0 0 10px;
+			}
+			.section-title h2 {
+				margin: 0;
+				font-size: 34px;
+				letter-spacing: 0.5px;
+				font-family: "Pirata One", system-ui;
+				font-weight: 400;
+			}
+			.controls {
+				display: grid;
+				grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+				gap: 10px;
+				align-items: stretch;
+				margin-bottom: 8px;
+			}
+			input[type="text"],
+			input[type="number"] {
+				width: 100%;
+				padding: 12px 14px;
+				border-radius: 10px;
+				border: 1px solid var(--border);
+				background: #0f141a;
+				color: var(--text);
+				font-size: 16px;
+			}
+			input[type="number"]::-webkit-inner-spin-button,
+			input[type="number"]::-webkit-outer-spin-button {
+				opacity: 0;
+			}
+			button {
+				border: 1px solid var(--border);
+				border-radius: 10px;
+				background: linear-gradient(180deg, #0c2730, #0a3b4b);
+				color: #dff6ff;
+				font-size: 18px;
+				padding: 12px 14px;
+				cursor: pointer;
+				transition:
+					transform 120ms ease,
+					box-shadow 120ms ease,
+					border-color 120ms ease;
+			}
+			button:hover {
+				transform: translateY(-1px);
+				border-color: #3a495b;
+				box-shadow: 0 6px 14px rgba(0, 0, 0, 0.35);
+			}
+			button:active {
+				transform: translateY(0);
+			}
+			.inline-toggle {
+				display: inline-flex;
+				align-items: center;
+				gap: 8px;
+				font-size: 14px;
+				color: var(--muted);
+			}
+			.sub {
+				color: var(--muted);
+				font-size: 14px;
+				line-height: 1.5;
+			}
+			.dice-anim {
+				display: flex;
+				gap: 10px;
+				flex-wrap: wrap;
+				align-items: center;
+				justify-content: center;
+				margin-top: 12px;
+				padding: 12px;
+				border: 1px dashed var(--border);
+				border-radius: 12px;
+				background: #0f141a;
+			}
+			.die {
+				width: var(--die-size, 32px);
+				height: var(--die-size, 32px);
+				border-radius: 8px;
+				border: 1px solid var(--border);
+				background: #111720;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				font-weight: 700;
+				font-size: calc(var(--die-size, 32px) * 0.6);
+				color: #e6ebf2;
+			}
+			.die.spin {
+				animation: dice-spin 300ms linear infinite;
+			}
+			@keyframes dice-spin {
+				0% {
+					transform: rotate(0);
+				}
+				50% {
+					transform: rotate(10deg);
+				}
+				100% {
+					transform: rotate(0);
+				}
+			}
+			.dice-highlight {
+				background: #9cff9c !important;
+				border-color: #28a428 !important;
+				color: #000;
+				font-weight: 700;
+			}
+			.dice-six {
+				background: #2c0f0f !important;
+				border-color: #ff6b6b !important;
+				color: #ffdede;
+				box-shadow: 0 0 0 1px rgba(255, 107, 107, 0.35);
+			}
+			.dice-one {
+				background: #3a3005 !important;
+				border-color: #f4d35e !important;
+				color: #ffe9a0;
+				box-shadow: 0 0 0 1px rgba(244, 211, 94, 0.3);
+			}
+			.more-badge {
+				font-size: 11px;
+				color: var(--muted);
+				border: 1px dashed var(--border);
+				border-radius: 999px;
+				padding: 4px 8px;
+			}
+			.dice-success-badge {
+				display: inline-flex;
+				align-items: center;
+				gap: 8px;
+				padding: 6px 10px;
+				border-radius: 999px;
+				border: 1px solid var(--border);
+				background: #131a23;
+				font-weight: 700;
+				color: #e6ebf2;
+				margin-top: 10px;
+			}
+			.dice-badge-detail {
+				font-weight: 600;
+				color: var(--muted);
+				font-size: 12px;
+				background: rgba(255, 255, 255, 0.04);
+				border-radius: 8px;
+				padding: 4px 6px;
+			}
+			.dice-summary {
+				margin-top: 8px;
+				font-size: 15px;
+				opacity: 0.9;
+			}
+			.saving-checker {
+				margin-top: 18px;
+				padding-top: 14px;
+				border-top: 1px solid var(--border);
+			}
+			.saving-checker .saving-inputs {
+				display: grid;
+				grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+				gap: 10px;
+				margin: 10px 0;
+			}
+			.saving-checker label {
+				display: flex;
+				flex-direction: column;
+				gap: 6px;
+				font-size: 13px;
+				color: var(--muted);
+			}
+			.saving-result {
+				font-weight: 700;
+				font-size: 18px;
+				color: var(--accent);
+			}
+			.saving-rule {
+				font-size: 12px;
+				color: var(--muted);
+				margin-top: 4px;
+			}
+			.saving-table {
+				margin-top: 10px;
+				border: 1px solid var(--border);
+				border-radius: 8px;
+				overflow: hidden;
+				font-size: 11px;
+				display: none;
+			}
+			.saving-table.visible {
+				display: block;
+			}
+			.saving-table .row {
+				display: grid;
+				grid-template-columns: repeat(11, minmax(22px, 1fr));
+				border-bottom: 1px solid var(--border);
+			}
+			.saving-table .row:last-child {
+				border-bottom: none;
+			}
+			.saving-table .cell {
+				padding: 6px 4px;
+				text-align: center;
+			}
+			.saving-table .head {
+				background: #121820;
+				font-weight: 700;
+			}
+			.saving-table .muted {
+				color: var(--muted);
+			}
+			.spin-field {
+				touch-action: none;
+				min-height: 52px;
+				font-size: 18px;
+			}
+			.pill {
+				display: inline-flex;
+				align-items: center;
+				gap: 6px;
+				padding: 6px 10px;
+				border-radius: 999px;
+				border: 1px solid var(--border);
+				background: #121820;
+				color: #cfe4ff;
+				font-size: 13px;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="container">
+			<header>
+				<div>
+					<div class="title">⚙️ Astronomican</div>
+					<!----
+					<div class="subtitle">Focused dice roller with wound helper</div>
+					--->
+				</div>
+				<!---
+				<div class="pill">10th Edition</div>
+				-->
+			</header>
+
+			<section class="panel">
+				<div class="section-title">
+					<h2>Dice Roller</h2>
+					<label class="inline-toggle">
+						<input type="checkbox" id="diceTypingToggle" />
+						Type manually
+					</label>
+				</div>
+
+				<div class="controls">
+					<input
+						id="diceExpr"
+						type="number"
+						min="1"
+						max="100"
+						step="1"
+						inputmode="numeric"
+						class="spin-field"
+						placeholder="Rolls (default d6), 1-100"
+					/>
+					<button id="btnRoll" type="button">Roll</button>
+					<input
+						id="diceHighlight"
+						type="number"
+						min="0"
+						max="100"
+						step="1"
+						inputmode="numeric"
+						class="spin-field"
+						placeholder="Highlight rolls ≥"
+					/>
+				</div>
+
+				<p class="sub" id="diceHelp">
+					Examples: <code>d6</code> (roll one D6), <code>6d6+2</code> (roll six
+					D6 and add 2), <code>3d10-1</code>, or just <code>20</code> (roll
+					twenty D6).
+				</p>
+
+				<div id="diceAnim" class="dice-anim"></div>
+				<div id="diceOut" class="dice-summary"></div>
+
+				<div class="saving-checker">
+					<div class="section-title">
+						<h2>Saving Roll Checker</h2>
+						<button
+							id="woundTableToggle"
+							type="button"
+							style="font-size: 14px; padding: 8px 10px"
+						>
+							Show S/T table
+						</button>
+					</div>
+					<p class="sub">
+						Enter attacker Strength (S) and target Toughness (T).
+					</p>
+					<div class="saving-inputs">
+						<label for="woundStr"
+							>Strength (S)
+							<input
+								type="number"
+								id="woundStr"
+								min="1"
+								max="30"
+								inputmode="numeric"
+								value="4"
+							/>
+						</label>
+						<label for="woundTough"
+							>Toughness (T)
+							<input
+								type="number"
+								id="woundTough"
+								min="1"
+								max="30"
+								inputmode="numeric"
+								value="4"
+							/>
+						</label>
+					</div>
+					<div id="woundResult" class="saving-result">Wounds on 4+</div>
+					<div id="woundRule" class="saving-rule">S = T → 4+</div>
+					<div
+						class="saving-table"
+						id="woundTable"
+						aria-label="S vs T table"
+						hidden
+					></div>
+				</div>
+			</section>
+		</div>
+
+		<audio id="diceSound" src="sounds/dice-roll.mp3" preload="auto"></audio>
+
+		<script>
+			// =============================
+			// Dice helpers
+			// =============================
+			function attachSwipeSpinner(input, opts = {}) {
+				if (!input) return;
+				const min = Number.isFinite(opts.min) ? opts.min : 0;
+				const max = Number.isFinite(opts.max) ? opts.max : 100;
+				const step = Number.isFinite(opts.step) ? opts.step : 1;
+				const shouldBlock = () => window.__diceTypingMode;
+
+				const clampVal = (v) => Math.max(min, Math.min(max, v));
+				const parseVal = () => {
+					const raw = input.value.trim();
+					const num = Number(raw);
+					if (Number.isFinite(num)) return num;
+					if (raw === "") return min;
+					return null; // allow typed expressions
+				};
+				const applyDelta = (delta) => {
+					if (shouldBlock()) return;
+					const current = parseVal();
+					if (current === null) return;
+					const next = clampVal(current + delta);
+					if (next === current) return;
+					input.value = String(next);
+					input.dispatchEvent(new Event("input", { bubbles: true }));
+				};
+
+				input.addEventListener("wheel", (e) => {
+					if (shouldBlock()) return;
+					e.preventDefault();
+					const delta = e.deltaY < 0 ? step : -step;
+					applyDelta(delta);
+				});
+
+				let touchStartY = null;
+				input.addEventListener("touchstart", (e) => {
+					if (shouldBlock()) return;
+					if (!e.touches || !e.touches.length) return;
+					touchStartY = e.touches[0].clientY;
+					e.preventDefault();
+				});
+				input.addEventListener("touchmove", (e) => {
+					if (shouldBlock()) return;
+					if (touchStartY == null || !e.touches || !e.touches.length) return;
+					const y = e.touches[0].clientY;
+					const dy = touchStartY - y;
+					const threshold = 18;
+					if (Math.abs(dy) >= threshold) {
+						const delta = dy > 0 ? step : -step;
+						applyDelta(delta);
+						touchStartY = y;
+						e.preventDefault();
+					}
+				});
+				input.addEventListener("touchend", () => {
+					touchStartY = null;
+				});
+			}
+
+			function parseDiceExpr(expr) {
+				expr = (expr || "").toString().trim();
+				if (!expr) return null;
+				const m =
+					expr.match(/^(\d+)?d(\d+)([+-]\d+)?$/i) || expr.match(/^(\d+)$/);
+				if (!m) return null;
+				if (m[0].includes("d")) {
+					const num = parseInt(m[1] || "1", 10);
+					const sides = parseInt(m[2], 10);
+					const mod = m[3] ? parseInt(m[3], 10) : 0;
+					return { num, sides, mod };
+				}
+				const num = parseInt(m[1], 10);
+				return { num, sides: 6, mod: 0 };
+			}
+
+			function rollDice(num, sides) {
+				const out = [];
+				for (let i = 0; i < num; i++)
+					out.push(1 + Math.floor(Math.random() * sides));
+				return out;
+			}
+
+			function doRoll(expr, tn) {
+				const spec = parseDiceExpr(expr);
+				if (!spec) return { err: "Bad expression" };
+				const rolls = rollDice(spec.num, spec.sides);
+				const total = rolls.reduce((a, b) => a + b, 0) + spec.mod;
+				let successes = null;
+				if (tn && Number.isFinite(tn))
+					successes = rolls.filter((v) => v >= tn).length;
+				return { spec, rolls, total, successes };
+			}
+
+			function renderDiceFaces(container, num, sides) {
+				container.innerHTML = "";
+				const maxShow = Math.min(num, 50);
+				const baseSize = 56;
+				const scaleFactor = Math.max(0.4, 1 - (maxShow - 1) * 0.01);
+				const sizePx = Math.max(16, Math.round(baseSize * scaleFactor));
+				container.style.setProperty("--die-size", `${sizePx}px`);
+				for (let i = 0; i < maxShow; i++) {
+					const d = document.createElement("div");
+					d.className = "die spin";
+					d.textContent =
+						1 + Math.floor(Math.random() * Math.max(2, Math.min(20, sides)));
+					container.appendChild(d);
+				}
+				if (num > maxShow) {
+					const more = document.createElement("span");
+					more.className = "more-badge";
+					more.textContent = `+${num - maxShow} more`;
+					container.appendChild(more);
+				}
+			}
+
+			function tickDiceFaces(container, sides) {
+				container.querySelectorAll(".die").forEach((d) => {
+					d.textContent =
+						1 + Math.floor(Math.random() * Math.max(2, Math.min(20, sides)));
+				});
+			}
+
+			function applyDiceHighlightAndSummary(
+				container,
+				rolls,
+				spec,
+				threshold,
+				successes,
+			) {
+				const diceEls = container.querySelectorAll(".die");
+				const maxShow = Math.min(spec.num, diceEls.length);
+
+				for (let i = 0; i < maxShow; i++) {
+					const val = rolls[i];
+					const el = diceEls[i];
+					el.textContent = val;
+					el.classList.remove("dice-highlight", "dice-six", "dice-one");
+					if (val === 6) el.classList.add("dice-six");
+					else if (val === 1) el.classList.add("dice-one");
+					else if (Number.isFinite(threshold) && val >= threshold)
+						el.classList.add("dice-highlight");
+				}
+
+				const outEl = document.getElementById("diceOut");
+				if (!outEl) return;
+				const badge = document.createElement("span");
+				badge.className = "dice-success-badge";
+				const sixes = rolls.filter((v) => v === 6).length;
+				const ones = rolls.filter((v) => v === 1).length;
+				const total = rolls.reduce((a, b) => a + b, 0) + (spec.mod || 0);
+
+				if (Number.isFinite(threshold) && typeof successes === "number") {
+					badge.innerHTML = `<strong style="font-size:18px">${successes} ≥ ${threshold}+</strong>`;
+				} else {
+					badge.innerHTML = `<strong style="font-size:16px">No threshold</strong>`;
+				}
+				const sixEl = document.createElement("span");
+				sixEl.className = "dice-badge-detail";
+				sixEl.textContent = `6s: ${sixes}`;
+				const oneEl = document.createElement("span");
+				oneEl.className = "dice-badge-detail";
+				oneEl.textContent = `1s: ${ones}`;
+				badge.appendChild(sixEl);
+				badge.appendChild(oneEl);
+
+				const summary = document.createElement("div");
+				summary.className = "dice-summary";
+				const modText = spec.mod
+					? spec.mod > 0
+						? ` + ${spec.mod}`
+						: ` - ${Math.abs(spec.mod)}`
+					: "";
+				summary.textContent = `${spec.num}d${spec.sides}${modText} → total ${total} (rolls: ${rolls.join(", ")})`;
+
+				outEl.innerHTML = "";
+				outEl.appendChild(badge);
+				outEl.appendChild(summary);
+			}
+
+			function runDiceAnimation(spec, finalRolls, threshold, successes) {
+				return new Promise((resolve) => {
+					const anim = document.getElementById("diceAnim");
+					if (!anim) return resolve();
+					renderDiceFaces(anim, spec.num, spec.sides);
+
+					const start = performance.now();
+					const duration = Math.min(1500, 400 + spec.num * 80);
+					const interval = setInterval(
+						() => tickDiceFaces(anim, spec.sides),
+						90,
+					);
+
+					function end() {
+						clearInterval(interval);
+						anim
+							.querySelectorAll(".die")
+							.forEach((d) => d.classList.remove("spin"));
+						applyDiceHighlightAndSummary(
+							anim,
+							finalRolls,
+							spec,
+							threshold,
+							successes,
+						);
+						resolve();
+					}
+
+					const raf = (t) => {
+						if (t - start >= duration) return end();
+						requestAnimationFrame(raf);
+					};
+					requestAnimationFrame(raf);
+				});
+			}
+
+			// =============================
+			// Saving roll helper
+			// =============================
+			function woundRollNeeded(str, tough) {
+				if (
+					!Number.isFinite(str) ||
+					!Number.isFinite(tough) ||
+					str <= 0 ||
+					tough <= 0
+				)
+					return null;
+				if (str >= tough * 2) return "2+";
+				if (str > tough) return "3+";
+				if (str === tough) return "4+";
+				if (str * 2 <= tough) return "6+";
+				return "5+";
+			}
+
+			function woundRuleText(str, tough, result) {
+				if (!result) return "Enter Strength and Toughness.";
+				if (str >= tough * 2) return "S ≥ 2T → 2+";
+				if (str > tough) return "S > T → 3+";
+				if (str === tough) return "S = T → 4+";
+				if (str * 2 <= tough) return "S ≤ T/2 → 6+";
+				return "S < T → 5+";
+			}
+
+			function updateWoundHelper() {
+				const sEl = document.getElementById("woundStr");
+				const tEl = document.getElementById("woundTough");
+				const out = document.getElementById("woundResult");
+				const rule = document.getElementById("woundRule");
+				if (!sEl || !tEl || !out || !rule) return;
+				const s = parseInt(sEl.value, 10);
+				const t = parseInt(tEl.value, 10);
+				const res = woundRollNeeded(s, t);
+				out.textContent = res ? `Wounds on ${res}` : "—";
+				rule.textContent = woundRuleText(s, t, res);
+			}
+
+			function renderWoundTable() {
+				const tbl = document.getElementById("woundTable");
+				if (!tbl) return;
+				tbl.innerHTML = "";
+				const header = document.createElement("div");
+				header.className = "row head";
+				const corner = document.createElement("div");
+				corner.className = "cell muted";
+				corner.textContent = "S↓ / T→";
+				header.appendChild(corner);
+				for (let t = 1; t <= 10; t++) {
+					const cell = document.createElement("div");
+					cell.className = "cell head";
+					cell.textContent = t;
+					header.appendChild(cell);
+				}
+				tbl.appendChild(header);
+
+				for (let s = 1; s <= 10; s++) {
+					const row = document.createElement("div");
+					row.className = "row";
+					const head = document.createElement("div");
+					head.className = "cell head";
+					head.textContent = s;
+					row.appendChild(head);
+					for (let t = 1; t <= 10; t++) {
+						const cell = document.createElement("div");
+						cell.className = "cell";
+						cell.textContent = woundRollNeeded(s, t) || "–";
+						row.appendChild(cell);
+					}
+					tbl.appendChild(row);
+				}
+			}
+
+			function toggleWoundTable() {
+				const tbl = document.getElementById("woundTable");
+				const btn = document.getElementById("woundTableToggle");
+				if (!tbl || !btn) return;
+				const willShow = tbl.hidden;
+				tbl.hidden = !willShow;
+				tbl.classList.toggle("visible", willShow);
+				btn.textContent = willShow ? "Hide S/T table" : "Show S/T table";
+			}
+
+			// =============================
+			// Init bindings
+			// =============================
+			window.__diceTypingMode = false;
+			const diceExpr = document.getElementById("diceExpr");
+			const diceHighlightInput = document.getElementById("diceHighlight");
+			const diceTypingToggle = document.getElementById("diceTypingToggle");
+
+			attachSwipeSpinner(diceExpr, { min: 1, max: 100, step: 1 });
+			attachSwipeSpinner(diceHighlightInput, { min: 0, max: 100, step: 1 });
+
+			function clampDiceNumber(el) {
+				if (!el) return;
+				const n = parseInt(el.value, 10);
+				if (!Number.isFinite(n)) {
+					el.value = "";
+					return;
+				}
+				const min = Number(el.getAttribute("min") ?? "0");
+				const max = Number(el.getAttribute("max") ?? "100");
+				el.value = String(Math.max(min, Math.min(max, n)));
+			}
+
+			function applyDiceTypingMode() {
+				const enabled = !!window.__diceTypingMode;
+				if (diceExpr) {
+					if (enabled) {
+						diceExpr.type = "text";
+						diceExpr.inputMode = "text";
+						diceExpr.readOnly = false;
+						diceExpr.placeholder = "e.g. 6d6+2 or 2d3";
+					} else {
+						diceExpr.type = "number";
+						diceExpr.min = "1";
+						diceExpr.max = "100";
+						diceExpr.step = "1";
+						diceExpr.inputMode = "numeric";
+						diceExpr.readOnly = false;
+						diceExpr.placeholder = "Rolls (default d6), 1-100";
+						clampDiceNumber(diceExpr);
+					}
+				}
+				if (diceHighlightInput) {
+					diceHighlightInput.type = "number";
+					diceHighlightInput.min = "0";
+					diceHighlightInput.max = "100";
+					diceHighlightInput.step = "1";
+					diceHighlightInput.inputMode = "numeric";
+					diceHighlightInput.readOnly = false;
+					clampDiceNumber(diceHighlightInput);
+				}
+			}
+
+			const maybeShowPicker = (el) => {
+				if (!el || window.__diceTypingMode) return;
+				if (typeof el.showPicker === "function") {
+					try {
+						el.showPicker();
+					} catch (_) {
+						/* ignore */
+					}
+				}
+			};
+
+			if (diceExpr)
+				["focus", "pointerdown"].forEach((ev) =>
+					diceExpr.addEventListener(ev, () => maybeShowPicker(diceExpr)),
+				);
+			if (diceHighlightInput)
+				["focus", "pointerdown"].forEach((ev) =>
+					diceHighlightInput.addEventListener(ev, () =>
+						maybeShowPicker(diceHighlightInput),
+					),
+				);
+
+			if (diceTypingToggle) {
+				diceTypingToggle.addEventListener("change", (e) => {
+					window.__diceTypingMode = !!e.target.checked;
+					applyDiceTypingMode();
+					if (window.__diceTypingMode && diceExpr) diceExpr.focus();
+				});
+			}
+			applyDiceTypingMode();
+
+			document.getElementById("btnRoll").addEventListener("click", () => {
+				const diceSound = document.getElementById("diceSound");
+				if (diceSound) {
+					diceSound.currentTime = 0;
+					diceSound.play().catch(() => {});
+				}
+
+				const expr = diceExpr.value.trim();
+				const tnVal = parseInt(diceHighlightInput.value, 10);
+				const threshold = Number.isFinite(tnVal) ? tnVal : null;
+				const res = doRoll(expr, threshold);
+				if (res.err) {
+					const out = document.getElementById("diceOut");
+					if (out) out.textContent = res.err;
+					const anim = document.getElementById("diceAnim");
+					if (anim) anim.innerHTML = "";
+					return;
+				}
+				const out = document.getElementById("diceOut");
+				if (out) out.textContent = "Rolling…";
+				runDiceAnimation(res.spec, res.rolls, threshold, res.successes);
+			});
+
+			// Enter key triggers roll
+			[diceExpr, diceHighlightInput].forEach((inp) => {
+				if (inp) {
+					inp.addEventListener("focus", () => inp.select());
+					inp.addEventListener("click", () => inp.select());
+					inp.addEventListener("keydown", (e) => {
+						if (e.key === "Enter") {
+							e.preventDefault();
+							document.getElementById("btnRoll").click();
+						}
+					});
+				}
+			});
+
+			// Wound helper bindings
+			["woundStr", "woundTough"].forEach((id) => {
+				const el = document.getElementById(id);
+				if (el) el.addEventListener("input", updateWoundHelper);
+			});
+			const woundToggle = document.getElementById("woundTableToggle");
+			if (woundToggle) woundToggle.addEventListener("click", toggleWoundTable);
+			renderWoundTable();
+			updateWoundHelper();
+		</script>
+	</body>
+</html>
