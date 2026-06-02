@@ -64,8 +64,9 @@
 
       .brand-logo {
         width: 12rem;
-        height: 12rem;
-        object-fit: contain;
+        height: 6rem;
+        object-fit: cover;
+        object-position: center;
       }
 
       #openImportBtn {
@@ -343,6 +344,11 @@
         min-width: 0;
       }
 
+      .modifier-column {
+        border-left: 1px solid #444;
+        padding-left: 16px;
+      }
+
       .target-panel input {
         width: 60px;
         margin-left: 5px;
@@ -356,7 +362,7 @@
 
       .target-row {
         display: grid;
-        grid-template-columns: minmax(140px, 1fr) 70px auto;
+        grid-template-columns: minmax(140px, 1fr) 86px auto;
         gap: 8px;
         align-items: center;
       }
@@ -364,6 +370,12 @@
       .target-row input[type="text"] {
         width: 100%;
         box-sizing: border-box;
+      }
+
+      .target-toughness {
+        width: 100%;
+        min-height: 40px;
+        margin: 0;
       }
 
       .remove-target {
@@ -378,6 +390,17 @@
 
       .remove-target:disabled {
         opacity: 0.35;
+      }
+
+      .add-target-icon {
+        justify-self: start;
+        background: transparent;
+        border: 0;
+        color: #00ff88;
+        font-size: 1.45rem;
+        line-height: 1;
+        margin: 0;
+        padding: 0 2px;
       }
 
       .target-select {
@@ -404,6 +427,13 @@
       @media (max-width: 760px) {
         .target-modifier-columns {
           grid-template-columns: 1fr;
+        }
+
+        .modifier-column {
+          border-left: 0;
+          border-top: 1px solid #444;
+          padding-left: 0;
+          padding-top: 12px;
         }
       }
 
@@ -552,7 +582,7 @@
 
         .brand-logo {
           width: 9.4rem;
-          height: 9.4rem;
+          height: 4.7rem;
         }
 
         #openImportBtn,
@@ -560,10 +590,14 @@
         #closeImportBtn,
         #rollAttacksBtn,
         #rollHitsBtn,
-        #rollWoundsBtn,
-        #addTargetBtn {
+        #rollWoundsBtn {
           min-height: 44px;
           width: 100%;
+        }
+
+        .add-target-icon {
+          min-height: 34px;
+          width: auto;
         }
 
         .target-panel,
@@ -576,7 +610,7 @@
         }
 
         .target-row {
-          grid-template-columns: minmax(0, 1fr) 58px 28px;
+          grid-template-columns: minmax(0, 1fr) 74px 28px;
           gap: 6px;
         }
 
@@ -736,7 +770,6 @@
       <div class="target-modifier-columns">
         <div class="target-column">
           <h2>Target toughness</h2>
-          <button id="addTargetBtn" type="button">Add Target</button>
           <div id="targets" class="target-list"></div>
         </div>
         <div class="modifier-column">
@@ -946,10 +979,6 @@
         renderArmy();
         updateAttackPool();
         closeImportModal();
-      });
-
-      document.getElementById("addTargetBtn").addEventListener("click", () => {
-        addTarget();
       });
 
       document
@@ -1347,20 +1376,36 @@
         updateAttackPool();
       }
 
+      function renderToughnessOptions(selectedToughness) {
+        return Array.from({ length: 20 }, (_, index) => index + 1)
+          .map(
+            (value) =>
+              `<option value="${value}" ${Number(selectedToughness) === value ? "selected" : ""}>T${value}</option>`,
+          )
+          .join("");
+      }
+
       function renderTargets() {
         const container = document.getElementById("targets");
 
-        container.innerHTML = targets
+        const targetRows = targets
           .map(
             (target) => `
 	      						<div class="target-row">
 	      							<input type="text" class="target-name" data-id="${target.id}" value="${escapeHtml(target.name)}">
-	      							<input type="number" class="target-toughness" data-id="${target.id}" value="${target.toughness}" min="1" max="20" aria-label="Target toughness">
+	      							<select class="target-toughness" data-id="${target.id}" aria-label="Target toughness">
+                        ${renderToughnessOptions(target.toughness)}
+                      </select>
 		      							<button type="button" class="remove-target" data-id="${target.id}" aria-label="Remove target" title="Remove target" ${targets.length <= 1 ? "disabled" : ""}>×</button>
 	      						</div>
       					`,
           )
           .join("");
+
+        container.innerHTML = `
+          ${targetRows}
+          <button type="button" class="add-target-icon" aria-label="Add target" title="Add target">+</button>
+        `;
 
         container.querySelectorAll(".target-name").forEach((input) => {
           input.addEventListener("input", () => {
@@ -1372,11 +1417,11 @@
           });
         });
 
-        container.querySelectorAll(".target-toughness").forEach((input) => {
-          input.addEventListener("input", () => {
-            const target = getTargetById(input.dataset.id);
+        container.querySelectorAll(".target-toughness").forEach((select) => {
+          select.addEventListener("change", () => {
+            const target = getTargetById(select.dataset.id);
             if (!target) return;
-            target.toughness = Math.max(1, Number(input.value) || 1);
+            target.toughness = Math.max(1, Number(select.value) || 1);
             updateAttackPool();
           });
         });
@@ -1386,6 +1431,10 @@
             removeTarget(button.dataset.id);
           });
         });
+
+        container
+          .querySelector(".add-target-icon")
+          .addEventListener("click", addTarget);
       }
 
       function renderTargetOptions(selectedTargetId) {
