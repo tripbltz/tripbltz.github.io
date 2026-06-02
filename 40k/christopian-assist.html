@@ -154,21 +154,9 @@
 
       .unit-header {
         display: grid;
-        grid-template-columns: auto minmax(0, 1fr) auto;
+        grid-template-columns: minmax(0, 1fr) auto;
         gap: 10px;
         align-items: center;
-      }
-
-      .unit-checkbox {
-        width: 28px;
-        height: 28px;
-        border-radius: 6px;
-      }
-
-      .unit-checkbox::before {
-        width: 14px;
-        height: 14px;
-        border-radius: 3px;
       }
 
       .unit-name-input {
@@ -203,6 +191,27 @@
         display: flex;
         gap: 6px;
         flex-wrap: wrap;
+      }
+
+      .unit-weapon-filters {
+        display: flex;
+        gap: 6px;
+        flex-wrap: wrap;
+      }
+
+      .unit-weapon-filter {
+        margin: 0;
+        padding: 4px 8px;
+        border: 1px solid #444;
+        border-radius: 6px;
+        background: #1a1a1a;
+        color: #ddd;
+        font-size: 0.85rem;
+      }
+
+      .unit-weapon-filter.active {
+        border-color: #00ff88;
+        background: #123326;
       }
 
       .hidden-unit-chip {
@@ -603,7 +612,7 @@
         }
 
         .unit-header {
-          grid-template-columns: 34px minmax(0, 1fr) 28px;
+          grid-template-columns: minmax(0, 1fr) 28px;
         }
 
         .unit-name-input {
@@ -771,6 +780,22 @@
 
     <div class="units-heading">
       <h2>Units</h2>
+      <div class="unit-weapon-filters">
+        <button
+          type="button"
+          class="unit-weapon-filter active"
+          data-filter="ranged"
+        >
+          Ranged
+        </button>
+        <button
+          type="button"
+          class="unit-weapon-filter active"
+          data-filter="melee"
+        >
+          Melee
+        </button>
+      </div>
       <div id="hiddenUnits" class="hidden-units"></div>
     </div>
 
@@ -798,6 +823,10 @@
       let targets = [{ id: 1, name: "Target 1", toughness: 4 }];
       let nextTargetId = 2;
       let combinedArmsActive = false;
+      let unitWeaponFilters = {
+        ranged: true,
+        melee: true,
+      };
       const weaponLookup = new Map();
 
       ////////////////////////////////////////////////////
@@ -1245,6 +1274,12 @@
         return Boolean(profile) && range !== "melee";
       }
 
+      function isWeaponRowVisible(weapon) {
+        const isMelee = isMeleeWeaponName(weapon.name);
+
+        return isMelee ? unitWeaponFilters.melee : unitWeaponFilters.ranged;
+      }
+
       function calculateWeaponCounts(unit, aliveOnly = true) {
         const counts = new Map();
 
@@ -1371,6 +1406,10 @@
           .replace(/'/g, "&#039;");
       }
 
+      function unitHasEnabledWeapons(unit) {
+        return unit.weapons.some((weapon) => weapon.enabled !== false);
+      }
+
       function killModelWithWeapon(unit, weaponName) {
         const model = unit.models.find(
           (candidate) =>
@@ -1433,14 +1472,15 @@
             const div = document.createElement("div");
             const livingWeaponCounts = calculateWeaponCounts(unit);
             const originalWeaponCounts = calculateWeaponCounts(unit, false);
+            const hasEnabledWeapons = unitHasEnabledWeapons(unit);
 
+            unit.selected = hasEnabledWeapons;
             div.className = "unit-card";
-            if (unit.selected) {
+            if (hasEnabledWeapons) {
               div.classList.add("selected");
             }
             div.innerHTML = `
 		      <div class="unit-header">
-		      	<input type="checkbox" class="unit-checkbox" ${unit.selected ? "checked" : ""}>
 		      	<input type="text" class="unit-name-input" value="${escapeHtml(unit.displayName)}">
 		      	<button type="button" class="collapse-unit" aria-label="Hide unit" title="Hide unit">−</button>
 		      </div>
@@ -1451,15 +1491,17 @@
 	      	<hr>
 			    <div class="weapon">Models Alive: ${unit.models.filter((m) => m.alive).length}/${unit.models.length || 0}</div>
 			    <div class="weapon">Weapons / casualties</div>
-			        ${unit.weapons
-                .map((w, index) => {
-                  const sourceName = w.sourceName || w.name;
-                  const activeCount = livingWeaponCounts.get(sourceName) || 0;
-                  const originalCount =
-                    originalWeaponCounts.get(sourceName) || w.count;
-                  const casualties = originalCount - activeCount;
+				    ${unit.weapons
+              .map((weapon, index) => ({ weapon, index }))
+              .filter(({ weapon }) => isWeaponRowVisible(weapon))
+              .map(({ weapon: w, index }) => {
+                const sourceName = w.sourceName || w.name;
+                const activeCount = livingWeaponCounts.get(sourceName) || 0;
+                const originalCount =
+                  originalWeaponCounts.get(sourceName) || w.count;
+                const casualties = originalCount - activeCount;
 
-                  return `
+                return `
 	      		<div class="weapon-row">
       			<label class="weapon">
       				<input
@@ -1477,19 +1519,10 @@
 	      			</div>
 	      		</div>
 	      	`;
-                })
-                .join("")}
+              })
+              .join("")}
 	      </div>
 	      `;
-
-            const checkbox = div.querySelector(".unit-checkbox");
-
-            checkbox.addEventListener("change", () => {
-              unit.selected = checkbox.checked;
-
-              div.classList.toggle("selected", checkbox.checked);
-              updateAttackPool();
-            });
 
             const unitNameInput = div.querySelector(".unit-name-input");
             unitNameInput.addEventListener("input", () => {
@@ -1515,6 +1548,8 @@
                 weaponCheckbox.addEventListener("change", () => {
                   const weaponIndex = Number(weaponCheckbox.dataset.index);
                   unit.weapons[weaponIndex].enabled = weaponCheckbox.checked;
+                  unit.selected = unitHasEnabledWeapons(unit);
+                  div.classList.toggle("selected", unit.selected);
                   updateAttackPool();
                 });
               });
@@ -1753,46 +1788,44 @@
       function buildCurrentPool() {
         const pool = [];
 
-        parsedArmy
-          .filter((unit) => unit.selected)
-          .forEach((unit) => {
-            const livingWeaponCounts = calculateWeaponCounts(unit);
-            const originalWeaponCounts = calculateWeaponCounts(unit, false);
+        parsedArmy.filter(unitHasEnabledWeapons).forEach((unit) => {
+          const livingWeaponCounts = calculateWeaponCounts(unit);
+          const originalWeaponCounts = calculateWeaponCounts(unit, false);
 
-            unit.weapons
-              .filter((weapon) => weapon.enabled !== false)
-              .forEach((weapon) => {
-                const profile = getWeaponProfile(weapon.name);
-                if (!profile) {
-                  console.warn(
-                    "Missing weapon profile:",
-                    weapon.name,
-                    "Unit:",
-                    unit.displayName,
-                  );
-                  return;
-                }
+          unit.weapons
+            .filter((weapon) => weapon.enabled !== false)
+            .forEach((weapon) => {
+              const profile = getWeaponProfile(weapon.name);
+              if (!profile) {
+                console.warn(
+                  "Missing weapon profile:",
+                  weapon.name,
+                  "Unit:",
+                  unit.displayName,
+                );
+                return;
+              }
 
-                const sourceName = weapon.sourceName || weapon.name;
-                const activeCount = livingWeaponCounts.get(sourceName) || 0;
-                if (activeCount <= 0) return;
-                const originalCount =
-                  originalWeaponCounts.get(sourceName) || weapon.count;
+              const sourceName = weapon.sourceName || weapon.name;
+              const activeCount = livingWeaponCounts.get(sourceName) || 0;
+              if (activeCount <= 0) return;
+              const originalCount =
+                originalWeaponCounts.get(sourceName) || weapon.count;
 
-                pool.push({
-                  id: `${unit.id}-${weapon.name}`,
-                  unitId: unit.id,
-                  unitName: unit.displayName,
-                  weaponName: weapon.name,
-                  sourceWeaponName: sourceName,
-                  count: activeCount,
-                  originalCount,
-                  casualties: originalCount - activeCount,
-                  targetId: unit.targetId,
-                  profile,
-                });
+              pool.push({
+                id: `${unit.id}-${weapon.name}`,
+                unitId: unit.id,
+                unitName: unit.displayName,
+                weaponName: weapon.name,
+                sourceWeaponName: sourceName,
+                count: activeCount,
+                originalCount,
+                casualties: originalCount - activeCount,
+                targetId: unit.targetId,
+                profile,
               });
-          });
+            });
+        });
 
         return pool;
       }
@@ -2223,6 +2256,28 @@
       }
     </script>
     <script>
+      function updateUnitWeaponFilterButtons() {
+        document.querySelectorAll(".unit-weapon-filter").forEach((button) => {
+          const filter = button.dataset.filter;
+          button.classList.toggle("active", Boolean(unitWeaponFilters[filter]));
+        });
+      }
+
+      document.querySelectorAll(".unit-weapon-filter").forEach((button) => {
+        button.addEventListener("click", () => {
+          const filter = button.dataset.filter;
+          unitWeaponFilters[filter] = !unitWeaponFilters[filter];
+
+          if (!unitWeaponFilters.ranged && !unitWeaponFilters.melee) {
+            unitWeaponFilters[filter] = true;
+          }
+
+          updateUnitWeaponFilterButtons();
+          renderArmy();
+        });
+      });
+      updateUnitWeaponFilterButtons();
+
       function updateModifierHighlights() {
         document.querySelectorAll(".modifier-grid label").forEach((label) => {
           const checkbox = label.querySelector('input[type="checkbox"]');
