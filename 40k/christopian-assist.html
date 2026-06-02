@@ -1,0 +1,2008 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Christopian Assist</title>
+		<link
+			href="https://fonts.googleapis.com/css2?family=Pirata+One&display=swap"
+			rel="stylesheet"
+		/>
+
+		<style>
+			body {
+				font-family: Arial, sans-serif;
+				background: #1a1a1a;
+				color: white;
+				margin: 20px;
+			}
+
+			h1,
+			h2,
+			h3,
+			h4 {
+				font-family: "Pirata One", cursive;
+				font-weight: 400;
+			}
+
+			h1 {
+				font-size: 3rem;
+				margin-top: 0;
+				margin-bottom: 0;
+			}
+
+			.topbar {
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+				gap: 12px;
+			}
+
+			.brand {
+				display: flex;
+				align-items: center;
+				gap: 12px;
+			}
+
+			.brand-logo {
+				width: 3rem;
+				height: 3rem;
+				object-fit: cover;
+			}
+
+			textarea {
+				width: 100%;
+				height: 250px;
+				background: #222;
+				color: white;
+				border: 1px solid #444;
+				padding: 10px;
+			}
+
+			button {
+				padding: 10px 20px;
+				margin: 10px 0;
+				cursor: pointer;
+			}
+
+			input[type="checkbox"] {
+				appearance: none;
+				-webkit-appearance: none;
+				display: inline-grid;
+				place-content: center;
+				width: 18px;
+				height: 18px;
+				margin: 0;
+				border: 2px solid #666;
+				border-radius: 4px;
+				background: #111;
+				cursor: pointer;
+				vertical-align: middle;
+			}
+
+			input[type="checkbox"]::before {
+				content: "";
+				width: 9px;
+				height: 9px;
+				border-radius: 2px;
+				background: #00ff88;
+				transform: scale(0);
+				transition: transform 0.12s ease-in-out;
+			}
+
+			input[type="checkbox"]:checked {
+				border-color: #00ff88;
+				background: #123326;
+			}
+
+			input[type="checkbox"]:checked::before {
+				transform: scale(1);
+			}
+
+			input[type="checkbox"]:focus-visible {
+				outline: 2px solid #00ff88;
+				outline-offset: 2px;
+			}
+
+			#units {
+				display: grid;
+				grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+				gap: 10px;
+			}
+
+			.unit-card {
+				background: #2b2b2b;
+				border: 2px solid #444;
+				padding: 10px;
+				border-radius: 8px;
+			}
+
+			.unit-card.selected {
+				border-color: #00ff88;
+			}
+
+			.unit-header {
+				display: grid;
+				grid-template-columns: auto minmax(0, 1fr) auto;
+				gap: 10px;
+				align-items: center;
+			}
+
+			.unit-checkbox {
+				width: 28px;
+				height: 28px;
+				border-radius: 6px;
+			}
+
+			.unit-checkbox::before {
+				width: 14px;
+				height: 14px;
+				border-radius: 3px;
+			}
+
+			.unit-name-input {
+				width: 100%;
+				min-width: 0;
+				box-sizing: border-box;
+				background: #1a1a1a;
+				color: white;
+				border: 1px solid #555;
+				padding: 6px;
+				font-weight: 700;
+			}
+
+			.collapse-unit {
+				background: transparent;
+				border: 0;
+				color: #f5a142;
+				font-size: 1.3rem;
+				line-height: 1;
+				margin: 0;
+				padding: 0 2px;
+			}
+
+			.units-heading {
+				display: flex;
+				align-items: center;
+				gap: 10px;
+				flex-wrap: wrap;
+			}
+
+			.hidden-units {
+				display: flex;
+				gap: 6px;
+				flex-wrap: wrap;
+			}
+
+			.hidden-unit-chip {
+				display: inline-flex;
+				align-items: center;
+				gap: 4px;
+				margin: 0;
+				padding: 4px 8px;
+				border: 1px solid #444;
+				border-radius: 6px;
+				background: #1a1a1a;
+				color: #ddd;
+				font-size: 0.85rem;
+			}
+
+			.hidden-unit-chip .show-unit-plus {
+				color: #00ff88;
+				font-weight: 700;
+			}
+
+			.weapon {
+				font-size: 0.9em;
+				color: #bbb;
+			}
+
+			.weapon-row {
+				display: grid;
+				grid-template-columns: minmax(0, 1fr) auto;
+				gap: 8px;
+				align-items: center;
+				margin: 8px 0 0 10px;
+			}
+
+			.weapon-row button {
+				margin: 0;
+				padding: 4px 8px;
+			}
+
+			.restore-casualty {
+				background: transparent;
+				border: 0;
+				color: #ff5b5b;
+				font-size: 1.2rem;
+				line-height: 1;
+				margin: 0;
+				padding: 0 2px;
+			}
+
+			.restore-casualty:disabled {
+				opacity: 0.35;
+			}
+
+			.casualty-controls {
+				display: flex;
+				align-items: center;
+				gap: 6px;
+				font-size: 0.85em;
+				color: #ddd;
+			}
+
+			.status {
+				color: #00ff88;
+			}
+
+			.detachment-status {
+				color: #bbb;
+				margin-top: 8px;
+			}
+
+			#attackPool {
+				background: #222;
+				border: 1px solid #444;
+				padding: 10px;
+				border-radius: 8px;
+				min-height: 50px;
+				margin-top: 10px;
+			}
+			#shotSummary {
+				background: #222;
+				border: 1px solid #444;
+				padding: 10px;
+				border-radius: 8px;
+				min-height: 50px;
+				margin-top: 10px;
+			}
+			#attackResults {
+				background: #222;
+				border: 1px solid #444;
+				padding: 10px;
+				border-radius: 8px;
+				min-height: 50px;
+				margin-top: 10px;
+			}
+			#hitResults {
+				background: #222;
+				border: 1px solid #444;
+				padding: 10px;
+				border-radius: 8px;
+				min-height: 50px;
+				margin-top: 10px;
+			}
+			#woundResults {
+				background: #222;
+				border: 1px solid #444;
+				padding: 10px;
+				border-radius: 8px;
+				min-height: 50px;
+				margin-top: 10px;
+			}
+
+			.target-panel {
+				background: #222;
+				border: 1px solid #444;
+				padding: 10px;
+				border-radius: 8px;
+				margin-top: 10px;
+				margin-bottom: 10px;
+			}
+
+			.target-modifier-columns {
+				display: grid;
+				grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+				gap: 16px;
+				align-items: start;
+			}
+
+			.target-column,
+			.modifier-column {
+				min-width: 0;
+			}
+
+			.target-panel input {
+				width: 60px;
+				margin-left: 5px;
+			}
+
+			.target-list {
+				display: grid;
+				gap: 8px;
+				margin-top: 8px;
+			}
+
+			.target-row {
+				display: grid;
+				grid-template-columns: minmax(140px, 1fr) 70px auto;
+				gap: 8px;
+				align-items: center;
+			}
+
+			.target-row input[type="text"] {
+				width: 100%;
+				box-sizing: border-box;
+			}
+
+			.remove-target {
+				background: transparent;
+				border: 0;
+				color: #ff5b5b;
+				font-size: 1.2rem;
+				line-height: 1;
+				margin: 0;
+				padding: 0 2px;
+			}
+
+			.remove-target:disabled {
+				opacity: 0.35;
+			}
+
+			.target-select {
+				width: 100%;
+				margin-top: 8px;
+				background: #1a1a1a;
+				color: white;
+				border: 1px solid #444;
+				padding: 6px;
+			}
+
+			.option-row {
+				display: block;
+				margin-top: 8px;
+			}
+
+			.modifier-grid {
+				display: grid;
+				grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+				gap: 8px;
+				margin-top: 10px;
+			}
+
+			@media (max-width: 760px) {
+				.target-modifier-columns {
+					grid-template-columns: 1fr;
+				}
+			}
+
+			.modifier-grid label {
+				display: flex;
+				flex-direction: column;
+				justify-content: center;
+				background: #1a1a1a;
+				border: 1px solid #444;
+				border-radius: 6px;
+				cursor: pointer;
+				min-height: 64px;
+				padding: 8px;
+			}
+
+			.modifier-grid input[type="checkbox"] {
+				position: absolute;
+				opacity: 0;
+				pointer-events: none;
+			}
+
+			.modifier-grid label.active {
+				border-color: #00ff88;
+				background: #123326;
+			}
+
+			.modifier-grid select {
+				width: 100%;
+				margin-top: 4px;
+				background: #111;
+				color: white;
+				border: 1px solid #555;
+				padding: 4px 6px;
+			}
+
+			.attack-row {
+				padding: 4px 0;
+				border-bottom: 1px solid #333;
+			}
+
+			.dice-tray {
+				display: flex;
+				flex-wrap: wrap;
+				gap: 6px;
+				margin-top: 8px;
+			}
+
+			.die {
+				display: inline-flex;
+				align-items: center;
+				justify-content: center;
+				width: 32px;
+				height: 32px;
+				border-radius: 6px;
+				border: 2px solid #666;
+				background: #111;
+				color: white;
+				font-weight: 700;
+				animation: diceRoll 0.45s ease-out;
+			}
+
+			.die.success {
+				border-color: #00ff88;
+				background: #123326;
+			}
+
+			.die.fail {
+				border-color: #ff5b5b;
+				background: #351414;
+			}
+
+			.die.lethal {
+				box-shadow: 0 0 0 2px #f5c542 inset;
+			}
+
+			.roll-note {
+				display: inline-block;
+				margin-top: 6px;
+				color: #bbb;
+				font-size: 0.9em;
+			}
+
+			.modal-backdrop {
+				position: fixed;
+				inset: 0;
+				display: none;
+				align-items: center;
+				justify-content: center;
+				background: rgba(0, 0, 0, 0.72);
+				z-index: 1000;
+				padding: 20px;
+			}
+
+			.modal-backdrop.open {
+				display: flex;
+			}
+
+			.modal {
+				width: min(760px, 100%);
+				background: #222;
+				border: 1px solid #555;
+				border-radius: 8px;
+				padding: 16px;
+			}
+
+			.modal-header {
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+				gap: 12px;
+			}
+
+			@keyframes diceRoll {
+				0% {
+					transform: rotate(-18deg) translateY(-8px);
+					opacity: 0.2;
+				}
+				70% {
+					transform: rotate(8deg) translateY(2px);
+					opacity: 1;
+				}
+				100% {
+					transform: rotate(0deg) translateY(0);
+				}
+			}
+		</style>
+	</head>
+	<body>
+		<div class="topbar">
+			<div class="brand">
+				<img
+					class="brand-logo"
+					src="./40k-images/logo-2.png"
+					alt=""
+					aria-hidden="true"
+				/>
+				<h1>Christopian Assist</h1>
+			</div>
+			<button id="openImportBtn" type="button">Import Army</button>
+		</div>
+
+		<div id="importModal" class="modal-backdrop">
+			<div class="modal">
+				<div class="modal-header">
+					<h2>Import Army</h2>
+					<button id="closeImportBtn" type="button">Close</button>
+				</div>
+				<textarea
+					id="armyInput"
+					placeholder="Paste army list here..."
+				></textarea>
+				<button id="parseBtn">Import Army</button>
+			</div>
+		</div>
+
+		<div class="target-panel">
+			<div class="target-modifier-columns">
+				<div class="target-column">
+					<h2>Target toughness</h2>
+					<button id="addTargetBtn" type="button">Add Target</button>
+					<div id="targets" class="target-list"></div>
+				</div>
+				<div class="modifier-column">
+					<h2>Modifiers</h2>
+					<div class="detachment-status" id="detachmentStatus">
+						Detachment: none detected
+					</div>
+					<div class="modifier-grid">
+						<label>
+							<input type="checkbox" id="halfRange" />
+							Half Range (Rapid Fire)
+						</label>
+						<label>
+							<input type="checkbox" id="takeAim" />
+							Take Aim (+1 BS)
+						</label>
+						<label>
+							<input type="checkbox" id="fixBayonets" />
+							Fix Bayonets (+1 WS)
+						</label>
+						<label>
+							<input type="checkbox" id="heavyStationary" />
+							Heavy / Stationary (+1 to hit)
+						</label>
+						<label>
+							<input type="checkbox" id="fieldsOfFire" />
+							Fields of Fire (+1 AP)
+						</label>
+						<label>
+							Hit Roll Modifier
+							<select id="hitRollModifier">
+								<option value="0">None</option>
+								<option value="1">+1 to hit</option>
+								<option value="-1">-1 to hit</option>
+							</select>
+						</label>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="units-heading">
+			<h2>Units</h2>
+			<div id="hiddenUnits" class="hidden-units"></div>
+		</div>
+
+		<div id="units"></div>
+		<h2>Attack Pool</h2>
+		<div id="attackPool">No units selected</div>
+		<h2>Shot Summary</h2>
+		<div id="shotSummary">No units selected</div>
+		<div id="attackRollSection" hidden>
+			<button id="rollAttacksBtn">Roll Attacks</button>
+			<div id="attackResults">No attack rolls yet</div>
+		</div>
+		<button id="rollHitsBtn">Roll Hits</button>
+		<div id="hitResults">No hit rolls yet</div>
+
+		<button id="rollWoundsBtn">Roll Wounds</button>
+		<div id="woundResults">No wound rolls yet</div>
+
+		<script>
+			let weaponDatabase = [];
+			let parsedArmy = [];
+			let lastAttackResults = null;
+			let lastHitResults = null;
+			let lastWoundResults = null;
+			let targets = [{ id: 1, name: "Target 1", toughness: 4 }];
+			let nextTargetId = 2;
+			let combinedArmsActive = false;
+			const weaponLookup = new Map();
+
+			////////////////////////////////////////////////////
+			// LOAD JSON
+			////////////////////////////////////////////////////
+
+			async function loadWeaponDatabase() {
+				try {
+					const response = await fetch("./data/wh40k_10th.json");
+					weaponDatabase = await response.json();
+
+					buildWeaponLookup();
+
+					console.info(`Loaded ${weaponDatabase.length} datasheets`);
+				} catch (err) {
+					console.error("Failed to load data/wh40k_10th.json", err);
+				}
+			}
+			renderTargets();
+			loadWeaponDatabase();
+			openImportModal();
+
+			function normalizeWeaponName(name) {
+				return String(name)
+					.toLowerCase()
+					.replace(/[’']/g, "'")
+					.replace(/[–—]/g, "-")
+					.replace(/\s+/g, " ")
+					.trim();
+			}
+
+			function buildWeaponLookup() {
+				weaponLookup.clear();
+
+				weaponDatabase.forEach((datasheet) => {
+					if (!datasheet.weapons) return;
+
+					datasheet.weapons.forEach((weapon) => {
+						if (!weapon.name) return;
+
+						weaponLookup.set(normalizeWeaponName(weapon.name), weapon);
+					});
+				});
+			}
+
+			function getWeaponProfile(name) {
+				const normalizedName = normalizeWeaponName(name);
+
+				return (
+					weaponLookup.get(normalizedName) ||
+					weaponLookup.get(`${normalizedName} - standard`) ||
+					null
+				);
+			}
+
+			function openImportModal() {
+				document.getElementById("importModal").classList.add("open");
+			}
+
+			function closeImportModal() {
+				document.getElementById("importModal").classList.remove("open");
+			}
+
+			////////////////////////////////////////////////////
+			// IMPORT ARMY
+			////////////////////////////////////////////////////
+
+			document
+				.getElementById("openImportBtn")
+				.addEventListener("click", openImportModal);
+
+			document
+				.getElementById("closeImportBtn")
+				.addEventListener("click", closeImportModal);
+
+			document.getElementById("parseBtn").addEventListener("click", () => {
+				const text = document.getElementById("armyInput").value;
+
+				combinedArmsActive = hasCombinedArmsDetachment(text);
+				parsedArmy = parseArmy(text);
+
+				updateDetachmentStatus();
+				renderArmy();
+				updateAttackPool();
+				closeImportModal();
+			});
+
+			document.getElementById("addTargetBtn").addEventListener("click", () => {
+				addTarget();
+			});
+
+			document
+				.getElementById("rollAttacksBtn")
+				.addEventListener("click", () => {
+					rollAttacks();
+				});
+			document.getElementById("rollHitsBtn").addEventListener("click", () => {
+				rollHits();
+			});
+			document.getElementById("rollWoundsBtn").addEventListener("click", () => {
+				rollWounds();
+			});
+
+			////////////////////////////////////////////////////
+			// PARSE ARMY
+			////////////////////////////////////////////////////
+
+			function hasCombinedArmsDetachment(text) {
+				return /combined\s+(arms|regiment)/i.test(text);
+			}
+
+			function updateDetachmentStatus() {
+				const status = document.getElementById("detachmentStatus");
+
+				status.innerText = combinedArmsActive
+					? "Detachment: Combined Arms detected - unmodified hit rolls of 6 auto-wound"
+					: "Detachment: none detected";
+			}
+
+			function isArmySectionHeading(line) {
+				return [
+					"CHARACTERS",
+					"BATTLELINE",
+					"DEDICATED TRANSPORTS",
+					"OTHER DATASHEETS",
+					"ALLIED UNITS",
+					"FORTIFICATIONS",
+				].includes(line.toUpperCase());
+			}
+
+			function parseArmy(text) {
+				const lines = text
+					.split("\n")
+					.map((x) => x.trim())
+					.filter((x) => x);
+
+				const units = [];
+
+				const unitCounts = {};
+				let inArmySection = false;
+
+				for (const line of lines) {
+					if (isArmySectionHeading(line)) {
+						inArmySection = true;
+						continue;
+					}
+
+					if (
+						inArmySection &&
+						/\(\d+\sPoints\)/i.test(line) &&
+						!line.includes("Strike Force")
+					) {
+						const unitName = line.replace(/\(\d+\sPoints\)/i, "").trim();
+
+						unitCounts[unitName] = (unitCounts[unitName] || 0) + 1;
+
+						units.push({
+							id: units.length + 1,
+							baseName: unitName,
+							displayName: unitName + " #" + unitCounts[unitName],
+							selected: false,
+							collapsed: false,
+							targetId: getDefaultTargetId(),
+							weapons: [],
+							models: [],
+						});
+					}
+				}
+
+				extractWeapons(units, text);
+
+				return units;
+			}
+
+			////////////////////////////////////////////////////
+			// EXTRACT WEAPONS
+			////////////////////////////////////////////////////
+
+			function extractWeapons(units, text) {
+				const lines = text
+					.split("\n")
+					.map((line) => line.trim())
+					.filter((line) => line);
+
+				let currentUnit = null;
+				let currentRoleGroup = null;
+				const seenUnits = {};
+				let inArmySection = false;
+
+				for (let index = 0; index < lines.length; index++) {
+					const line = lines[index];
+					if (isArmySectionHeading(line)) {
+						inArmySection = true;
+						currentUnit = null;
+						currentRoleGroup = null;
+						continue;
+					}
+
+					let foundUnit = null;
+
+					if (inArmySection && /\(\d+\sPoints\)/i.test(line)) {
+						const unitName = line.replace(/\(\d+\sPoints\)/i, "").trim();
+						seenUnits[unitName] = (seenUnits[unitName] || 0) + 1;
+						foundUnit = units.find(
+							(u) =>
+								u.baseName === unitName &&
+								u.displayName === `${unitName} #${seenUnits[unitName]}`,
+						);
+					}
+
+					if (foundUnit) {
+						currentUnit = foundUnit;
+						currentRoleGroup = null;
+						currentUnit.modelGroups = [];
+						continue;
+					}
+
+					if (currentUnit && line.startsWith("•")) {
+						const modelMatch = line.match(/(\d+)x\s(.+)/);
+
+						if (modelMatch) {
+							const entryName = modelMatch[2].trim();
+							const modelCount = Number(modelMatch[1]);
+							const nextLine = lines[index + 1] || "";
+							const startsModelLoadout = nextLine.startsWith("◦");
+
+							if (startsModelLoadout) {
+								currentRoleGroup = {
+									role: entryName,
+									count: modelCount,
+									weapons: [],
+								};
+								currentUnit.modelGroups.push(currentRoleGroup);
+								continue;
+							}
+
+							currentRoleGroup = getOrCreateUnitWeaponGroup(currentUnit);
+							currentRoleGroup.weapons.push({
+								count: modelCount,
+								name: entryName,
+							});
+						}
+					}
+
+					if (currentUnit && line.startsWith("◦")) {
+						const match = line.match(/(\d+)x\s(.+)/);
+
+						if (match && currentRoleGroup) {
+							currentRoleGroup.weapons.push({
+								count: Number(match[1]),
+								name: match[2].trim(),
+							});
+						}
+					}
+				}
+
+				units.forEach((unit) => {
+					buildModelLoadouts(unit);
+					unit.weapons = buildWeaponRows(unit);
+					delete unit.modelGroups;
+				});
+			}
+
+			function getOrCreateUnitWeaponGroup(unit) {
+				if (!unit.modelGroups) {
+					unit.modelGroups = [];
+				}
+
+				let group = unit.modelGroups.find(
+					(entry) => entry.role === unit.baseName,
+				);
+
+				if (!group) {
+					group = {
+						role: unit.baseName,
+						count: 1,
+						weapons: [],
+					};
+					unit.modelGroups.push(group);
+				}
+
+				return group;
+			}
+
+			function createModel(role) {
+				return {
+					id:
+						typeof crypto !== "undefined" && crypto.randomUUID
+							? crypto.randomUUID()
+							: `${Date.now()}-${Math.random()}`,
+					role,
+					alive: true,
+					weapons: [],
+				};
+			}
+
+			function buildModelLoadouts(unit) {
+				unit.models = [];
+
+				(unit.modelGroups || []).forEach((group) => {
+					const models = [];
+
+					for (let i = 0; i < group.count; i++) {
+						models.push(createModel(group.role));
+					}
+
+					assignWeaponsToModels(models, group.weapons);
+					unit.models.push(...models);
+				});
+			}
+
+			function assignWeaponsToModels(models, weapons) {
+				const attackWeapons = weapons.filter((weapon) => {
+					const hasProfile = Boolean(getWeaponProfile(weapon.name));
+
+					if (!hasProfile) {
+						console.info(`Skipping non-weapon wargear: ${weapon.name}`);
+					}
+
+					return hasProfile;
+				});
+
+				const sortedWeapons = attackWeapons.sort(
+					(a, b) =>
+						getWeaponAssignmentPriority(a.name) -
+						getWeaponAssignmentPriority(b.name),
+				);
+
+				sortedWeapons.forEach((weapon) => {
+					for (let i = 0; i < weapon.count; i++) {
+						const model = chooseModelForWeapon(models, weapon.name);
+						if (!model) return;
+
+						model.weapons.push(weapon.name);
+					}
+				});
+			}
+
+			function getWeaponAssignmentPriority(name) {
+				if (isMeleeWeaponName(name)) return 30;
+				if (isBasicRangedWeaponName(name)) return 20;
+				return 10;
+			}
+
+			function isMeleeWeaponName(name) {
+				const profile = getWeaponProfile(name);
+				const range = String(profile?.range || "").toLowerCase();
+				const normalizedName = normalizeWeaponName(name);
+
+				return (
+					range === "melee" ||
+					normalizedName.includes("close combat weapon") ||
+					normalizedName.includes("chainsword") ||
+					normalizedName.includes("power weapon") ||
+					normalizedName.includes("power fist")
+				);
+			}
+
+			function isBasicRangedWeaponName(name) {
+				const normalizedName = normalizeWeaponName(name);
+
+				return [
+					"lasgun",
+					"laspistol",
+					"hot-shot lasgun",
+					"hot-shot laspistol",
+					"sergeant's autogun",
+					"bolt pistol",
+					"ripper gun",
+				].includes(normalizedName);
+			}
+
+			function chooseModelForWeapon(models, weaponName) {
+				if (models.length === 0) return null;
+
+				if (isBasicRangedWeaponName(weaponName)) {
+					const modelWithoutRangedWeapon = models.find(
+						(model) =>
+							!model.weapons.some((weapon) => isRangedAttackWeaponName(weapon)),
+					);
+
+					if (modelWithoutRangedWeapon) {
+						return modelWithoutRangedWeapon;
+					}
+				}
+
+				if (isMeleeWeaponName(weaponName)) {
+					const modelWithoutMeleeWeapon = models.find(
+						(model) =>
+							!model.weapons.some((weapon) => isMeleeWeaponName(weapon)),
+					);
+
+					if (modelWithoutMeleeWeapon) {
+						return modelWithoutMeleeWeapon;
+					}
+				}
+
+				return [...models].sort(
+					(a, b) => a.weapons.length - b.weapons.length,
+				)[0];
+			}
+
+			function isRangedAttackWeaponName(name) {
+				const profile = getWeaponProfile(name);
+				const range = String(profile?.range || "").toLowerCase();
+
+				return Boolean(profile) && range !== "melee";
+			}
+
+			function calculateWeaponCounts(unit, aliveOnly = true) {
+				const counts = new Map();
+
+				unit.models
+					.filter((model) => !aliveOnly || model.alive)
+					.forEach((model) => {
+						model.weapons.forEach((weaponName) => {
+							counts.set(weaponName, (counts.get(weaponName) || 0) + 1);
+						});
+					});
+
+				return counts;
+			}
+
+			function buildWeaponRows(unit) {
+				return Array.from(calculateWeaponCounts(unit, false).entries())
+					.sort((a, b) => a[0].localeCompare(b[0]))
+					.map(([name, count]) => ({
+						name,
+						count,
+						enabled: false,
+					}));
+			}
+
+			////////////////////////////////////////////////////
+			// RENDER
+			////////////////////////////////////////////////////
+
+			function getDefaultTargetId() {
+				return targets[0]?.id ?? null;
+			}
+
+			function getTargetById(targetId) {
+				return targets.find((target) => target.id === Number(targetId)) || null;
+			}
+
+			function addTarget() {
+				targets.push({
+					id: nextTargetId++,
+					name: `Target ${targets.length + 1}`,
+					toughness: 4,
+				});
+				renderTargets();
+				renderArmy();
+				updateAttackPool();
+			}
+
+			function removeTarget(targetId) {
+				if (targets.length <= 1) return;
+
+				targets = targets.filter((target) => target.id !== Number(targetId));
+
+				const fallbackTargetId = getDefaultTargetId();
+				parsedArmy.forEach((unit) => {
+					if (!getTargetById(unit.targetId)) {
+						unit.targetId = fallbackTargetId;
+					}
+				});
+
+				renderTargets();
+				renderArmy();
+				updateAttackPool();
+			}
+
+			function renderTargets() {
+				const container = document.getElementById("targets");
+
+				container.innerHTML = targets
+					.map(
+						(target) => `
+	      						<div class="target-row">
+	      							<input type="text" class="target-name" data-id="${target.id}" value="${escapeHtml(target.name)}">
+	      							<input type="number" class="target-toughness" data-id="${target.id}" value="${target.toughness}" min="1" max="20" aria-label="Target toughness">
+		      							<button type="button" class="remove-target" data-id="${target.id}" aria-label="Remove target" title="Remove target" ${targets.length <= 1 ? "disabled" : ""}>×</button>
+	      						</div>
+      					`,
+					)
+					.join("");
+
+				container.querySelectorAll(".target-name").forEach((input) => {
+					input.addEventListener("input", () => {
+						const target = getTargetById(input.dataset.id);
+						if (!target) return;
+						target.name = input.value.trim() || `Target ${target.id}`;
+						renderArmy();
+						updateAttackPool();
+					});
+				});
+
+				container.querySelectorAll(".target-toughness").forEach((input) => {
+					input.addEventListener("input", () => {
+						const target = getTargetById(input.dataset.id);
+						if (!target) return;
+						target.toughness = Math.max(1, Number(input.value) || 1);
+						updateAttackPool();
+					});
+				});
+
+				container.querySelectorAll(".remove-target").forEach((button) => {
+					button.addEventListener("click", () => {
+						removeTarget(button.dataset.id);
+					});
+				});
+			}
+
+			function renderTargetOptions(selectedTargetId) {
+				return targets
+					.map(
+						(target) =>
+							`<option value="${target.id}" ${Number(selectedTargetId) === target.id ? "selected" : ""}>${escapeHtml(target.name)} (T${target.toughness})</option>`,
+					)
+					.join("");
+			}
+
+			function escapeHtml(value) {
+				return String(value)
+					.replace(/&/g, "&amp;")
+					.replace(/</g, "&lt;")
+					.replace(/>/g, "&gt;")
+					.replace(/"/g, "&quot;")
+					.replace(/'/g, "&#039;");
+			}
+
+			function killModelWithWeapon(unit, weaponName) {
+				const model = unit.models.find(
+					(candidate) =>
+						candidate.alive &&
+						candidate.weapons.some(
+							(modelWeapon) =>
+								normalizeWeaponName(modelWeapon) ===
+								normalizeWeaponName(weaponName),
+						),
+				);
+
+				if (model) {
+					model.alive = false;
+				}
+			}
+
+			function restoreModelWithWeapon(unit, weaponName) {
+				const model = [...unit.models]
+					.reverse()
+					.find(
+						(candidate) =>
+							!candidate.alive &&
+							candidate.weapons.some(
+								(modelWeapon) =>
+									normalizeWeaponName(modelWeapon) ===
+									normalizeWeaponName(weaponName),
+							),
+					);
+
+				if (model) {
+					model.alive = true;
+				}
+			}
+
+			function renderArmy() {
+				const container = document.getElementById("units");
+				const hiddenContainer = document.getElementById("hiddenUnits");
+
+				container.innerHTML = "";
+				hiddenContainer.innerHTML = "";
+
+				parsedArmy
+					.filter((unit) => unit.collapsed)
+					.forEach((unit) => {
+						const button = document.createElement("button");
+						button.type = "button";
+						button.className = "hidden-unit-chip";
+						button.innerHTML = `<span class="show-unit-plus">+</span>${escapeHtml(unit.displayName)}`;
+						button.title = `Show ${unit.displayName}`;
+						button.addEventListener("click", () => {
+							unit.collapsed = false;
+							renderArmy();
+						});
+						hiddenContainer.appendChild(button);
+					});
+
+				parsedArmy
+					.filter((unit) => !unit.collapsed)
+					.forEach((unit) => {
+						const div = document.createElement("div");
+						const livingWeaponCounts = calculateWeaponCounts(unit);
+						const originalWeaponCounts = calculateWeaponCounts(unit, false);
+
+						div.className = "unit-card";
+						if (unit.selected) {
+							div.classList.add("selected");
+						}
+						div.innerHTML = `
+		      <div class="unit-header">
+		      	<input type="checkbox" class="unit-checkbox" ${unit.selected ? "checked" : ""}>
+		      	<input type="text" class="unit-name-input" value="${escapeHtml(unit.displayName)}">
+		      	<button type="button" class="collapse-unit" aria-label="Hide unit" title="Hide unit">−</button>
+		      </div>
+	      <div class="unit-body">
+	      	<select class="target-select">
+	      		${renderTargetOptions(unit.targetId)}
+	      	</select>
+	      	<hr>
+			    <div class="weapon">Models Alive: ${unit.models.filter((m) => m.alive).length}/${unit.models.length || 0}</div>
+			    <div class="weapon">Weapons / casualties</div>
+			    ${unit.weapons
+						.map((w, index) => {
+							const activeCount = livingWeaponCounts.get(w.name) || 0;
+							const originalCount = originalWeaponCounts.get(w.name) || w.count;
+							const casualties = originalCount - activeCount;
+
+							return `
+	      		<div class="weapon-row">
+      			<label class="weapon">
+      				<input
+      					type="checkbox"
+      					class="weapon-checkbox"
+      					data-index="${index}"
+	      					${w.enabled !== false ? "checked" : ""}
+	      				>
+	      				${activeCount}/${originalCount}x ${escapeHtml(w.name)}
+	      			</label>
+	      			<div class="casualty-controls">
+	      				<span>Dead: ${casualties}</span>
+	      				<button type="button" class="casualty-btn" data-index="${index}" data-action="kill" ${activeCount <= 0 ? "disabled" : ""}>Kill</button>
+	      				<button type="button" class="casualty-btn restore-casualty" data-index="${index}" data-action="restore" aria-label="Undo casualty" title="Undo casualty" ${casualties <= 0 ? "disabled" : ""}>↶</button>
+	      			</div>
+	      		</div>
+	      	`;
+						})
+						.join("")}
+	      </div>
+	      `;
+
+						const checkbox = div.querySelector(".unit-checkbox");
+
+						checkbox.addEventListener("change", () => {
+							unit.selected = checkbox.checked;
+
+							div.classList.toggle("selected", checkbox.checked);
+							updateAttackPool();
+						});
+
+						const unitNameInput = div.querySelector(".unit-name-input");
+						unitNameInput.addEventListener("input", () => {
+							unit.displayName = unitNameInput.value.trim() || unit.baseName;
+							updateAttackPool();
+						});
+
+						const collapseButton = div.querySelector(".collapse-unit");
+						collapseButton.addEventListener("click", () => {
+							unit.collapsed = true;
+							renderArmy();
+						});
+
+						const targetSelect = div.querySelector(".target-select");
+						targetSelect.addEventListener("change", () => {
+							unit.targetId = Number(targetSelect.value);
+							updateAttackPool();
+						});
+
+						div
+							.querySelectorAll(".weapon-checkbox")
+							.forEach((weaponCheckbox) => {
+								weaponCheckbox.addEventListener("change", () => {
+									const weaponIndex = Number(weaponCheckbox.dataset.index);
+									unit.weapons[weaponIndex].enabled = weaponCheckbox.checked;
+									updateAttackPool();
+								});
+							});
+
+						div.querySelectorAll(".casualty-btn").forEach((button) => {
+							button.addEventListener("click", () => {
+								const weaponIndex = Number(button.dataset.index);
+								const weapon = unit.weapons[weaponIndex];
+
+								if (button.dataset.action === "kill") {
+									killModelWithWeapon(unit, weapon.name);
+								} else {
+									restoreModelWithWeapon(unit, weapon.name);
+								}
+								renderArmy();
+								updateAttackPool();
+							});
+						});
+
+						container.appendChild(div);
+					});
+			}
+
+			////////////////////////////////////////////////////
+			// ATTACK POOL
+			////////////////////////////////////////////////////
+
+			function updateAttackPool() {
+				const pool = buildCurrentPool();
+				const attackRollSection = document.getElementById("attackRollSection");
+				const needsAttackRolls = attackRollsRequired(pool);
+
+				renderAttackPool(pool);
+				renderShotSummary(pool);
+				attackRollSection.hidden = !needsAttackRolls;
+				lastAttackResults = null;
+				document.getElementById("attackResults").innerHTML = needsAttackRolls
+					? "No attack rolls yet"
+					: "No random attack rolls required";
+				document.getElementById("hitResults").innerHTML = "No hit rolls yet";
+				lastHitResults = null;
+				document.getElementById("woundResults").innerHTML =
+					"No wound rolls yet";
+				lastWoundResults = null;
+			}
+
+			function renderAttackPool(pool) {
+				const container = document.getElementById("attackPool");
+
+				if (pool.length === 0) {
+					container.innerHTML = "No units selected";
+					return;
+				}
+
+				container.innerHTML = pool
+					.slice()
+					.sort(
+						(a, b) =>
+							a.unitName.localeCompare(b.unitName) ||
+							a.weaponName.localeCompare(b.weaponName),
+					)
+					.map((entry) => {
+						const profile = entry.profile;
+						const target = getTargetById(entry.targetId);
+						const ap = getModifiedAp(profile);
+
+						return `
+	      					<div class="attack-row">
+	      						<strong>${escapeHtml(entry.unitName)} - ${entry.count}x ${escapeHtml(entry.weaponName)}</strong><br>
+	      						Target: ${escapeHtml(target?.name || "No target")} |
+	      						Range: ${profile.range || "-"} |
+	      						 A: ${profile.attacks || "-"} |
+	      						 BS/WS: ${profile.skill || "-"} |
+	      						 S: ${profile.strength || "-"} |
+	      						 AP: ${ap}${ap !== (profile.ap ?? "0") ? " (Fields of Fire)" : ""} |
+	      						 D: ${profile.damage || "-"}
+	      					</div>
+	      				`;
+					})
+					.join("");
+			}
+
+			function rollDice(count, sides) {
+				return rollDiceResults(count, sides).reduce(
+					(total, roll) => total + roll,
+					0,
+				);
+			}
+
+			function rollDiceResults(count, sides) {
+				const rolls = [];
+
+				for (let i = 0; i < count; i++) {
+					rolls.push(Math.floor(Math.random() * sides) + 1);
+				}
+
+				return rolls;
+			}
+
+			function renderDiceTray(rolls) {
+				if (!rolls.length) return "";
+
+				return `
+          <div class="dice-tray">
+            ${rolls
+							.map((roll) => {
+								const classes = ["die"];
+								if (roll.success === true) classes.push("success");
+								if (roll.success === false) classes.push("fail");
+								if (roll.lethal) classes.push("lethal");
+
+								return `<span class="${classes.join(" ")}">${roll.value}</span>`;
+							})
+							.join("")}
+          </div>
+        `;
+			}
+
+			function getRapidFireValue(profile) {
+				if (!profile) return 0;
+
+				const text = JSON.stringify(profile).toLowerCase();
+
+				const match = text.match(/rapid fire\s*(\d+)/i);
+				if (match) {
+					return Number(match[1]);
+				}
+
+				return 0;
+			}
+
+			function rollAttackValue(attacks) {
+				return rollAttackDetails(attacks).total;
+			}
+
+			function isFixedAttackExpression(attacks) {
+				if (!attacks) return true;
+
+				return /^\d+$/.test(String(attacks).trim());
+			}
+
+			function attackRollsRequired(pool) {
+				return pool.some(
+					(entry) => !isFixedAttackExpression(entry.profile.attacks),
+				);
+			}
+
+			function buildFixedAttackResults(pool) {
+				const halfRange = document.getElementById("halfRange").checked;
+
+				return pool.map((entry) => {
+					const attacksPerWeapon = Number(entry.profile.attacks || 0);
+					let attacks = attacksPerWeapon * entry.count;
+					const rapidFire = getRapidFireValue(entry.profile);
+
+					if (halfRange && rapidFire > 0) {
+						attacks += rapidFire * entry.count;
+					}
+
+					return {
+						...entry,
+						attacks,
+						attackRolls: [],
+						attackBonus: 0,
+					};
+				});
+			}
+
+			function rollAttackDetails(attacks) {
+				if (!attacks) {
+					return {
+						total: 0,
+						rolls: [],
+						fixed: true,
+					};
+				}
+
+				const text = attacks.toUpperCase().trim();
+
+				if (/^\d+$/.test(text)) {
+					return {
+						total: Number(text),
+						rolls: [],
+						fixed: true,
+					};
+				}
+
+				if (text === "D3") {
+					const rolls = rollDiceResults(1, 3);
+					return { total: rolls[0], rolls, fixed: false };
+				}
+				if (text === "D6") {
+					const rolls = rollDiceResults(1, 6);
+					return { total: rolls[0], rolls, fixed: false };
+				}
+				if (text === "2D6") {
+					const rolls = rollDiceResults(2, 6);
+					return {
+						total: rolls.reduce((total, roll) => total + roll, 0),
+						rolls,
+						fixed: false,
+					};
+				}
+				if (text === "3D6") {
+					const rolls = rollDiceResults(3, 6);
+					return {
+						total: rolls.reduce((total, roll) => total + roll, 0),
+						rolls,
+						fixed: false,
+					};
+				}
+
+				const match = text.match(/(\d*)D(\d+)\+(\d+)/);
+				if (match) {
+					const diceCount = Number(match[1] || 1);
+					const diceSize = Number(match[2]);
+					const bonus = Number(match[3]);
+					const rolls = rollDiceResults(diceCount, diceSize);
+
+					return {
+						total: rolls.reduce((total, roll) => total + roll, 0) + bonus,
+						rolls,
+						fixed: false,
+						bonus,
+					};
+				}
+
+				return {
+					total: 0,
+					rolls: [],
+					fixed: true,
+				};
+			}
+
+			function buildCurrentPool() {
+				const pool = [];
+
+				parsedArmy
+					.filter((unit) => unit.selected)
+					.forEach((unit) => {
+						const livingWeaponCounts = calculateWeaponCounts(unit);
+						const originalWeaponCounts = calculateWeaponCounts(unit, false);
+
+						unit.weapons
+							.filter((weapon) => weapon.enabled !== false)
+							.forEach((weapon) => {
+								const profile = getWeaponProfile(weapon.name);
+								if (!profile) {
+									console.warn(
+										"Missing weapon profile:",
+										weapon.name,
+										"Unit:",
+										unit.displayName,
+									);
+									return;
+								}
+
+								const activeCount = livingWeaponCounts.get(weapon.name) || 0;
+								if (activeCount <= 0) return;
+								const originalCount =
+									originalWeaponCounts.get(weapon.name) || weapon.count;
+
+								pool.push({
+									id: `${unit.id}-${weapon.name}`,
+									unitId: unit.id,
+									unitName: unit.displayName,
+									weaponName: weapon.name,
+									count: activeCount,
+									originalCount,
+									casualties: originalCount - activeCount,
+									targetId: unit.targetId,
+									profile,
+								});
+							});
+					});
+
+				return pool;
+			}
+
+			function parseSkill(skill) {
+				if (!skill || skill === "N/A") return null;
+				const match = skill.match(/(\d+)\+/);
+				return match ? Number(match[1]) : null;
+			}
+
+			function isEntryMelee(entry) {
+				const range = String(entry.profile?.range || "").toLowerCase();
+				const name = String(entry.weaponName || "").toLowerCase();
+
+				return range === "melee" || name.includes("close combat weapon");
+			}
+
+			function getHitRollModifier() {
+				const manualModifier = Number(
+					document.getElementById("hitRollModifier")?.value || 0,
+				);
+				const heavyStationary =
+					document.getElementById("heavyStationary")?.checked;
+
+				const modifier = manualModifier + (heavyStationary ? 1 : 0);
+
+				return Math.max(-1, Math.min(1, modifier));
+			}
+
+			function applySkillModifiers(skill, entry) {
+				const takeAim = document.getElementById("takeAim")?.checked;
+				const fixBayonets = document.getElementById("fixBayonets")?.checked;
+
+				if (skill === null) return null;
+
+				let modified = skill;
+
+				if (takeAim && !isEntryMelee(entry)) {
+					modified -= 1;
+				}
+
+				if (fixBayonets && isEntryMelee(entry)) {
+					modified -= 1;
+				}
+
+				if (modified < 2) {
+					modified = 2;
+				}
+
+				return modified;
+			}
+
+			function applyHitRollModifier(skill) {
+				if (skill === null) return null;
+
+				const modified = skill - getHitRollModifier();
+
+				return Math.max(2, Math.min(6, modified));
+			}
+
+			function getModifiedAp(profile) {
+				const fieldsOfFire = document.getElementById("fieldsOfFire")?.checked;
+				const baseAp = Number(profile.ap ?? 0);
+
+				if (!fieldsOfFire || Number.isNaN(baseAp)) {
+					return profile.ap ?? "0";
+				}
+
+				return baseAp - 1;
+			}
+
+			function rollHits() {
+				const container = document.getElementById("hitResults");
+				if (!lastAttackResults) {
+					const pool = buildCurrentPool();
+
+					if (pool.length === 0) {
+						container.innerHTML = "No units selected";
+						return;
+					}
+
+					if (attackRollsRequired(pool)) {
+						container.innerHTML = "Roll attacks first";
+						return;
+					}
+
+					lastAttackResults = buildFixedAttackResults(pool);
+				}
+
+				let totalHits = 0;
+				lastHitResults = [];
+
+				container.innerHTML = lastAttackResults
+					.map((entry) => {
+						const attacks = entry.attacks;
+						const baseSkill = parseSkill(entry.profile.skill);
+						const characteristicSkill = applySkillModifiers(baseSkill, entry);
+						const skill = applyHitRollModifier(characteristicSkill);
+						let hits = 0;
+						let lethalWounds = 0;
+						const hitRolls = [];
+
+						if (skill === null) {
+							hits = attacks;
+						} else {
+							for (let i = 0; i < attacks; i++) {
+								const roll = Math.floor(Math.random() * 6) + 1;
+								const success = roll >= skill;
+								const lethal = combinedArmsActive && roll === 6 && success;
+
+								hitRolls.push({
+									value: roll,
+									success,
+									lethal,
+								});
+
+								if (success) {
+									hits++;
+
+									if (lethal) {
+										lethalWounds++;
+									}
+								}
+							}
+						}
+
+						totalHits += hits;
+						lastHitResults.push({
+							...entry,
+							hits,
+							lethalWounds,
+							hitRolls,
+						});
+
+						return `
+	      	<div class="attack-row">
+	      		<strong>${escapeHtml(entry.unitName)} - ${escapeHtml(entry.weaponName)}</strong>: ${attacks} attacks &rarr; ${hits} hits
+	      		${baseSkill !== null && characteristicSkill !== baseSkill ? `<br>Order: ${baseSkill}+ → ${characteristicSkill}+` : ""}
+            ${characteristicSkill !== null && skill !== characteristicSkill ? `<br>Hit modifier: ${characteristicSkill}+ → ${skill}+` : ""}
+	      		${lethalWounds > 0 ? `<br>Combined Arms: ${lethalWounds} auto-wound(s) from hit rolls of 6` : ""}
+            ${skill === null ? `<span class="roll-note">Torrent: auto-hit</span>` : renderDiceTray(hitRolls)}
+	      	</div>
+	      `;
+					})
+					.join("");
+
+				container.innerHTML += `<hr><strong>Total Hits: ${totalHits}</strong>`;
+			}
+
+			function getWoundTarget(strength, toughness) {
+				const s = Number(strength);
+				const t = Number(toughness);
+
+				if (!s || !t) return 6;
+				if (s >= t * 2) return 2;
+				if (s > t) return 3;
+				if (s === t) return 4;
+				if (s * 2 <= t) return 6;
+				return 5;
+			}
+
+			function rollWounds() {
+				const container = document.getElementById("woundResults");
+
+				if (!lastHitResults) {
+					container.innerHTML = "Roll hits first";
+					return;
+				}
+
+				let totalWounds = 0;
+				lastWoundResults = [];
+
+				container.innerHTML = lastHitResults
+					.map((entry) => {
+						const hits = entry.hits;
+						const lethalWounds = entry.lethalWounds || 0;
+						const woundRolls = Math.max(0, hits - lethalWounds);
+						const target = getTargetById(entry.targetId);
+						const toughness = target?.toughness || 4;
+						const woundTarget = getWoundTarget(
+							entry.profile.strength,
+							toughness,
+						);
+
+						let wounds = lethalWounds;
+						const woundRollsResults = [];
+
+						for (let i = 0; i < woundRolls; i++) {
+							const roll = Math.floor(Math.random() * 6) + 1;
+							const success = roll >= woundTarget;
+
+							woundRollsResults.push({
+								value: roll,
+								success,
+							});
+
+							if (success) {
+								wounds++;
+							}
+						}
+
+						lastWoundResults.push({
+							...entry,
+							wounds,
+							lethalWounds,
+							woundRolls: woundRollsResults,
+							ap: getModifiedAp(entry.profile),
+							damage: entry.profile.damage,
+							strength: entry.profile.strength,
+						});
+
+						totalWounds += wounds;
+
+						return `<div class="attack-row"><strong>${escapeHtml(entry.unitName)} - ${escapeHtml(entry.weaponName)}</strong>: ${hits} hits${lethalWounds > 0 ? ` (${lethalWounds} auto-wound)` : ""} &rarr; ${wounds} wounds into ${escapeHtml(target?.name || "No target")} (${woundTarget}+) | AP ${getModifiedAp(entry.profile)} | D ${entry.profile.damage}${lethalWounds > 0 ? `<br><span class="roll-note">${lethalWounds} wound(s) added before rolling from Combined Arms</span>` : ""}${renderDiceTray(woundRollsResults)}</div>`;
+					})
+					.join("");
+
+				container.innerHTML += `<hr><strong>Total Wounds: ${totalWounds}</strong>`;
+
+				// Quick Save Summary by AP
+				const apGroups = {};
+
+				lastWoundResults.forEach((result) => {
+					if (result.wounds <= 0) return;
+
+					const ap = result.ap ?? "0";
+
+					if (!apGroups[ap]) {
+						apGroups[ap] = 0;
+					}
+
+					apGroups[ap] += result.wounds;
+				});
+
+				container.innerHTML += "<h3>Quick Save Summary</h3>";
+
+				Object.entries(apGroups)
+					.sort((a, b) => Number(a[0]) - Number(b[0]))
+					.forEach(([ap, wounds]) => {
+						container.innerHTML += `
+      					<div class="attack-row">
+      						<strong>AP ${ap}</strong>: ${wounds} save(s)
+      					</div>
+      				`;
+					});
+
+				container.innerHTML += "<hr>";
+
+				container.innerHTML += "<h3>Opponent Save Summary</h3>";
+
+				container.innerHTML += renderWoundsByTarget(lastWoundResults);
+			}
+
+			function renderWoundsByTarget(results) {
+				const targetGroups = new Map();
+
+				results.forEach((result) => {
+					if (result.wounds <= 0) return;
+
+					const target = getTargetById(result.targetId);
+					const targetName = target?.name || "No target";
+
+					if (!targetGroups.has(targetName)) {
+						targetGroups.set(targetName, []);
+					}
+
+					targetGroups.get(targetName).push(result);
+				});
+
+				if (targetGroups.size === 0) {
+					return `<div class="attack-row">No saves required</div>`;
+				}
+
+				return Array.from(targetGroups.entries())
+					.map(([targetName, targetResults]) => {
+						const rows = targetResults
+							.sort(
+								(a, b) =>
+									a.unitName.localeCompare(b.unitName) ||
+									a.weaponName.localeCompare(b.weaponName),
+							)
+							.map(
+								(result) => `
+      								<div class="attack-row">
+      									<strong>${escapeHtml(result.unitName)}</strong><br>
+      									${escapeHtml(result.weaponName)}<br>
+      									${result.wounds} save(s) at AP ${result.ap}<br>
+      									Damage: ${result.damage}
+      								</div>
+      							`,
+							)
+							.join("");
+
+						return `<h4>${escapeHtml(targetName).toUpperCase()}</h4>${rows}`;
+					})
+					.join("");
+			}
+
+			function rollAttacks() {
+				const pool = buildCurrentPool();
+				const container = document.getElementById("attackResults");
+				const halfRange = document.getElementById("halfRange").checked;
+
+				if (pool.length === 0) {
+					container.innerHTML = "No units selected";
+					return;
+				}
+
+				if (!attackRollsRequired(pool)) {
+					lastAttackResults = buildFixedAttackResults(pool);
+					container.innerHTML = "No random attack rolls required";
+					return;
+				}
+
+				let grandTotal = 0;
+				lastAttackResults = [];
+
+				container.innerHTML = pool
+					.map((entry) => {
+						let shots = 0;
+						const attackRolls = [];
+						let attackBonus = 0;
+
+						for (let i = 0; i < entry.count; i++) {
+							const rollDetails = rollAttackDetails(entry.profile.attacks);
+							shots += rollDetails.total;
+							attackBonus += rollDetails.bonus || 0;
+							attackRolls.push(
+								...rollDetails.rolls.map((roll) => ({
+									value: roll,
+								})),
+							);
+						}
+
+						const rapidFire = getRapidFireValue(entry.profile);
+						let rapidFireBonus = 0;
+
+						if (halfRange && rapidFire > 0) {
+							rapidFireBonus = rapidFire * entry.count;
+							shots += rapidFireBonus;
+						}
+
+						lastAttackResults.push({
+							...entry,
+							attacks: shots,
+							attackRolls,
+							attackBonus,
+						});
+
+						grandTotal += shots;
+
+						return `
+	      					<div class="attack-row">
+	      						<strong>${escapeHtml(entry.unitName)} - ${escapeHtml(entry.weaponName)}</strong>: ${shots} attacks rolled
+	      						${rapidFireBonus > 0 ? `<br>Rapid Fire bonus: +${rapidFireBonus}` : ""}
+                    ${attackBonus > 0 ? `<br>Attack roll bonus: +${attackBonus}` : ""}
+                    ${attackRolls.length > 0 ? renderDiceTray(attackRolls) : `<span class="roll-note">Fixed attacks: ${entry.count} x ${entry.profile.attacks}</span>`}
+	      					</div>
+	      			`;
+					})
+					.join("");
+
+				container.innerHTML += `<hr><strong>Total Attacks Rolled: ${grandTotal}</strong>`;
+			}
+
+			function calculateAverageAttacks(attacks) {
+				if (!attacks) return 0;
+
+				const text = attacks.toUpperCase().trim();
+
+				if (/^\d+$/.test(text)) {
+					return Number(text);
+				}
+
+				if (text === "D3") return 2;
+				if (text === "D6") return 3.5;
+				if (text === "2D6") return 7;
+				if (text === "3D6") return 10.5;
+
+				const match = text.match(/(\d*)D(\d+)\+(\d+)/);
+				if (match) {
+					const diceCount = Number(match[1] || 1);
+					const diceSize = Number(match[2]);
+					const bonus = Number(match[3]);
+					return diceCount * ((diceSize + 1) / 2) + bonus;
+				}
+
+				return 0;
+			}
+
+			function renderShotSummary(pool) {
+				const container = document.getElementById("shotSummary");
+
+				const halfRange = document.getElementById("halfRange")?.checked;
+
+				if (pool.length === 0) {
+					container.innerHTML = "No units selected";
+					return;
+				}
+
+				let totalAverageShots = 0;
+
+				container.innerHTML = pool
+					.slice()
+					.sort(
+						(a, b) =>
+							a.unitName.localeCompare(b.unitName) ||
+							a.weaponName.localeCompare(b.weaponName),
+					)
+					.map((entry) => {
+						const attacksPerWeapon = calculateAverageAttacks(
+							entry.profile.attacks,
+						);
+						let totalShots = attacksPerWeapon * entry.count;
+
+						const rapidFire = getRapidFireValue(entry.profile);
+						if (halfRange && rapidFire > 0) {
+							totalShots += rapidFire * entry.count;
+						}
+
+						totalAverageShots += totalShots;
+
+						return `<div class="attack-row"><strong>${escapeHtml(entry.unitName)} - ${escapeHtml(entry.weaponName)}</strong>: ${entry.count} weapon(s) × ${entry.profile.attacks} = ${totalShots.toFixed(1)} average shots</div>`;
+					})
+					.join("");
+
+				container.innerHTML += `<hr><strong>Total Average Shots: ${totalAverageShots.toFixed(1)}</strong>`;
+			}
+		</script>
+		<script>
+			function updateModifierHighlights() {
+				document.querySelectorAll(".modifier-grid label").forEach((label) => {
+					const checkbox = label.querySelector('input[type="checkbox"]');
+					const select = label.querySelector("select");
+					const isActive =
+						(checkbox && checkbox.checked) || (select && select.value !== "0");
+
+					label.classList.toggle("active", Boolean(isActive));
+				});
+			}
+
+			[
+				"takeAim",
+				"fixBayonets",
+				"heavyStationary",
+				"fieldsOfFire",
+				"halfRange",
+				"hitRollModifier",
+			].forEach((id) => {
+				const control = document.getElementById(id);
+				if (!control) return;
+
+				control.addEventListener("change", () => {
+					updateModifierHighlights();
+					if (parsedArmy.length > 0) {
+						updateAttackPool();
+					}
+				});
+			});
+			updateModifierHighlights();
+		</script>
+	</body>
+</html>
