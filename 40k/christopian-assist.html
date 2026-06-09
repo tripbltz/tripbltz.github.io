@@ -277,11 +277,6 @@
         color: #00ff88;
       }
 
-      .detachment-status {
-        color: #bbb;
-        margin-top: 8px;
-      }
-
       #attackPool {
         background: #222;
         border: 1px solid #444;
@@ -507,6 +502,10 @@
 
       .die.lethal {
         box-shadow: 0 0 0 2px #f5c542 inset;
+      }
+
+      .die.sustained {
+        box-shadow: 0 0 0 2px #6aa8ff inset;
       }
 
       .roll-note {
@@ -774,9 +773,6 @@
         </div>
         <div class="modifier-column">
           <h2>Modifiers</h2>
-          <div class="detachment-status" id="detachmentStatus">
-            Detachment: none detected
-          </div>
           <div class="modifier-grid">
             <label>
               <input type="checkbox" id="halfRange" />
@@ -797,6 +793,14 @@
             <label>
               <input type="checkbox" id="fieldsOfFire" />
               Fields of Fire (+1 AP)
+            </label>
+            <label>
+              <input type="checkbox" id="lethalHits" />
+              Lethal Hits
+            </label>
+            <label>
+              <input type="checkbox" id="sustainedHits" />
+              Sustained Hits 1
             </label>
             <label>
               Hit Roll Modifier
@@ -855,12 +859,12 @@
       let lastWoundResults = null;
       let targets = [{ id: 1, name: "Target 1", toughness: 4 }];
       let nextTargetId = 2;
-      let combinedArmsActive = false;
       let unitWeaponFilters = {
         ranged: true,
         melee: true,
       };
       const weaponLookup = new Map();
+      const unitWeaponLookup = new Map();
 
       ////////////////////////////////////////////////////
       // LOAD JSON
@@ -893,6 +897,7 @@
 
       function buildWeaponLookup() {
         weaponLookup.clear();
+        unitWeaponLookup.clear();
 
         weaponDatabase.forEach((datasheet) => {
           if (!datasheet.weapons) return;
@@ -900,13 +905,46 @@
           datasheet.weapons.forEach((weapon) => {
             if (!weapon.name) return;
 
-            weaponLookup.set(normalizeWeaponName(weapon.name), weapon);
+            const normalizedWeaponName = normalizeWeaponName(weapon.name);
+            const normalizedUnitName = normalizeWeaponName(
+              datasheet.unitname || "",
+            );
+            const factionName = normalizeWeaponName(
+              datasheet.factionname || "",
+            );
+
+            if (normalizedUnitName) {
+              unitWeaponLookup.set(
+                `${normalizedUnitName}|${normalizedWeaponName}`,
+                weapon,
+              );
+            }
+
+            if (
+              !weaponLookup.has(normalizedWeaponName) ||
+              factionName === "astra militarum"
+            ) {
+              weaponLookup.set(normalizedWeaponName, weapon);
+            }
           });
         });
       }
 
-      function getWeaponProfile(name) {
+      function getWeaponProfile(name, unitName = null) {
         const normalizedName = normalizeWeaponName(name);
+        const normalizedUnitName = normalizeWeaponName(unitName || "");
+
+        if (normalizedUnitName) {
+          const unitProfile =
+            unitWeaponLookup.get(`${normalizedUnitName}|${normalizedName}`) ||
+            unitWeaponLookup.get(
+              `${normalizedUnitName}|${normalizedName} - standard`,
+            );
+
+          if (unitProfile) {
+            return unitProfile;
+          }
+        }
 
         return (
           weaponLookup.get(normalizedName) ||
@@ -972,10 +1010,8 @@
       document.getElementById("parseBtn").addEventListener("click", () => {
         const text = document.getElementById("armyInput").value;
 
-        combinedArmsActive = hasCombinedArmsDetachment(text);
         parsedArmy = parseArmy(text);
 
-        updateDetachmentStatus();
         renderArmy();
         updateAttackPool();
         closeImportModal();
@@ -996,18 +1032,6 @@
       ////////////////////////////////////////////////////
       // PARSE ARMY
       ////////////////////////////////////////////////////
-
-      function hasCombinedArmsDetachment(text) {
-        return /combined\s+(arms|regiment)/i.test(text);
-      }
-
-      function updateDetachmentStatus() {
-        const status = document.getElementById("detachmentStatus");
-
-        status.innerText = combinedArmsActive
-          ? "Detachment: Combined Arms detected - unmodified hit rolls of 6 auto-wound"
-          : "Detachment: none detected";
-      }
 
       function isArmySectionHeading(line) {
         return [
@@ -1710,6 +1734,7 @@
                 if (roll.success === true) classes.push("success");
                 if (roll.success === false) classes.push("fail");
                 if (roll.lethal) classes.push("lethal");
+                if (roll.sustained) classes.push("sustained");
 
                 return `<span class="${classes.join(" ")}">${roll.value}</span>`;
               })
@@ -1844,7 +1869,7 @@
           unit.weapons
             .filter((weapon) => weapon.enabled !== false)
             .forEach((weapon) => {
-              const profile = getWeaponProfile(weapon.name);
+              const profile = getWeaponProfile(weapon.name, unit.baseName);
               if (!profile) {
                 console.warn(
                   "Missing weapon profile:",
@@ -1864,6 +1889,7 @@
               pool.push({
                 id: `${unit.id}-${weapon.name}`,
                 unitId: unit.id,
+                unitBaseName: unit.baseName,
                 unitName: unit.displayName,
                 weaponName: weapon.name,
                 sourceWeaponName: sourceName,
@@ -1948,6 +1974,10 @@
 
       function rollHits() {
         const container = document.getElementById("hitResults");
+        const lethalHitsActive = document.getElementById("lethalHits")?.checked;
+        const sustainedHitsActive =
+          document.getElementById("sustainedHits")?.checked;
+
         if (!lastAttackResults) {
           const pool = buildCurrentPool();
 
@@ -1975,6 +2005,7 @@
             const skill = applyHitRollModifier(characteristicSkill);
             let hits = 0;
             let lethalWounds = 0;
+            let sustainedHits = 0;
             const hitRolls = [];
 
             if (skill === null) {
@@ -1983,12 +2014,15 @@
               for (let i = 0; i < attacks; i++) {
                 const roll = Math.floor(Math.random() * 6) + 1;
                 const success = roll >= skill;
-                const lethal = combinedArmsActive && roll === 6 && success;
+                const criticalHit = roll === 6 && success;
+                const lethal = lethalHitsActive && criticalHit;
+                const sustained = sustainedHitsActive && criticalHit;
 
                 hitRolls.push({
                   value: roll,
                   success,
                   lethal,
+                  sustained,
                 });
 
                 if (success) {
@@ -1996,6 +2030,11 @@
 
                   if (lethal) {
                     lethalWounds++;
+                  }
+
+                  if (sustained) {
+                    hits++;
+                    sustainedHits++;
                   }
                 }
               }
@@ -2006,6 +2045,7 @@
               ...entry,
               hits,
               lethalWounds,
+              sustainedHits,
               hitRolls,
             });
 
@@ -2014,7 +2054,8 @@
 	      		<strong>${escapeHtml(entry.unitName)} - ${escapeHtml(entry.weaponName)}</strong>: ${attacks} attacks &rarr; ${hits} hits
 	      		${baseSkill !== null && characteristicSkill !== baseSkill ? `<br>Order: ${baseSkill}+ → ${characteristicSkill}+` : ""}
             ${characteristicSkill !== null && skill !== characteristicSkill ? `<br>Hit modifier: ${characteristicSkill}+ → ${skill}+` : ""}
-	      		${lethalWounds > 0 ? `<br>Combined Arms: ${lethalWounds} auto-wound(s) from hit rolls of 6` : ""}
+	      		${lethalWounds > 0 ? `<br>Lethal Hits: ${lethalWounds} auto-wound(s) from hit rolls of 6` : ""}
+	      		${sustainedHits > 0 ? `<br>Sustained Hits 1: +${sustainedHits} extra hit(s) from hit rolls of 6` : ""}
             ${skill === null ? `<span class="roll-note">Torrent: auto-hit</span>` : renderDiceTray(hitRolls)}
 	      	</div>
 	      `;
@@ -2088,7 +2129,7 @@
 
             totalWounds += wounds;
 
-            return `<div class="attack-row"><strong>${escapeHtml(entry.unitName)} - ${escapeHtml(entry.weaponName)}</strong>: ${hits} hits${lethalWounds > 0 ? ` (${lethalWounds} auto-wound)` : ""} &rarr; ${wounds} wounds into ${escapeHtml(target?.name || "No target")} (${woundTarget}+) | AP ${getModifiedAp(entry.profile)} | D ${entry.profile.damage}${lethalWounds > 0 ? `<br><span class="roll-note">${lethalWounds} wound(s) added before rolling from Combined Arms</span>` : ""}${renderDiceTray(woundRollsResults)}</div>`;
+            return `<div class="attack-row"><strong>${escapeHtml(entry.unitName)} - ${escapeHtml(entry.weaponName)}</strong>: ${hits} hits${lethalWounds > 0 ? ` (${lethalWounds} auto-wound)` : ""} &rarr; ${wounds} wounds into ${escapeHtml(target?.name || "No target")} (${woundTarget}+) | AP ${getModifiedAp(entry.profile)} | D ${entry.profile.damage}${lethalWounds > 0 ? `<br><span class="roll-note">${lethalWounds} wound(s) added before rolling from Lethal Hits</span>` : ""}${renderDiceTray(woundRollsResults)}</div>`;
           })
           .join("");
 
@@ -2343,6 +2384,8 @@
         "fixBayonets",
         "heavyStationary",
         "fieldsOfFire",
+        "lethalHits",
+        "sustainedHits",
         "halfRange",
         "hitRollModifier",
       ].forEach((id) => {
