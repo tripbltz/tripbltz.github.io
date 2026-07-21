@@ -21,8 +21,8 @@
 				--muted: rgba(255, 255, 255, 0.42);
 				--faint: rgba(255, 255, 255, 0.18);
 				--glow: rgba(255, 255, 255, 0.1);
-				--photo-opacity: 0.58;
-				--photo-focus-opacity: 0.82;
+				--photo-opacity: 1;
+				--photo-focus-opacity: 1;
 				--interface-opacity: 1;
 				--brightness: 1;
 				--pad: clamp(28px, 4.4vw, 82px);
@@ -34,14 +34,14 @@
 				--secondary: rgba(255, 255, 255, 0.76);
 				--muted: rgba(255, 255, 255, 0.5);
 				--glow: rgba(255, 255, 255, 0.14);
-				--photo-opacity: 0.64;
+				--photo-opacity: 1;
 				--brightness: 1.08;
 			}
 
 			.theme-afternoon {
 				--secondary: rgba(255, 255, 255, 0.7);
 				--muted: rgba(255, 255, 255, 0.46);
-				--photo-opacity: 0.6;
+				--photo-opacity: 1;
 				--brightness: 1;
 			}
 
@@ -49,7 +49,7 @@
 				--secondary: rgba(245, 245, 245, 0.62);
 				--muted: rgba(245, 245, 245, 0.38);
 				--glow: rgba(255, 255, 255, 0.07);
-				--photo-opacity: 0.53;
+				--photo-opacity: 1;
 				--brightness: 0.9;
 			}
 
@@ -59,8 +59,8 @@
 				--muted: rgba(255, 255, 255, 0.28);
 				--faint: rgba(255, 255, 255, 0.1);
 				--glow: rgba(255, 255, 255, 0.035);
-				--photo-opacity: 0.34;
-				--photo-focus-opacity: 0.5;
+				--photo-opacity: 1;
+				--photo-focus-opacity: 1;
 				--brightness: 0.72;
 			}
 
@@ -214,14 +214,7 @@
 				min-height: 0;
 				opacity: var(--photo-opacity);
 				transition: opacity var(--transition-slow), transform var(--transition-slow);
-				-webkit-mask-image:
-					linear-gradient(to right, transparent 0, black 13%, black 100%),
-					linear-gradient(to bottom, transparent 0, black 10%, black 88%, transparent 100%);
-				mask-image:
-					linear-gradient(to right, transparent 0, black 13%, black 100%),
-					linear-gradient(to bottom, transparent 0, black 10%, black 88%, transparent 100%);
-				-webkit-mask-composite: source-in;
-				mask-composite: intersect;
+				filter: brightness(calc(1 / var(--brightness)));
 			}
 
 			.photo-stage img {
@@ -391,13 +384,7 @@
 					height: 50vh;
 					min-height: 820px;
 					max-height: 960px;
-					opacity: calc(var(--photo-opacity) + 0.16);
-					-webkit-mask-image:
-						linear-gradient(to bottom, transparent 0, black 8%, black 92%, transparent 100%),
-						linear-gradient(to right, transparent 0, black 7%, black 93%, transparent 100%);
-					mask-image:
-						linear-gradient(to bottom, transparent 0, black 8%, black 92%, transparent 100%),
-						linear-gradient(to right, transparent 0, black 7%, black 93%, transparent 100%);
+					opacity: var(--photo-opacity);
 				}
 
 				.photo-stage img {
@@ -455,9 +442,7 @@
 				.photo-stage {
 					grid-column: 1;
 					grid-row: 3;
-					opacity: 0.32;
-					-webkit-mask-image: linear-gradient(to bottom, transparent 0, black 20%, black 82%, transparent 100%);
-					mask-image: linear-gradient(to bottom, transparent 0, black 20%, black 82%, transparent 100%);
+					opacity: var(--photo-opacity);
 				}
 
 				.photo-stage img {
