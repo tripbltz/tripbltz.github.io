@@ -1,0 +1,616 @@
+/* Campaign reports share the command interface while allowing longer reading. */
+.secondary-view {
+  display: grid;
+  gap: 22px;
+  min-width: 0;
+}
+.secondary-view > .section-heading {
+  margin: 0 0 2px;
+  align-items: flex-start;
+}
+.secondary-view > .section-heading h2 {
+  font-size: 34px;
+  text-transform: uppercase;
+  margin: 6px 0 10px;
+}
+.secondary-view > .section-heading .muted {
+  font-size: 13px;
+}
+.secondary-view .section-heading > .toolbar {
+  justify-content: flex-end;
+}
+.secondary-view > .panel {
+  padding: 24px;
+}
+.secondary-view .panel-head {
+  padding: 0 0 16px;
+  margin: 0 0 16px;
+  flex-wrap: wrap;
+}
+.secondary-view .panel-head h3 {
+  font: 600 24px var(--heading);
+  letter-spacing: 0.03em;
+}
+.secondary-view .panel-head .eyebrow {
+  font-size: 9px;
+  margin-bottom: 6px;
+}
+.secondary-view .panel-head .toolbar,
+.secondary-view .toolbar:last-child {
+  margin-bottom: 0;
+}
+.secondary-view .card-grid {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
+}
+.secondary-view .card {
+  min-width: 0;
+}
+.secondary-view .card h4 {
+  line-height: 1.25;
+}
+.secondary-view .card p {
+  line-height: 1.65;
+}
+.secondary-view .stat {
+  min-width: 0;
+  padding: 12px;
+}
+.secondary-view .stat strong {
+  margin: 0 0 4px;
+  font-size: 30px;
+}
+.secondary-view .stat span {
+  display: block;
+  font-size: 9px;
+  line-height: 1.6;
+}
+.secondary-view .detail-list {
+  font-size: 12px;
+  line-height: 1.6;
+}
+.secondary-view .detail-list dd {
+  overflow-wrap: anywhere;
+}
+.secondary-view .text-link {
+  border: 0;
+  padding: 0;
+  background: transparent;
+  color: #d6c196;
+  font: inherit;
+  text-align: left;
+  white-space: normal;
+  line-height: 1.5;
+  min-height: 30px;
+  text-decoration: underline;
+  text-decoration-color: #6c6247;
+  text-underline-offset: 4px;
+}
+.secondary-view .text-link:hover {
+  color: #f2dfb5;
+  text-decoration-color: currentColor;
+}
+.secondary-view .narrative {
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+  line-height: 1.8;
+}
+.secondary-view .owner-dot {
+  display: inline-block;
+  flex-shrink: 0;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  border: 1px solid #ffffff40;
+}
+.secondary-view .badge {
+  line-height: 1.5;
+  font-size: 9px;
+}
+.secondary-view .empty-state {
+  grid-column: 1/-1;
+  max-width: 100%;
+}
+.secondary-view .record-grid {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
+}
+.secondary-view .record-card h4 {
+  font-size: 23px;
+  margin: 10px 0 8px;
+}
+.secondary-view .record-card > .eyebrow {
+  font-size: 9px;
+  color: var(--gold);
+}
+.secondary-view .player-comparison {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
+}
+.secondary-view .player-summary {
+  border-top: 2px solid var(--faction-color);
+  min-width: 0;
+}
+.secondary-view .player-summary > h3 {
+  margin-top: 8px;
+}
+.secondary-view .player-summary > .stat-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+.secondary-view .player-summary > .muted {
+  font-size: 12px;
+  margin-top: 14px;
+}
+.secondary-view .player-summary .progress {
+  height: 4px;
+}
+.secondary-view .final-assault {
+  margin: 0;
+  padding: 28px;
+  background: radial-gradient(ellipse at 90% 0, #4b3b24, #241f17 85%);
+}
+.secondary-view .final-assault h3 {
+  font-size: 32px;
+  color: #ddc394;
+  margin: 9px 0 16px;
+}
+.secondary-view .final-assault .btn {
+  margin-top: 16px;
+}
+.secondary-view .final-assault > .muted {
+  margin-top: 16px;
+}
+.secondary-view .resource-actions {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr));
+  gap: 14px;
+}
+.secondary-view .resource-actions .card {
+  display: flex;
+  flex-direction: column;
+  background: #141811;
+  padding: 18px;
+}
+.secondary-view .resource-actions .card h4 {
+  font-size: 22px;
+  margin: 7px 0 12px;
+}
+.secondary-view .resource-actions .card > .toolbar {
+  margin-top: auto;
+  padding-top: 18px;
+}
+.secondary-view .event-card {
+  background: #141811;
+}
+.secondary-view .event-card .panel-head {
+  margin-bottom: 12px;
+  border: 0;
+  padding-bottom: 0;
+}
+.secondary-view .event-card .panel-head h4 {
+  font-size: 24px;
+}
+.secondary-view .event-card > .btn {
+  margin-top: 12px;
+}
+.secondary-view .event-list {
+  margin-top: 20px;
+}
+.secondary-view .table-wrap td > .btn {
+  display: flex;
+  margin-top: 8px;
+  font-size: 10px;
+  min-height: 34px;
+  padding: 6px 10px;
+}
+.secondary-view .chronicle-tabs {
+  margin: 0;
+  border-bottom: 1px solid var(--line);
+  gap: 8px;
+}
+.secondary-view .chronicle-tabs [aria-selected="true"] {
+  color: #ddc494;
+  border-bottom-color: var(--gold);
+  background: #24271d;
+  border-radius: 3px 3px 0 0;
+}
+.secondary-view .chronicle-tabs [aria-selected="false"]:hover {
+  color: var(--text);
+  background: #1d211b;
+}
+.secondary-view .chronicle-entry {
+  grid-template-columns: 115px minmax(0, 1fr);
+  gap: 0;
+  margin-bottom: 18px;
+}
+.secondary-view .chronicle-date {
+  padding: 25px 18px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+  gap: 12px;
+  background: #141811;
+}
+.secondary-view .chronicle-date > .eyebrow {
+  font-size: 9px;
+  letter-spacing: 0.06em;
+}
+.secondary-view .chronicle-body {
+  padding: 24px 28px;
+  min-width: 0;
+}
+.secondary-view .chronicle-body > .toolbar {
+  margin-top: 20px;
+  gap: 18px;
+}
+.secondary-view .chronicle-body p {
+  color: #b8bfad;
+  line-height: 1.8;
+}
+.secondary-view .summary-score {
+  display: block;
+  margin: 12px 0 16px;
+  color: #dcc697;
+  font: 500 28px var(--heading);
+  letter-spacing: 0.07em;
+}
+.secondary-view .chronicle-photos {
+  flex-wrap: wrap;
+  margin-top: 18px;
+}
+.secondary-view .photo-thumb {
+  border-radius: 3px;
+  overflow: hidden;
+  min-height: 44px;
+}
+.secondary-view .photo-thumb img {
+  display: block;
+  width: 140px;
+  height: 95px;
+}
+.secondary-view .army-card {
+  border-top: 2px solid var(--faction-color);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+}
+.secondary-view .army-card > .panel-head {
+  border: 0;
+  margin: 0;
+  padding: 0;
+}
+.secondary-view .army-mark {
+  height: 46px;
+  width: 46px;
+  margin: 0;
+  display: grid;
+  place-items: center;
+  color: #c7b38a;
+  border: 1px solid #4c5140;
+  background: #22271d;
+}
+.secondary-view .army-mark > .icon {
+  width: 27px;
+  height: 27px;
+}
+.secondary-view .army-mark > img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.secondary-view .army-card > h3 {
+  font-size: 31px;
+  margin: 23px 0 12px;
+  text-transform: uppercase;
+}
+.secondary-view .army-card > .muted {
+  font-size: 13px;
+  min-height: 65px;
+}
+.secondary-view .army-stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  padding-top: 18px;
+  margin: 18px 0 4px;
+}
+.secondary-view .army-stats .stat {
+  border: 0;
+  background: transparent;
+  padding: 0;
+}
+.secondary-view .army-stats .stat strong {
+  font-size: 28px;
+}
+.secondary-view .army-card > .btn {
+  align-self: flex-start;
+  margin-top: auto;
+}
+.secondary-view .unit-list {
+  margin-top: 22px;
+  gap: 16px;
+}
+.secondary-view .unit-card {
+  background: #141811;
+  padding: 20px;
+}
+.secondary-view .unit-card h4 {
+  font-size: 24px;
+}
+.secondary-view .unit-card .panel-head {
+  border: 0;
+  margin-bottom: 0;
+  padding-bottom: 0;
+  align-items: flex-start;
+}
+.secondary-view .unit-card .stat-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin: 20px 0;
+  gap: 12px;
+}
+.secondary-view .unit-card .stat {
+  border: 0;
+  border-left: 1px solid var(--line);
+  padding: 0 14px;
+  background: transparent;
+}
+.secondary-view .unit-card > .eyebrow {
+  margin: 12px 0;
+  color: var(--gold);
+}
+.secondary-view .unit-card > .toolbar {
+  gap: 8px;
+}
+.secondary-view .gallery-filters {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin: 0;
+  gap: 18px;
+  padding: 22px;
+}
+.secondary-view .gallery-filters > * {
+  min-width: 0;
+}
+.secondary-view .gallery-filters > .toolbar {
+  grid-column: 1/-1;
+  min-height: 25px;
+  justify-content: space-between;
+  margin: 0;
+}
+.secondary-view .gallery-grid {
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 230px), 1fr));
+  gap: 18px;
+}
+.secondary-view .gallery-photo {
+  padding: 0;
+  overflow: hidden;
+  cursor: default;
+}
+.secondary-view .gallery-photo > button {
+  display: block;
+  width: 100%;
+  padding: 0;
+  background: #0b0e0a;
+  border: 0;
+  overflow: hidden;
+}
+.secondary-view .gallery-photo img {
+  display: block;
+  width: 100%;
+  height: 210px;
+  object-fit: cover;
+  border-radius: 0;
+  transition: transform 0.2s;
+}
+.secondary-view .gallery-photo > button:hover img {
+  transform: scale(1.03);
+}
+.secondary-view .gallery-photo figcaption {
+  padding: 16px;
+}
+.secondary-view .gallery-photo figcaption > p:first-child {
+  margin-bottom: 8px;
+  color: #d5d7c9;
+}
+.secondary-view .gallery-photo figcaption .muted {
+  font-size: 11px;
+  margin: 8px 0 0;
+  line-height: 1.6;
+}
+#secondary-form {
+  display: grid;
+  gap: 18px;
+}
+#secondary-form > p {
+  font-size: 13px;
+  color: #b8bfad;
+  line-height: 1.7;
+}
+#secondary-form .form-actions {
+  margin: 8px 0 0;
+  padding-top: 20px;
+  gap: 10px;
+}
+#secondary-form .form-error {
+  padding: 12px 15px;
+  border: 1px solid #825343;
+  background: #35241c;
+  color: #edbcaa;
+}
+#secondary-form .form-error[hidden] {
+  display: none;
+}
+#secondary-form .check-field {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  min-height: 44px;
+  font-size: 13px;
+  color: #c6cbbd;
+}
+#secondary-form .check-field input {
+  flex-shrink: 0;
+}
+#secondary-form #event-preview {
+  border-left: 2px solid #716346;
+  padding-left: 18px;
+}
+#secondary-form #event-preview p {
+  font-size: 13px;
+  line-height: 1.7;
+}
+@media (max-width: 760px) {
+  .secondary-view {
+    gap: 18px;
+  }
+  .secondary-view > .section-heading {
+    flex-wrap: wrap;
+  }
+  .secondary-view > .section-heading h2 {
+    font-size: 30px;
+  }
+  .secondary-view .section-heading > .toolbar {
+    justify-content: flex-start;
+  }
+  .secondary-view > .panel {
+    padding: 20px;
+  }
+  .secondary-view .chronicle-entry {
+    grid-template-columns: 95px minmax(0, 1fr);
+  }
+  .secondary-view .chronicle-date {
+    padding: 20px 13px;
+  }
+  .secondary-view .chronicle-body {
+    padding: 20px;
+  }
+  .secondary-view .gallery-filters {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 520px) {
+  .secondary-view .btn,
+  #secondary-form .btn {
+    min-height: 44px;
+    white-space: normal;
+    text-align: center;
+  }
+  .secondary-view > .section-heading h2 {
+    font-size: 29px;
+    overflow-wrap: anywhere;
+  }
+  .secondary-view > .panel {
+    padding: 18px;
+  }
+  .secondary-view .panel-head {
+    align-items: flex-start;
+    gap: 14px;
+  }
+  .secondary-view .panel-head .toolbar {
+    gap: 8px;
+  }
+  .secondary-view .stat-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+  .secondary-view .player-summary > .stat-grid {
+    gap: 7px;
+  }
+  .secondary-view .player-summary .stat {
+    padding: 10px 7px;
+  }
+  .secondary-view .player-summary .stat strong {
+    font-size: 27px;
+  }
+  .secondary-view .player-summary .stat span {
+    font-size: 8px;
+  }
+  .secondary-view .chronicle-entry {
+    display: block;
+  }
+  .secondary-view .chronicle-date {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 18px;
+  }
+  .secondary-view .chronicle-body {
+    padding: 18px;
+    border-left-width: 2px;
+  }
+  .secondary-view .chronicle-body h3 {
+    font-size: 25px;
+  }
+  .secondary-view .chronicle-body > .toolbar {
+    gap: 12px;
+  }
+  .secondary-view .chronicle-photos {
+    gap: 7px;
+  }
+  .secondary-view .photo-thumb {
+    max-width: calc(50% - 4px);
+  }
+  .secondary-view .photo-thumb img {
+    height: 90px;
+  }
+  .secondary-view .unit-card {
+    padding: 16px;
+  }
+  .secondary-view .unit-card .stat-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    row-gap: 18px;
+  }
+  .secondary-view .army-card {
+    padding: 20px;
+  }
+  .secondary-view .army-card > h3 {
+    font-size: 29px;
+  }
+  .secondary-view .army-card > .muted {
+    min-height: 0;
+  }
+  .secondary-view .army-stats {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .secondary-view .gallery-filters {
+    gap: 14px;
+    padding: 16px;
+  }
+  .secondary-view .gallery-filters .field > span {
+    font-size: 9px;
+  }
+  .secondary-view .gallery-filters input,
+  .secondary-view .gallery-filters select {
+    padding: 10px 8px;
+    font-size: 12px;
+    min-width: 0;
+    max-width: 100%;
+  }
+  .secondary-view .gallery-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+  .secondary-view .gallery-photo img {
+    height: 150px;
+  }
+  .secondary-view .gallery-photo figcaption {
+    padding: 12px;
+  }
+  .secondary-view .gallery-photo figcaption > p,
+  .secondary-view .gallery-photo .text-link {
+    font-size: 11px;
+    line-height: 1.6;
+    overflow-wrap: anywhere;
+  }
+  .secondary-view .gallery-photo figcaption .muted {
+    font-size: 10px;
+  }
+  .secondary-view .resource-actions {
+    grid-template-columns: 1fr;
+  }
+  .secondary-view .toolbar {
+    gap: 9px;
+  }
+  .secondary-view .final-assault {
+    padding: 20px;
+  }
+}

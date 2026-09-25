@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#111310" />
+    <meta
+      name="description"
+      content="A living campaign atlas for the War for Christopia. Chart the frontline, record your battles, and write the history of a world at war."
+    />
+    <title>The War for Christopia · Campaign Command</title>
+    <link rel="icon" type="image/svg+xml" href="assets/sigil.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700;800&family=Barlow:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="css/styles.css" />
+    <link rel="stylesheet" href="css/secondary.css" />
+    <script src="config.js"></script>
+    <script type="module" src="js/app.js"></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to campaign</a>
+    <div id="app">
+      <div class="boot">
+        <img src="assets/sigil.svg" alt="" width="64" />
+        <p class="eyebrow">ESTABLISHING VOX LINK</p>
+        <h1>THE WAR FOR CHRISTOPIA</h1>
+        <p class="muted">Retrieving tactical data…</p>
+      </div>
+    </div>
+    <dialog id="modal"><div id="modal-content"></div></dialog>
+    <div id="toasts" role="status" aria-live="polite"></div>
+    <noscript
+      >This campaign terminal requires JavaScript to display the map and record
+      battles.</noscript
+    >
+  </body>
+</html>

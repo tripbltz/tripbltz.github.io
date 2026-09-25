@@ -1,0 +1,6 @@
+project_id = "christopia"
+
+[functions.campaign-command]
+# The function verifies the bearer token with auth.getUser(). This also supports
+# projects using publishable keys instead of the legacy anon JWT.
+verify_jwt = false

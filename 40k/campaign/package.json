@@ -1,0 +1,21 @@
+{
+  "name": "war-for-christopia",
+  "private": true,
+  "type": "module",
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "node scripts/serve.mjs",
+    "test": "node --test tests/*.test.js",
+    "build": "node scripts/build.mjs",
+    "prepare:functions": "node scripts/prepare-functions.mjs",
+    "test:browser": "node tests/browser.mjs"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "devDependencies": {
+    "@electric-sql/pglite": "^0.3.14",
+    "fake-indexeddb": "^6.2.2",
+    "playwright": "^1.63.0"
+  }
+}
