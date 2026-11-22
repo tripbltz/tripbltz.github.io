@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 	<head>
 		<meta charset="utf-8" />
@@ -75,7 +75,13 @@
 				margin: 0;
 				overflow: hidden;
 				background: var(--bg);
-				font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+				font-family:
+					Inter,
+					system-ui,
+					-apple-system,
+					BlinkMacSystemFont,
+					"Segoe UI",
+					sans-serif;
 				letter-spacing: 0;
 			}
 
@@ -109,14 +115,23 @@
 			.mirror::before {
 				background:
 					radial-gradient(circle at 24% 28%, var(--glow), transparent 30%),
-					radial-gradient(circle at 82% 70%, rgba(255, 255, 255, 0.045), transparent 34%),
+					radial-gradient(
+						circle at 82% 70%,
+						rgba(255, 255, 255, 0.045),
+						transparent 34%
+					),
 					#000;
 				opacity: 0.95;
 				transition: opacity var(--transition-slow);
 			}
 
 			.mirror::after {
-				background: linear-gradient(90deg, rgba(0, 0, 0, 0.5), transparent 28%, rgba(0, 0, 0, 0.72));
+				background: linear-gradient(
+					90deg,
+					rgba(0, 0, 0, 0.5),
+					transparent 28%,
+					rgba(0, 0, 0, 0.72)
+				);
 			}
 
 			.time-panel {
@@ -124,7 +139,9 @@
 				grid-row: 1;
 				align-self: start;
 				opacity: var(--interface-opacity);
-				transition: opacity var(--transition-slow), transform var(--transition-slow);
+				transition:
+					opacity var(--transition-slow),
+					transform var(--transition-slow);
 			}
 
 			.clock {
@@ -151,7 +168,9 @@
 				min-width: min(390px, 100%);
 				text-align: right;
 				opacity: var(--interface-opacity);
-				transition: opacity var(--transition-slow), transform var(--transition-slow);
+				transition:
+					opacity var(--transition-slow),
+					transform var(--transition-slow);
 			}
 
 			.weather-main {
@@ -193,7 +212,9 @@
 				line-height: 1.02;
 				text-wrap: balance;
 				opacity: var(--interface-opacity);
-				transition: opacity var(--transition-slow), transform var(--transition-slow);
+				transition:
+					opacity var(--transition-slow),
+					transform var(--transition-slow);
 			}
 
 			.message-subtle {
@@ -213,7 +234,9 @@
 				justify-self: stretch;
 				min-height: 0;
 				opacity: var(--photo-opacity);
-				transition: opacity var(--transition-slow), transform var(--transition-slow);
+				transition:
+					opacity var(--transition-slow),
+					transform var(--transition-slow);
 				filter: brightness(calc(1 / var(--brightness)));
 			}
 
@@ -226,7 +249,9 @@
 				object-position: center right;
 				opacity: 0;
 				transform: scale(1.015);
-				transition: opacity 2600ms ease, transform 9000ms ease;
+				transition:
+					opacity 2600ms ease,
+					transform 9000ms ease;
 				will-change: opacity, transform;
 			}
 
@@ -255,7 +280,9 @@
 				gap: 12px;
 				max-width: 640px;
 				opacity: var(--interface-opacity);
-				transition: opacity var(--transition-slow), transform var(--transition-slow);
+				transition:
+					opacity var(--transition-slow),
+					transform var(--transition-slow);
 			}
 
 			.utility-status {
@@ -339,7 +366,13 @@
 				}
 
 				.mirror::after {
-					background: linear-gradient(180deg, rgba(0, 0, 0, 0.46), transparent 24%, transparent 72%, rgba(0, 0, 0, 0.72));
+					background: linear-gradient(
+						180deg,
+						rgba(0, 0, 0, 0.46),
+						transparent 24%,
+						transparent 72%,
+						rgba(0, 0, 0, 0.72)
+					);
 				}
 
 				.clock {
@@ -482,16 +515,22 @@
 
 			<section class="weather" aria-label="Weather">
 				<div class="weather-main">
-					<span class="weather-icon" id="weather-icon" aria-hidden="true">--</span>
+					<span class="weather-icon" id="weather-icon" aria-hidden="true"
+						>--</span
+					>
 					<span id="weather-temp">--&deg;C</span>
 				</div>
-				<div class="weather-range" id="weather-range">High --&deg; · Low --&deg;</div>
+				<div class="weather-range" id="weather-range">
+					High --&deg; · Low --&deg;
+				</div>
 				<div class="weather-summary" id="weather-summary">Weather loading</div>
 			</section>
 
 			<section class="message" aria-live="polite">
 				<span id="message-main">Good afternoon</span>
-				<span class="message-subtle" id="message-subtle">Ward-Smith household</span>
+				<span class="message-subtle" id="message-subtle"
+					>Ward-Smith household</span
+				>
 			</section>
 
 			<div class="photo-stage" id="photo-stage" aria-label="Family photo">
@@ -500,7 +539,9 @@
 			</div>
 
 			<section class="utility energy" aria-label="House energy">
-				<div class="utility-status" id="energy-status">Energy status loading</div>
+				<div class="utility-status" id="energy-status">
+					Energy status loading
+				</div>
 				<div class="utility-grid">
 					<div class="utility-item">
 						<div class="utility-label">Solar</div>
@@ -557,50 +598,53 @@
 					focusEvery: 3,
 					focusDurationMs: 22000,
 					images: [
-						"img/1-2025.jpeg",
-						"img/2-2025.jpeg",
-						"img/3-2025.jpeg",
-						"img/4-2025.jpeg",
-						"img/5-2025.jpeg",
-						"img/6-2025.jpeg",
-						"img/7-2025.jpeg",
-						"img/8-2025.jpeg",
-						"img/9-2025.jpeg",
-						"img/10-2025.jpeg",
-						"img/11-2025.jpeg",
-						"img/12-2025.jpeg",
-						"img/13-2025.jpeg",
-						"img/14-2025.jpeg",
-						"img/15-2025.jpeg",
-						"img/16-2025.jpeg",
-						"img/17-2025.jpeg",
-						"img/18-2025.jpeg",
-						"img/19-2025.jpeg",
-						"img/20-2025.jpeg",
-						"img/21-2025.jpeg",
-						"img/22-2025.jpeg",
-						"img/23-2025.jpeg",
-						"img/24-2025.jpeg",
-						"img/25-2025.jpeg",
-						"img/26-2025.jpeg",
-						"img/27-2025.jpeg",
-						"img/28-2025.jpeg",
-						"img/29-2025.jpeg",
-						"img/0225-14.jpeg",
-						"img/0325-1.jpeg",
-						"img/0325-4.jpeg",
-						"img/0425-2.jpeg",
-						"img/0425-1.jpeg",
-						"img/0525-1.jpeg",
-						"img/0525-2.jpeg",
-						"img/0525-3.jpeg",
-						"img/0925-1.jpeg",
-						"img/0925-2.jpeg",
-						"img/0925-3.jpeg",
-						"img/0925-4.jpeg",
-						"img/0925-5.jpeg",
-						"img/0925-6.jpeg",
-						"img/0925-7.jpeg",
+						"img/image1.png",
+						"img/image2.png",
+						"img/image3.png",
+						//"img/1-2025.jpeg",
+						//"img/2-2025.jpeg",
+						//"img/3-2025.jpeg",
+						//"img/4-2025.jpeg",
+						//"img/5-2025.jpeg",
+						//"img/6-2025.jpeg",
+						//"img/7-2025.jpeg",
+						//"img/8-2025.jpeg",
+						//"img/9-2025.jpeg",
+						//"img/10-2025.jpeg",
+						//"img/11-2025.jpeg",
+						//"img/12-2025.jpeg",
+						//"img/13-2025.jpeg",
+						//"img/14-2025.jpeg",
+						//"img/15-2025.jpeg",
+						//"img/16-2025.jpeg",
+						//"img/17-2025.jpeg",
+						//"img/18-2025.jpeg",
+						//"img/19-2025.jpeg",
+						//"img/20-2025.jpeg",
+						//"img/21-2025.jpeg",
+						//"img/22-2025.jpeg",
+						//"img/23-2025.jpeg",
+						//"img/24-2025.jpeg",
+						//"img/25-2025.jpeg",
+						//"img/26-2025.jpeg",
+						//"img/27-2025.jpeg",
+						//"img/28-2025.jpeg",
+						//"img/29-2025.jpeg",
+						//"img/0225-14.jpeg",
+						//"img/0325-1.jpeg",
+						//"img/0325-4.jpeg",
+						//"img/0425-2.jpeg",
+						//"img/0425-1.jpeg",
+						//"img/0525-1.jpeg",
+						//"img/0525-2.jpeg",
+						//"img/0525-3.jpeg",
+						//"img/0925-1.jpeg",
+						//"img/0925-2.jpeg",
+						//"img/0925-3.jpeg",
+						//"img/0925-4.jpeg",
+						//"img/0925-5.jpeg",
+						//"img/0925-6.jpeg",
+						//"img/0925-7.jpeg",
 					],
 				},
 				energy: {
@@ -610,13 +654,55 @@
 					apiUrl: "http://localhost:8011/api/energy",
 				},
 				specialDays: [
-					{ name: "Christmas Day", month: 12, day: 25, type: "christmas", message: "Merry Christmas! 🎄" },
-					{ name: "Christmas Eve", month: 12, day: 24, type: "christmas", message: "Christmas Eve 🎄" },
-					{ name: "New Year's Eve", month: 12, day: 31, type: "new-year", message: "New Year's Eve" },
-					{ name: "New Year's Day", month: 1, day: 1, type: "new-year", message: "Happy New Year!" },
-					{ name: "Halloween", month: 10, day: 31, type: "halloween", message: "Happy Halloween" },
-					{ name: "Penny's Birthday", month: 5, day: 20, type: "birthday", message: "Happy Birthday Penny! 🎈" },
-					{ name: "Anniversary", month: 6, day: 1, type: "anniversary", message: "Happy Anniversary! ❤️" },
+					{
+						name: "Christmas Day",
+						month: 12,
+						day: 25,
+						type: "christmas",
+						message: "Merry Christmas! 🎄",
+					},
+					{
+						name: "Christmas Eve",
+						month: 12,
+						day: 24,
+						type: "christmas",
+						message: "Christmas Eve 🎄",
+					},
+					{
+						name: "New Year's Eve",
+						month: 12,
+						day: 31,
+						type: "new-year",
+						message: "New Year's Eve",
+					},
+					{
+						name: "New Year's Day",
+						month: 1,
+						day: 1,
+						type: "new-year",
+						message: "Happy New Year!",
+					},
+					{
+						name: "Halloween",
+						month: 10,
+						day: 31,
+						type: "halloween",
+						message: "Happy Halloween",
+					},
+					{
+						name: "Penny's Birthday",
+						month: 5,
+						day: 20,
+						type: "birthday",
+						message: "Happy Birthday Penny! 🎈",
+					},
+					{
+						name: "Anniversary",
+						month: 6,
+						day: 1,
+						type: "anniversary",
+						message: "Happy Anniversary! ❤️",
+					},
 				],
 			};
 
@@ -678,14 +764,23 @@
 							hour: "numeric",
 							hour12: false,
 							timeZone: CONFIG.location.timezone,
-						}).format(date)
+						}).format(date),
 					);
-					return CONFIG.greetings.find((entry) => hour >= entry.from && hour < entry.to) || CONFIG.greetings[1];
+					return (
+						CONFIG.greetings.find(
+							(entry) => hour >= entry.from && hour < entry.to,
+						) || CONFIG.greetings[1]
+					);
 				},
 				update(date) {
 					const greeting = this.getGreeting(date);
 					if (this.currentTheme !== greeting.theme) {
-						DOM.body.classList.remove("theme-morning", "theme-afternoon", "theme-evening", "theme-night");
+						DOM.body.classList.remove(
+							"theme-morning",
+							"theme-afternoon",
+							"theme-evening",
+							"theme-night",
+						);
 						DOM.body.classList.add(`theme-${greeting.theme}`);
 						this.currentTheme = greeting.theme;
 					}
@@ -706,9 +801,13 @@
 						day: "numeric",
 						timeZone: CONFIG.location.timezone,
 					}).formatToParts(date);
-					const month = Number(parts.find((part) => part.type === "month").value);
+					const month = Number(
+						parts.find((part) => part.type === "month").value,
+					);
 					const day = Number(parts.find((part) => part.type === "day").value);
-					const specialDay = CONFIG.specialDays.find((entry) => entry.month === month && entry.day === day);
+					const specialDay = CONFIG.specialDays.find(
+						(entry) => entry.month === month && entry.day === day,
+					);
 
 					if (!specialDay) {
 						this.activeDay = null;
@@ -743,10 +842,19 @@
 						particle.className = "effect-particle";
 						particle.textContent = effect.symbol;
 						particle.style.left = `${Math.random() * 100}%`;
-						particle.style.setProperty("--size", `${10 + Math.random() * 16}px`);
-						particle.style.setProperty("--duration", `${18 + Math.random() * 18}s`);
+						particle.style.setProperty(
+							"--size",
+							`${10 + Math.random() * 16}px`,
+						);
+						particle.style.setProperty(
+							"--duration",
+							`${18 + Math.random() * 18}s`,
+						);
 						particle.style.setProperty("--delay", `${Math.random() * -28}s`);
-						particle.style.setProperty("--sway", `${-60 + Math.random() * 120}px`);
+						particle.style.setProperty(
+							"--sway",
+							`${-60 + Math.random() * 120}px`,
+						);
 						fragment.appendChild(particle);
 					}
 					DOM.specialEffect.appendChild(fragment);
@@ -763,11 +871,16 @@
 					if (!CONFIG.features.weather || !CONFIG.weather.enabled) return;
 					this.loadCached();
 					this.refresh();
-					setInterval(() => this.refresh(), CONFIG.weather.refreshMinutes * 60 * 1000);
+					setInterval(
+						() => this.refresh(),
+						CONFIG.weather.refreshMinutes * 60 * 1000,
+					);
 				},
 				loadCached() {
 					try {
-						const cached = JSON.parse(localStorage.getItem(CONFIG.weather.cacheKey));
+						const cached = JSON.parse(
+							localStorage.getItem(CONFIG.weather.cacheKey),
+						);
 						if (cached) {
 							this.lastGood = cached;
 							WeatherView.render(cached);
@@ -790,11 +903,15 @@
 						}).toString();
 
 						const response = await fetch(url);
-						if (!response.ok) throw new Error(`Weather request failed: ${response.status}`);
+						if (!response.ok)
+							throw new Error(`Weather request failed: ${response.status}`);
 						const data = await response.json();
 						const interpreted = WeatherInterpreter.fromForecast(data);
 						this.lastGood = interpreted;
-						localStorage.setItem(CONFIG.weather.cacheKey, JSON.stringify(interpreted));
+						localStorage.setItem(
+							CONFIG.weather.cacheKey,
+							JSON.stringify(interpreted),
+						);
 						WeatherView.render(interpreted);
 					} catch (error) {
 						console.warn("Weather refresh failed", error);
@@ -826,45 +943,60 @@
 					const times = data.hourly.time.map((time) => new Date(time));
 					const rainHours = data.hourly.precipitation_probability
 						.map((chance, index) => ({ chance, date: times[index] }))
-						.filter((entry) => entry.date.getHours() >= currentHour && entry.chance >= 55);
+						.filter(
+							(entry) =>
+								entry.date.getHours() >= currentHour && entry.chance >= 55,
+						);
 
 					if (rainHours.length) {
 						const firstRain = rainHours[0].date;
 						if (firstRain.getHours() === currentHour) {
-							const stopping = data.hourly.precipitation_probability.findIndex((chance, index) => {
-								const hour = times[index].getHours();
-								return hour > currentHour && chance < 35;
-							});
-							if (stopping > -1) return `Rain easing around ${this.hourLabel(times[stopping])}`;
+							const stopping = data.hourly.precipitation_probability.findIndex(
+								(chance, index) => {
+									const hour = times[index].getHours();
+									return hour > currentHour && chance < 35;
+								},
+							);
+							if (stopping > -1)
+								return `Rain easing around ${this.hourLabel(times[stopping])}`;
 							return "Rain likely for a while";
 						}
 						return `Rain expected from ${this.hourLabel(firstRain)}`;
 					}
 
-					const afternoonTemps = data.hourly.temperature_2m.filter((temp, index) => {
-						const hour = times[index].getHours();
-						return hour >= 12 && hour <= 17 && temp !== null;
-					});
+					const afternoonTemps = data.hourly.temperature_2m.filter(
+						(temp, index) => {
+							const hour = times[index].getHours();
+							return hour >= 12 && hour <= 17 && temp !== null;
+						},
+					);
 					const afternoonHigh = Math.max(...afternoonTemps);
 
 					if (currentHour < 11 && low <= 5) return "Cold morning";
-					if (currentHour < 13 && afternoonHigh - currentTemp >= 4) return "Warmer this afternoon";
+					if (currentHour < 13 && afternoonHigh - currentTemp >= 4)
+						return "Warmer this afternoon";
 					if (high >= 24) return "Warm day ahead";
 					if (low <= 2) return "Cold overnight";
 					return "Clear for the rest of the day";
 				},
 				hourLabel(date) {
-					return date.toLocaleTimeString("en-GB", {
-						hour: "numeric",
-						hour12: true,
-						timeZone: CONFIG.location.timezone,
-					}).toLowerCase().replace(" ", "");
+					return date
+						.toLocaleTimeString("en-GB", {
+							hour: "numeric",
+							hour12: true,
+							timeZone: CONFIG.location.timezone,
+						})
+						.toLowerCase()
+						.replace(" ", "");
 				},
 				iconForCode(code, isDay) {
 					if ([0, 1].includes(code)) return isDay ? "☀️" : "🌙";
 					if ([2, 3].includes(code)) return "☁️";
 					if ([45, 48].includes(code)) return "🌫️";
-					if ([51, 53, 55, 56, 57, 61, 63, 65, 66, 67, 80, 81, 82].includes(code)) return "🌧️";
+					if (
+						[51, 53, 55, 56, 57, 61, 63, 65, 66, 67, 80, 81, 82].includes(code)
+					)
+						return "🌧️";
 					if ([71, 73, 75, 77, 85, 86].includes(code)) return "❄️";
 					if ([95, 96, 99].includes(code)) return "⛈️";
 					return "☁️";
@@ -884,7 +1016,11 @@
 				index: -1,
 				activeLayer: 0,
 				start() {
-					if (!CONFIG.features.photos || !CONFIG.photos.enabled || !CONFIG.photos.images.length) {
+					if (
+						!CONFIG.features.photos ||
+						!CONFIG.photos.enabled ||
+						!CONFIG.photos.images.length
+					) {
 						DOM.photoStage.hidden = true;
 						return;
 					}
@@ -907,11 +1043,16 @@
 					nextImage.src = src;
 				},
 				maybeFocus() {
-					if (!CONFIG.features.photoFocusMode || !CONFIG.photos.focusEvery) return;
-					const shouldFocus = this.index > 0 && this.index % CONFIG.photos.focusEvery === 0;
+					if (!CONFIG.features.photoFocusMode || !CONFIG.photos.focusEvery)
+						return;
+					const shouldFocus =
+						this.index > 0 && this.index % CONFIG.photos.focusEvery === 0;
 					if (!shouldFocus) return;
 					DOM.mirror.classList.add("photo-focus");
-					setTimeout(() => DOM.mirror.classList.remove("photo-focus"), CONFIG.photos.focusDurationMs);
+					setTimeout(
+						() => DOM.mirror.classList.remove("photo-focus"),
+						CONFIG.photos.focusDurationMs,
+					);
 				},
 			};
 
@@ -920,13 +1061,17 @@
 				start() {
 					if (!CONFIG.features.energy || !CONFIG.energy.enabled) return;
 					this.refresh();
-					setInterval(() => this.refresh(), CONFIG.energy.refreshMinutes * 60 * 1000);
+					setInterval(
+						() => this.refresh(),
+						CONFIG.energy.refreshMinutes * 60 * 1000,
+					);
 				},
 				async refresh() {
 					try {
-						const status = CONFIG.energy.mode === "mock"
-							? this.getMockStatus()
-							: await this.getCurrentStatus();
+						const status =
+							CONFIG.energy.mode === "mock"
+								? this.getMockStatus()
+								: await this.getCurrentStatus();
 						this.lastGood = status;
 						EnergyView.render(status);
 					} catch (error) {
@@ -936,18 +1081,29 @@
 				},
 				async getCurrentStatus() {
 					const response = await fetch(CONFIG.energy.apiUrl);
-					if (!response.ok) throw new Error(`Energy request failed: ${response.status}`);
+					if (!response.ok)
+						throw new Error(`Energy request failed: ${response.status}`);
 					return response.json();
 				},
 				getMockStatus() {
 					const hour = new Date().getHours();
 					const daylight = Math.max(0, Math.sin(((hour - 6) / 13) * Math.PI));
 					const solarGeneration = Number((daylight * 3.4).toFixed(1));
-					const houseConsumption = Number((0.8 + (hour >= 17 && hour <= 21 ? 0.7 : 0.2)).toFixed(1));
+					const houseConsumption = Number(
+						(0.8 + (hour >= 17 && hour <= 21 ? 0.7 : 0.2)).toFixed(1),
+					);
 					const batteryCharging = solarGeneration > houseConsumption + 0.4;
-					const gridExport = batteryCharging ? Number((solarGeneration - houseConsumption - 0.5).toFixed(1)) : 0;
-					const gridImport = solarGeneration < houseConsumption ? Number((houseConsumption - solarGeneration).toFixed(1)) : 0;
-					const batteryPercentage = Math.min(96, Math.max(18, Math.round(58 + daylight * 30 - (hour > 20 ? 12 : 0))));
+					const gridExport = batteryCharging
+						? Number((solarGeneration - houseConsumption - 0.5).toFixed(1))
+						: 0;
+					const gridImport =
+						solarGeneration < houseConsumption
+							? Number((houseConsumption - solarGeneration).toFixed(1))
+							: 0;
+					const batteryPercentage = Math.min(
+						96,
+						Math.max(18, Math.round(58 + daylight * 30 - (hour > 20 ? 12 : 0))),
+					);
 
 					return {
 						solarGeneration,
@@ -961,7 +1117,8 @@
 				describe(status) {
 					if (status.gridExport > 0.2) return "Exporting to grid";
 					if (status.batteryCharging) return "Charging battery";
-					if (status.solarGeneration >= status.houseConsumption * 0.75) return "Running on solar";
+					if (status.solarGeneration >= status.houseConsumption * 0.75)
+						return "Running on solar";
 					if (status.gridImport > 0.2) return "Using grid power";
 					return "House energy steady";
 				},
@@ -973,9 +1130,10 @@
 					DOM.energySolar.textContent = `${status.solarGeneration.toFixed(1)} kW`;
 					DOM.energyBattery.textContent = `${status.batteryPercentage}%`;
 					DOM.energyHouse.textContent = `${status.houseConsumption.toFixed(1)} kW`;
-					DOM.energyGrid.textContent = status.gridExport > 0
-						? `Export ${status.gridExport.toFixed(1)} kW`
-						: `Import ${status.gridImport.toFixed(1)} kW`;
+					DOM.energyGrid.textContent =
+						status.gridExport > 0
+							? `Export ${status.gridExport.toFixed(1)} kW`
+							: `Import ${status.gridImport.toFixed(1)} kW`;
 				},
 			};
 
